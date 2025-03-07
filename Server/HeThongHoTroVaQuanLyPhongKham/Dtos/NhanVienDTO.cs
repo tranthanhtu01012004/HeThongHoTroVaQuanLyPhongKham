@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class NhanVienDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã nhân viên phải là số dương")]
         public int MaNhanVien { get; set; }
 
         [Range(1, int.MaxValue, ErrorMessage = "Mã tài khoản phải là số dương nếu có")]

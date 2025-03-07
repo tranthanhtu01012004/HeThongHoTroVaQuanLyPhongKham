@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class BenhNhanDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã bệnh nhân phải là số dương")]
         public int MaBenhNhan { get; set; }
 
         [Range(0, 150, ErrorMessage = "Tuổi phải từ 0 đến 150")]

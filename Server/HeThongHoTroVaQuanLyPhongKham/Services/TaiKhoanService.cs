@@ -33,7 +33,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         public async Task<IEnumerable<TaiKhoanDTO>> GetAllAsync(int page, int pageSize)
         {
             var pageSkip = CalculatePageSkip(page, pageSize);
-            var taiKhoans = await _taiKhoanRepository.FindAllAsync(page, pageSize, pageSkip);
+            var taiKhoans = await _taiKhoanRepository.FindAllAsync(page, pageSize, pageSkip, "MaTaiKhoan");
             return taiKhoans.Select(t => _taiKhoanMapping.MapEntityToDto(t));
         }
 

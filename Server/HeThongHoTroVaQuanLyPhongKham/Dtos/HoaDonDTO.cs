@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class HoaDonDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã hóa đơn phải là số dương")]
         public int MaHoaDon { get; set; }
 
         [Required(ErrorMessage = "Mã lịch hẹn là bắt buộc")]

@@ -6,7 +6,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
     {
         public class LichHenDTO
         {
-            [Range(1, int.MaxValue, ErrorMessage = "Mã lịch hẹn phải là số dương")]
             public int MaLichHen { get; set; }
 
             [Required(ErrorMessage = "Mã bệnh nhân là bắt buộc")]

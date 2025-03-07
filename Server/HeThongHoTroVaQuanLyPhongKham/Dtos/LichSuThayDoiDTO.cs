@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class LichSuThayDoiDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã lịch sử phải là số dương")]
         public int MaLichSu { get; set; }
 
         [Required(ErrorMessage = "Mã nhân viên là bắt buộc")]

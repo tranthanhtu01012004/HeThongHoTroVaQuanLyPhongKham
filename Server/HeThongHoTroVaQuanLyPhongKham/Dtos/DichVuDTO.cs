@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class DichVuYTeDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã dịch vụ y tế phải là số dương")]
         public int MaDichVuYTe { get; set; }
 
         [Required(ErrorMessage = "Tên dịch vụ là bắt buộc")]

@@ -29,10 +29,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
             _logger.LogInformation($"Đã xóa {typeof(T).Name} thành công.");
         }
 
-        public async Task<IEnumerable<T>> FindAllAsync(int page, int pageSize, int pageSkip)
+        public async Task<IEnumerable<T>> FindAllAsync(int page, int pageSize, int pageSkip, string keyPropertyName)
         {
             var entities = await _context.Set<T>()
-                .OrderBy(e => EF.Property<int>(e, $"Ma{typeof(T).Name}"))
+                .OrderBy(e => EF.Property<int>(e, keyPropertyName))
                 .Skip(pageSkip)
                 .Take(pageSize)
                 .ToListAsync();

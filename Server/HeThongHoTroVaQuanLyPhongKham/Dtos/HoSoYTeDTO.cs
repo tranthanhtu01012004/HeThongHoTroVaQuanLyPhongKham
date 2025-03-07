@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class HoSoYTeDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã hồ sơ y tế phải là số dương")]
         public int MaHoSoYTe { get; set; }
 
         [Required(ErrorMessage = "Mã bệnh nhân là bắt buộc")]

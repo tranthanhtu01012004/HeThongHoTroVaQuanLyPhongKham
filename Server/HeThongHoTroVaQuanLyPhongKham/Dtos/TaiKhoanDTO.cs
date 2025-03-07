@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class TaiKhoanDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã tài khoản phải là số dương")]
         public int MaTaiKhoan { get; set; }
 
         [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]

@@ -4,7 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class VaiTroDTO
     {
-        [Range(1, int.MaxValue, ErrorMessage = "Mã vai trò phải là số dương")]
         public int MaVaiTro { get; set; }
 
         [Required(ErrorMessage = "Tên vai trò là bắt buộc")]

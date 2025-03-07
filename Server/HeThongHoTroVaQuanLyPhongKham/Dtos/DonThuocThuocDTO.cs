@@ -4,8 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class DonThuocThuocDTO
     {
-        [Required(ErrorMessage = "Mã đơn thuốc là bắt buộc")]
-        [Range(1, int.MaxValue, ErrorMessage = "Mã đơn thuốc phải là số dương")]
         public int MaDonThuoc { get; set; }
 
         [Required(ErrorMessage = "Mã thuốc là bắt buộc")]
