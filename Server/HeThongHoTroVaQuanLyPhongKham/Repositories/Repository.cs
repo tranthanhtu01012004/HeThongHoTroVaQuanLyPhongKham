@@ -40,9 +40,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
             return entities;
         }
 
-        public async Task<T> FindByIdAsync(int id)
+        public async Task<T> FindByIdAsync(int id, string keyPropertyName)
         {
-            var entity = await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<int>(e, $"Ma{typeof(T).Name}") == id);
+            var entity = await _context.Set<T>().AsNoTracking().FirstOrDefaultAsync(e => EF.Property<int>(e, keyPropertyName) == id);
             _logger.LogInformation($"Đã tìm thấy {typeof(T).Name} với ID {id}.");
             return entity;
         }
