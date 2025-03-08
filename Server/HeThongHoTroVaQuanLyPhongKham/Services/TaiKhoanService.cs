@@ -2,25 +2,31 @@
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
-using HeThongHoTroVaQuanLyPhongKham.Common;
+using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class TaiKhoanService : BaseService, IService<TaiKhoanDTO>
     {
         private readonly IRepository<TblTaiKhoan> _taiKhoanRepository;
         private readonly IMapper<TaiKhoanDTO, TblTaiKhoan> _taiKhoanMapping;
+        private readonly ITaiKhoanRepository _taiKhoanRepo;
 
-        public TaiKhoanService(IRepository<TblTaiKhoan> taiKhoanRepository, IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping)
+        public TaiKhoanService(IRepository<TblTaiKhoan> taiKhoanRepository, IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepo)
         {
             _taiKhoanRepository = taiKhoanRepository;
             _taiKhoanMapping = taiKhoanMapping;
+            _taiKhoanRepo = taiKhoanRepo;
         }
 
         public async Task<TaiKhoanDTO> AddAsync(TaiKhoanDTO dto)
         {
-            return _taiKhoanMapping.MapEntityToDto(
-                await _taiKhoanRepository.CreateAsync(
-                    _taiKhoanMapping.MapDtoToEntity(dto)));
+            var taiKhoanExisting = await _taiKhoanRepo.FindByNameAsync(dto.TenDangNhap);
+            if (taiKhoanExisting != null && 
+                string.Equals(taiKhoanExisting.TenDangNhap, dto.TenDangNhap, StringComparison.OrdinalIgnoreCase))
+                throw new DuplicateEntityException($"Tài khoản với tên đăng nhập [{dto.TenDangNhap}] đã tồn tại.");
+
+            var taiKhoan = await _taiKhoanRepository.CreateAsync(_taiKhoanMapping.MapDtoToEntity(dto));
+            return _taiKhoanMapping.MapEntityToDto(taiKhoan);
         }
 
         public async Task DeleteAsync(int id)

@@ -2,7 +2,7 @@
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
-using HeThongHoTroVaQuanLyPhongKham.Common;
+using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class AuthService : IAuthService

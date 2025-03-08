@@ -1,4 +1,4 @@
-﻿namespace HeThongHoTroVaQuanLyPhongKham.Common
+﻿namespace HeThongHoTroVaQuanLyPhongKham.Exceptions
 {
     public class NotFoundException : Exception
     {
