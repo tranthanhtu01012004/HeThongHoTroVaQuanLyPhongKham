@@ -28,8 +28,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var phongKhamNhanVien = await _phongKhamNhanVienService.AddAsync(dto);
-                return Ok(ApiResponse<PhongKhamNhanVienDTO>.Success(phongKhamNhanVien, "Thêm dữ liệu cho PhongKhamNhanVien thành công."));
+                return Ok(ApiResponse<PhongKhamNhanVienDTO>.Success(
+                    await _phongKhamNhanVienService.AddAsync(dto), "Thêm dữ liệu cho PhongKhamNhanVien thành công."));
 
             } catch (NotFoundException ex)
             {

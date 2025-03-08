@@ -54,5 +54,21 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
             _logger.LogInformation($"Đã cập nhật {typeof(T).Name} thành công.");
             return entity;
         }
+
+        public IQueryable<T> GetQueryable()
+        {
+            return _context.Set<T>().AsNoTracking();
+        }
+
+        public async Task<IEnumerable<T>> FindAllWithQueryAsync(IQueryable<T> query, int page, int pageSize, int pageSkip, string keyPropertyName)
+        {
+            var entities = await query
+                .OrderBy(e => EF.Property<int>(e, keyPropertyName))
+                .Skip(pageSkip)
+                .Take(pageSize)
+                .ToListAsync();
+            _logger.LogInformation($"Đã lấy danh sách {typeof(T).Name} với truy vấn - trang {page} với {pageSize} bản ghi.");
+            return entities;
+        }
     }
 }

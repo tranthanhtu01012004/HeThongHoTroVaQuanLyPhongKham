@@ -38,7 +38,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -57,16 +57,18 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] ThuocDTO ThuocDTO)
+        public async Task<IActionResult> Create([FromBody] ThuocDTO thuocDto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var nhanVien = await _thuocService.AddAsync(ThuocDTO);
-
-                return Ok(ApiResponse<ThuocDTO>.Success(nhanVien, "Thêm thuốc mới thành công."));
+                return CreatedAtAction(
+                    nameof(GetById), 
+                    new { id = thuocDto.MaThuoc }, 
+                    ApiResponse<ThuocDTO>.Success(
+                        await _thuocService.AddAsync(thuocDto), "Thêm thuốc mới thành công."));
             }
             catch (NotFoundException ex)
             {
@@ -78,7 +80,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] ThuocDTO ThuocDTO)
         {
             try
@@ -101,7 +103,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try
