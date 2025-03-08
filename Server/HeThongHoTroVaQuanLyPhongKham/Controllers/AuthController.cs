@@ -1,5 +1,6 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -75,6 +76,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             catch (NotFoundException ex)
             {
                 return NotFound(ApiResponse<TaiKhoanDTO>.Fail(ex.Message));
+            } catch(DuplicateEntityException ex)
+            {
+                return Conflict(ApiResponse<TaiKhoanDTO>.Fail(ex.Message)); // 409: Tai nguyen dang yeu cau da ton tai, gay xung dot voi trang thai hien tai cua he thong.
             }
             catch (Exception ex)
             {
