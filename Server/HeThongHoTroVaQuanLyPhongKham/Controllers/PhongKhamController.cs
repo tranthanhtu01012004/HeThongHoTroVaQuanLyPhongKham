@@ -66,7 +66,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 
                 var phongKham = await _phongKhamService.AddAsync(PhongKhamDTO);
 
-                return Ok(ApiResponse<PhongKhamDTO>.Success(phongKham, "Đăng ký phòng khám thành công."));
+                return Ok(ApiResponse<PhongKhamDTO>.Success(phongKham, "Thêm phòng khám thành công."));
             }
             catch (NotFoundException ex)
             {

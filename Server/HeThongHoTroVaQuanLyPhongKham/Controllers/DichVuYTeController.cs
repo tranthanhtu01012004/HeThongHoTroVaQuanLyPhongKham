@@ -66,7 +66,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 
                 var nhanVien = await _dichVuYTeService.AddAsync(DichVuYTeDTO);
 
-                return Ok(ApiResponse<DichVuYTeDTO>.Success(nhanVien, "Đăng ký dịch vụ y tế thành công."));
+                return Ok(ApiResponse<DichVuYTeDTO>.Success(nhanVien, "Thêm dịch vụ y tế thành công."));
             }
             catch (NotFoundException ex)
             {
