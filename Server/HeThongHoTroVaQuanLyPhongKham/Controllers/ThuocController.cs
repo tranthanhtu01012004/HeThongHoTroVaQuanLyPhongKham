@@ -8,16 +8,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
-    [Route("api/admin/employees")]
+    [Route("api/admin/medicines")]
     [ApiController]
     [Authorize(Roles = "QuanLy")]
-    public class NhanVienController : ControllerBase
+    public class ThuocController : ControllerBase
     {
-        private readonly IService<NhanVienDTO> _nhanVienService;
+        private readonly IService<ThuocDTO> _thuocService;
 
-        public NhanVienController(IService<NhanVienDTO> nhanVienService)
+        public ThuocController(IService<ThuocDTO> thuocService)
         {
-            _nhanVienService = nhanVienService;
+            _thuocService = thuocService;
         }
 
         [HttpGet]
@@ -25,16 +25,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<NhanVienDTO>>.Success(
-                    await _nhanVienService.GetAllAsync(page, pageSize)));
+                return Ok(ApiResponse<IEnumerable<ThuocDTO>>.Success(
+                    await _thuocService.GetAllAsync(page, pageSize)));
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
         }
 
@@ -43,62 +43,61 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<NhanVienDTO>.Success(
-                    await _nhanVienService.GetByIdAsync(id), $"Tìm thấy nhân viên với ID [{id}]."));
+                return Ok(ApiResponse<ThuocDTO>.Success(
+                    await _thuocService.GetByIdAsync(id), $"Tìm thấy thuốc với ID [{id}]."));
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] NhanVienDTO NhanVienDTO)
+        public async Task<IActionResult> Create([FromBody] ThuocDTO ThuocDTO)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var nhanVien = await _nhanVienService.AddAsync(NhanVienDTO);
+                var nhanVien = await _thuocService.AddAsync(ThuocDTO);
 
-                return Ok(ApiResponse<NhanVienDTO>.Success(nhanVien, "Thêm nhân viên thành công."));
+                return Ok(ApiResponse<ThuocDTO>.Success(nhanVien, "Thêm thuốc mới thành công."));
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] NhanVienDTO NhanVienDTO)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] ThuocDTO ThuocDTO)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
-
-                if (id != NhanVienDTO.MaNhanVien)
+                if (id != ThuocDTO.MaThuoc)
                     return BadRequest("Id không khớp");
 
-                return Ok(ApiResponse<NhanVienDTO>.Success(
-                    await _nhanVienService.UpdateAsync(NhanVienDTO), $"Cập nhật nhân viên với ID [{id}] thành công."));
+                return Ok(ApiResponse<ThuocDTO>.Success(
+                    await _thuocService.UpdateAsync(ThuocDTO), $"Cập nhật dịch vụ y tế với ID [{id}] thành công."));
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
         }
 
@@ -107,16 +106,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                await _nhanVienService.DeleteAsync(id);
+                await _thuocService.DeleteAsync(id);
                 return NoContent();
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<ThuocDTO>.Fail(ex.Message));
             }
         }
     }
