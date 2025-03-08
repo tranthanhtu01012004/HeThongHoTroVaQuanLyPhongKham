@@ -2,8 +2,8 @@
 {
     public interface IMapper<TSource, TDestination>
     {
-        TSource MapEntityToDto(TDestination dto);
-        TDestination MapDtoToEntity(TSource entity);
+        TSource MapEntityToDto(TDestination entity);
+        TDestination MapDtoToEntity(TSource dto);
         void MapDtoToEntity(TSource dto, TDestination entity);
     }
 }
