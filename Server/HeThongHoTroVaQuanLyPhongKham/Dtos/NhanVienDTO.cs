@@ -21,5 +21,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [StringLength(100, ErrorMessage = "Email không được vượt quá 100 ký tự")]
         [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
         public string? Email { get; set; }
+
+        [StringLength(50, MinimumLength = 3, ErrorMessage = "Ca làm việc phải từ 3 đến 50 ký tự")]
+        public string? CaLamViec { get; set; }
+
+        [Required(ErrorMessage = "Chuyên môn là bắt buộc")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Chuyên môn phải từ 3 đến 100 ký tự")]
+        public string ChuyenMon { get; set; } = null!;
     }
 }

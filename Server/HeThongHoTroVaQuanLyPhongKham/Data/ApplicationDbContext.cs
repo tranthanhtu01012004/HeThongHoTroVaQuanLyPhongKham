@@ -34,8 +34,6 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<TblNhanVien> TblNhanViens { get; set; }
 
-    public virtual DbSet<TblNhanVienVaiTro> TblNhanVienVaiTros { get; set; }
-
     public virtual DbSet<TblPhongKham> TblPhongKhams { get; set; }
 
     public virtual DbSet<TblPhongKhamNhanVien> TblPhongKhamNhanViens { get; set; }
@@ -47,8 +45,7 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<TblVaiTro> TblVaiTros { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=DESKTOP-4QE7N69\\SQLEXPRESS;Database=HeThongQuanLyPhongKham_Db;Trusted_Connection=True;TrustServerCertificate=True;");
+        => optionsBuilder.UseSqlServer("Name=DbConnection");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -237,6 +234,12 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.SoDienThoai, "uq_tbl_nhan_vien_soDienThoai").IsUnique();
 
             entity.Property(e => e.MaNhanVien).HasColumnName("maNhanVien");
+            entity.Property(e => e.CaLamViec)
+                .HasMaxLength(50)
+                .HasColumnName("caLamViec");
+            entity.Property(e => e.ChuyenMon)
+                .HasMaxLength(100)
+                .HasColumnName("chuyenMon");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -254,30 +257,6 @@ public partial class ApplicationDbContext : DbContext
                 .HasForeignKey(d => d.MaTaiKhoan)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tbl_nhan_vien_tai_khoan");
-        });
-
-        modelBuilder.Entity<TblNhanVienVaiTro>(entity =>
-        {
-            entity.HasKey(e => new { e.MaNhanVien, e.MaVaiTro }).HasName("pk_tbl_nhan_vien_vai_tro");
-
-            entity.ToTable("tbl_nhan_vien_vai_tro");
-
-            entity.Property(e => e.MaNhanVien).HasColumnName("maNhanVien");
-            entity.Property(e => e.MaVaiTro).HasColumnName("maVaiTro");
-            entity.Property(e => e.CaLamViec)
-                .HasMaxLength(50)
-                .HasColumnName("caLamViec");
-            entity.Property(e => e.ChuyenMon)
-                .HasMaxLength(100)
-                .HasColumnName("chuyenMon");
-
-            entity.HasOne(d => d.MaNhanVienNavigation).WithMany(p => p.TblNhanVienVaiTros)
-                .HasForeignKey(d => d.MaNhanVien)
-                .HasConstraintName("fk_tbl_nhan_vien_vai_tro_nhan_vien");
-
-            entity.HasOne(d => d.MaVaiTroNavigation).WithMany(p => p.TblNhanVienVaiTros)
-                .HasForeignKey(d => d.MaVaiTro)
-                .HasConstraintName("fk_tbl_nhan_vien_vai_tro_vai_tro");
         });
 
         modelBuilder.Entity<TblPhongKham>(entity =>
@@ -323,6 +302,7 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.TenDangNhap, "uq_tbl_tai_khoan_tenDangNhap").IsUnique();
 
             entity.Property(e => e.MaTaiKhoan).HasColumnName("maTaiKhoan");
+            entity.Property(e => e.MaVaiTro).HasColumnName("maVaiTro");
             entity.Property(e => e.MatKhau)
                 .HasMaxLength(255)
                 .IsUnicode(false)
@@ -331,6 +311,10 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("tenDangNhap");
+
+            entity.HasOne(d => d.MaVaiTroNavigation).WithMany(p => p.TblTaiKhoans)
+                .HasForeignKey(d => d.MaVaiTro)
+                .HasConstraintName("fk_tbl_tai_khoan_vai_tro");
         });
 
         modelBuilder.Entity<TblThuoc>(entity =>

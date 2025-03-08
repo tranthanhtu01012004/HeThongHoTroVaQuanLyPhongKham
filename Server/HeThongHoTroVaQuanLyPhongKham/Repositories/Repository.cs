@@ -5,8 +5,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<T> _logger;
+        protected readonly ApplicationDbContext _context;
+        protected readonly ILogger<T> _logger;
 
         public Repository(ApplicationDbContext context, ILogger<T> logger)
         {

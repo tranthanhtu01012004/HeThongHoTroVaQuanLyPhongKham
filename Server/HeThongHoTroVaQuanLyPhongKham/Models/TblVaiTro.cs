@@ -9,5 +9,5 @@ public partial class TblVaiTro
 
     public string Ten { get; set; } = null!;
 
-    public virtual ICollection<TblNhanVienVaiTro> TblNhanVienVaiTros { get; set; } = new List<TblNhanVienVaiTro>();
+    public virtual ICollection<TblTaiKhoan> TblTaiKhoans { get; set; } = new List<TblTaiKhoan>();
 }

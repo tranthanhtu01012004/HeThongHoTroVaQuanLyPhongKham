@@ -15,13 +15,15 @@ public partial class TblNhanVien
 
     public string? Email { get; set; }
 
+    public string? CaLamViec { get; set; }
+
+    public string ChuyenMon { get; set; } = null!;
+
     public virtual TblTaiKhoan? MaTaiKhoanNavigation { get; set; }
 
     public virtual ICollection<TblLichHen> TblLichHens { get; set; } = new List<TblLichHen>();
 
     public virtual ICollection<TblLichSuThayDoi> TblLichSuThayDois { get; set; } = new List<TblLichSuThayDoi>();
-
-    public virtual ICollection<TblNhanVienVaiTro> TblNhanVienVaiTros { get; set; } = new List<TblNhanVienVaiTro>();
 
     public virtual ICollection<TblPhongKhamNhanVien> TblPhongKhamNhanViens { get; set; } = new List<TblPhongKhamNhanVien>();
 }

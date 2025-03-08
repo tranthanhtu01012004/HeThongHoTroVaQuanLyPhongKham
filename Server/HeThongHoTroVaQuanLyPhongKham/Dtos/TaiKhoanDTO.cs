@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using HeThongHoTroVaQuanLyPhongKham.Models;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
@@ -16,5 +17,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [DataType(DataType.Password)]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d).+$", ErrorMessage = "Mật khẩu phải chứa ít nhất một chữ cái và một số")]
         public string MatKhau { get; set; } = null!;
+
     }
 }

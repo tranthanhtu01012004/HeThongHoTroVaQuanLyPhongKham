@@ -1,6 +1,7 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,6 +9,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
     [Route("api/admin/accounts")]
     [ApiController]
+    [Authorize(Roles = "QuanLy")]
     public class TaiKhoanController : ControllerBase
     {
         private readonly IService<TaiKhoanDTO> _taiKhoanService;
@@ -49,28 +51,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpPost]
-        public async Task<IActionResult> Create([FromBody] TaiKhoanDTO taiKhoanDTO)
-        {
-            try
-            {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var taiKhoan = await _taiKhoanService.AddAsync(taiKhoanDTO);
-
-                return CreatedAtAction(
-                    nameof(GetById), new { id = taiKhoan.MaTaiKhoan }, 
-                    ApiResponse<TaiKhoanDTO>.Success(taiKhoan, "Thêm tài khoản thành công."));
-            } catch (NotFoundException ex)
-            {
-                return NotFound(ApiResponse<TaiKhoanDTO>.Fail(ex.Message));
-            } catch (Exception ex)
-            {
-                return BadRequest(ApiResponse<TaiKhoanDTO>.Fail(ex.Message));
-            }
-        }
-
         [HttpPut("{id}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] TaiKhoanDTO taiKhoanDTO)
         {
@@ -83,7 +63,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                     return BadRequest("Id không khớp");
 
                 return Ok(ApiResponse<TaiKhoanDTO>.Success(
-                    await _taiKhoanService.UpdateAsync(taiKhoanDTO), "Cập nhật tài khoản với ID [{id}] thành công."));
+                    await _taiKhoanService.UpdateAsync(taiKhoanDTO), $"Cập nhật tài khoản với ID [{id}] thành công."));
             } catch (NotFoundException ex)
             {
                 return NotFound(ApiResponse<TaiKhoanDTO>.Fail(ex.Message));
