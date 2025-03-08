@@ -2,7 +2,7 @@
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
-using HeThongHoTroVaQuanLyPhongKham.Common;
+using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class NhanVienService : BaseService, IService<NhanVienDTO>
@@ -33,8 +33,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         public async Task<IEnumerable<NhanVienDTO>> GetAllAsync(int page, int pageSize)
         {
             var pageSkip = CalculatePageSkip(page, pageSize);
-            var taiKhoans = await _nhanVienRepository.FindAllAsync(page, pageSize, pageSkip, "MaNhanVien");
-            return taiKhoans.Select(t => _nhanVienMapping.MapEntityToDto(t));
+            var nhanViens = await _nhanVienRepository.FindAllAsync(page, pageSize, pageSkip, "MaNhanVien");
+            return nhanViens.Select(t => _nhanVienMapping.MapEntityToDto(t));
         }
 
         public async Task<NhanVienDTO> GetByIdAsync(int id)
@@ -48,13 +48,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task<NhanVienDTO> UpdateAsync(NhanVienDTO dto)
         {
-            var taiKhoanUpdate = _nhanVienMapping.MapDtoToEntity(
+            var nhanVienUpdate = _nhanVienMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaNhanVien));
 
-            _nhanVienMapping.MapDtoToEntity(dto, taiKhoanUpdate);
+            _nhanVienMapping.MapDtoToEntity(dto, nhanVienUpdate);
 
             return _nhanVienMapping.MapEntityToDto(
-                await _nhanVienRepository.UpdateAsync(taiKhoanUpdate));
+                await _nhanVienRepository.UpdateAsync(nhanVienUpdate));
         }
     }
 }

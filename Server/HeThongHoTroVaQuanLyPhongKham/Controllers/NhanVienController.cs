@@ -1,13 +1,16 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
-    [Route("api/employees")]
+    [Route("api/admin/employees")]
     [ApiController]
+    [Authorize(Roles = "QuanLy")]
     public class NhanVienController : ControllerBase
     {
         private readonly IService<NhanVienDTO> _nhanVienService;
@@ -61,9 +64,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var taiKhoan = await _nhanVienService.AddAsync(NhanVienDTO);
+                var nhanVien = await _nhanVienService.AddAsync(NhanVienDTO);
 
-                return Ok(ApiResponse<NhanVienDTO>.Success(taiKhoan, "Đăng ký nhân viên thành công."));
+                return Ok(ApiResponse<NhanVienDTO>.Success(nhanVien, "Đăng ký nhân viên thành công."));
             }
             catch (NotFoundException ex)
             {
@@ -83,7 +86,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                if (id != NhanVienDTO.MaTaiKhoan)
+                if (id != NhanVienDTO.MaNhanVien)
                     return BadRequest("Id không khớp");
 
                 return Ok(ApiResponse<NhanVienDTO>.Success(
