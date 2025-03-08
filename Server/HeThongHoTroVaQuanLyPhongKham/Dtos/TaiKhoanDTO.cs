@@ -7,6 +7,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
     {
         public int MaTaiKhoan { get; set; }
 
+        [Range(1, int.MaxValue, ErrorMessage = "Mã vai trò phải là số dương nếu có")]
+        public int? MaVaiTro { get; set; }
+
         [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Tên đăng nhập phải từ 3 đến 50 ký tự")]
         [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới")]

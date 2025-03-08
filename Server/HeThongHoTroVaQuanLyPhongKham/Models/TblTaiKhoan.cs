@@ -7,7 +7,7 @@ public partial class TblTaiKhoan
 {
     public int MaTaiKhoan { get; set; }
 
-    public int MaVaiTro { get; set; }
+    public int? MaVaiTro { get; set; }
 
     public string TenDangNhap { get; set; } = null!;
 

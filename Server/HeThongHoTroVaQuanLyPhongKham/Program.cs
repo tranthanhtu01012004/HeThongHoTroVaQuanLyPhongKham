@@ -61,6 +61,7 @@ builder.Services.AddSwaggerGen();
 // Dependency Injection
 // Mapping
 builder.Services.AddScoped<IMapper<TaiKhoanDTO, TblTaiKhoan>, TaiKhoanMapper>();
+builder.Services.AddScoped<IMapper<NhanVienDTO, TblNhanVien>, NhanVienMapper>();
 
 // Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -70,6 +71,7 @@ builder.Services.AddScoped<ITaiKhoanRepository, TaiKhoanRepository>();
 builder.Services.AddScoped<IService<TaiKhoanDTO>, TaiKhoanService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IService<NhanVienDTO>, NhanVienService>();
 
 // Cấu hình JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
