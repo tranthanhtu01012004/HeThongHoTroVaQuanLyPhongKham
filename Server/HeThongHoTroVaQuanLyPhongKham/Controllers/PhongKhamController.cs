@@ -10,7 +10,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
     [Route("api/admin/clinics")]
     [ApiController]
-    [Authorize("QuanLy")]
+    [Authorize(Roles = "QuanLy")]
     public class PhongKhamController : ControllerBase
     {
         private readonly IService<PhongKhamDTO> _phongKhamService;

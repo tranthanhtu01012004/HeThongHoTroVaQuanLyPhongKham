@@ -37,13 +37,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Login([FromBody] TaiKhoanDTO taiKhoanDTO)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             try
             {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
                 var loginResponse = await _authService.Login(taiKhoanDTO);
                 return Ok(loginResponse);
             }
