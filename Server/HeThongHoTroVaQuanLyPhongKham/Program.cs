@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using HeThongHoTroVaQuanLyPhongKham.Data;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
@@ -32,6 +33,7 @@ builder.Services.AddScoped<IMapper<PhongKhamDTO,TblPhongKham>, PhongKhamMapper>(
 builder.Services.AddScoped<IMapper<PhongKhamNhanVienDTO, TblPhongKhamNhanVien>, PhongKhamNhanVienMapper>();
 builder.Services.AddScoped<IMapper<DichVuYTeDTO, TblDichVuYTe>, DichVuYTeMapper>();
 builder.Services.AddScoped<IMapper<ThuocDTO, TblThuoc>, ThuocMapper>();
+builder.Services.AddScoped<IMapper<LichHenDTO, TblLichHen>, LichHenMapper>();
 
 // Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -46,6 +48,7 @@ builder.Services.AddScoped<IService<PhongKhamDTO>, PhongKhamService>();
 builder.Services.AddScoped<IService<PhongKhamNhanVienDTO>, PhongKhamNhanVienService>();
 builder.Services.AddScoped<IService<DichVuYTeDTO>, DichVuYTeService>();
 builder.Services.AddScoped<IService<ThuocDTO>, ThuocService>();
+builder.Services.AddScoped<ILichHenService, LichHenService>();
 
 // Cấu hình JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

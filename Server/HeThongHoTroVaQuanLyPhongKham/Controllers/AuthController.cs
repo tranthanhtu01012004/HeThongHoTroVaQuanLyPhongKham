@@ -67,9 +67,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                var taiKhoan = await _taiKhoanService.AddAsync(taiKhoanDTO);
-
-                return Ok(ApiResponse<TaiKhoanDTO>.Success(taiKhoan, "Đăng ký tài khoản thành công."));
+                return Ok(ApiResponse<TaiKhoanDTO>.Success(
+                    await _taiKhoanService.AddAsync(taiKhoanDTO), "Đăng ký tài khoản thành công."));
             }
             catch (NotFoundException ex)
             {

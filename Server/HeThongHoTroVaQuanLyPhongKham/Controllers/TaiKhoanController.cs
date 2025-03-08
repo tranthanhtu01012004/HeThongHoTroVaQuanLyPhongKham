@@ -36,7 +36,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -52,7 +52,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id:int}")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] TaiKhoanDTO taiKhoanDTO)
         {
             try
@@ -74,7 +74,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:int}")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try
