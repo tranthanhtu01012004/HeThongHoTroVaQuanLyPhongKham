@@ -5,7 +5,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public interface IHoaDonService : IService<HoaDonDTO>
     {
-        Task<HoaDonDTO> UpdateTrangThaiAsync(int maHoaDon, HoaDonUpdateDTO dto);
-        Task<HoaDonDTO> UpdateTongTienAsync(int maHoaDon, HoaDonUpdateDTO dto);
+        Task<HoaDonDTO> UpdateTrangThaiAsync(HoaDonUpdateDTO dto);
+        Task<HoaDonDTO> UpdateTongTienAsync(HoaDonUpdateDTO dto);
     }
 }

@@ -11,6 +11,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             int? maNhanVien = null,
             int? maPhong = null
         );
-        Task<LichHenDTO> UpdateTrangThaiAsync(int maLichHen, LichHenUpdateDTO dto);
+        Task<LichHenDTO> UpdateTrangThaiAsync(LichHenUpdateDTO dto);
     }
 }

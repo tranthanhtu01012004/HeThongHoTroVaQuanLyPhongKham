@@ -54,7 +54,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                     return BadRequest("Id không khớp");
 
                 return Ok(ApiResponse<LichHenDTO>.Success(
-                    await _lichHenService.UpdateTrangThaiAsync(id, dto), $"Cập nhật lịch hẹn với mã lịch hẹn [{id}] - trạng thái [{dto.TrangThai}] thành công"));
+                    await _lichHenService.UpdateTrangThaiAsync(dto), $"Cập nhật lịch hẹn với mã lịch hẹn [{id}] - trạng thái [{dto.TrangThai}] thành công"));
             }
             catch (NotFoundException ex)
             {

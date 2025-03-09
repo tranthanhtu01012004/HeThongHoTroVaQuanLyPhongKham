@@ -59,23 +59,28 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 await _hoaDonRepository.UpdateAsync(hoaDonUpdate));
         }
 
-        public async Task<HoaDonDTO> UpdateTongTienAsync(int maHoaDon, HoaDonUpdateDTO dto)
+        public async Task<HoaDonDTO> UpdateTongTienAsync(HoaDonUpdateDTO dto)
         {
-            var hoaDon = await GetByIdAsync(maHoaDon);
+            var hoaDon = await GetByIdAsync(dto.MaHoaDon);
 
-            hoaDon.TongTien = dto.TongTien;
+            if (dto.TongTien is null)
+                throw new NotFoundException($"Hóa đơn với ID [{dto.MaHoaDon}] không có giá trị tổng tiền.");
+
+            hoaDon.TongTien = (decimal) dto.TongTien;
 
             return _hoaDonMapping.MapEntityToDto(
                 await _hoaDonRepository.UpdateAsync(
                     _hoaDonMapping.MapDtoToEntity(hoaDon)));
         }
 
-        public async Task<HoaDonDTO> UpdateTrangThaiAsync(int maHoaDon, HoaDonUpdateDTO dto)
+        public async Task<HoaDonDTO> UpdateTrangThaiAsync(HoaDonUpdateDTO dto)
         {
-            var hoaDon = await GetByIdAsync(maHoaDon);
+            var hoaDon = await GetByIdAsync(dto.MaHoaDon);
             
-            if (dto.TrangThaiThanhToan != null)
-                hoaDon.TrangThaiThanhToan = dto.TrangThaiThanhToan;
+            if (dto.TrangThaiThanhToan is null)
+                throw new NotFoundException($"Hóa đơn với ID [{dto.MaHoaDon}] không có giá trị trạng thái thanh toán.");
+
+            hoaDon.TrangThaiThanhToan = dto.TrangThaiThanhToan;
 
             return _hoaDonMapping.MapEntityToDto(
                 await _hoaDonRepository.UpdateAsync(
