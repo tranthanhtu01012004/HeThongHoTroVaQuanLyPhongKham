@@ -14,9 +14,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [Range(0, 9999999999.99, ErrorMessage = "Tổng tiền phải từ 0 đến 9,999,999,999.99")]
         public decimal TongTien { get; set; }
 
-        [Required(ErrorMessage = "Ngày thanh toán là bắt buộc")]
         [DataType(DataType.DateTime, ErrorMessage = "Ngày thanh toán không đúng định dạng")]
-        public DateTime NgayThanhToan { get; set; }
+        public DateTime? NgayThanhToan { get; set; }
 
         [Required(ErrorMessage = "Trạng thái thanh toán là bắt buộc")]
         [StringLength(50, MinimumLength = 1, ErrorMessage = "Trạng thái thanh toán phải từ 1 đến 50 ký tự")]

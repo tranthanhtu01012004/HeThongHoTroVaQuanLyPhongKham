@@ -3,7 +3,6 @@ using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 
@@ -11,7 +10,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
     [Route("api/admin/medical-records")]
     [ApiController]
-    [Authorize(Roles = "QuanLy")]
     public class HoSoYTeController : ControllerBase
     {
         private readonly IHoSoYTeService _hoSoYTeService;
@@ -22,6 +20,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
@@ -40,6 +39,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh,KhachHang")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -58,6 +58,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "QuanLy,BacSi,TroLyBacSy")]
         public async Task<IActionResult> Create([FromBody] HoSoYTeDTO dto)
         {
             try
@@ -82,6 +83,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi,TroLyBacSy")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] HoSoYTeDTO dto)
         {
             try
@@ -105,6 +107,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPatch("{id:int}/diagnosis")]
+        [Authorize(Roles = "QuanLy,BacSi,TroLyBacSy")]
         public async Task<IActionResult> UpdateChuanDoan([FromRoute] int id, [FromBody] HoSoYTeUpdateDTO dto)
         {
             try
@@ -128,6 +131,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPatch("{id:int}/treatment-method")]
+        [Authorize(Roles = "QuanLy,BacSi,TroLyBacSy")]
         public async Task<IActionResult> UpdatePhuongPhapDieuTri([FromRoute] int id, [FromBody] HoSoYTeUpdateDTO dto)
         {
             try
@@ -151,6 +155,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi,TroLyBacSy")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try

@@ -44,7 +44,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Đã xảy ra lỗi trong quá trình đăng nhập." });
+                return StatusCode(500, new { Message = ex.Message });
             }
         }
 

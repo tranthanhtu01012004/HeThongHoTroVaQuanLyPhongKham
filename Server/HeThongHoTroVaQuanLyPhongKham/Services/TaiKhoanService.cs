@@ -29,6 +29,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 throw new DuplicateEntityException($"Tài khoản với tên đăng nhập [{dto.TenDangNhap}] đã tồn tại.");
 
             var taiKhoanEntity = _taiKhoanMapping.MapDtoToEntity(dto);
+
+            taiKhoanEntity.MaVaiTro = dto.TenDangNhap.ToLower().Equals("admin") ? 1 : null;
             taiKhoanEntity.MatKhau = _passwordHasher.HashPassword(dto.MatKhau);
 
             return _taiKhoanMapping.MapEntityToDto(
@@ -64,6 +66,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 await GetByIdAsync(dto.MaTaiKhoan));
 
             _taiKhoanMapping.MapDtoToEntity(dto, taiKhoanUpdate);
+            taiKhoanUpdate.MatKhau = _passwordHasher.HashPassword(dto.MatKhau);
 
             return _taiKhoanMapping.MapEntityToDto(
                 await _taiKhoanRepository.UpdateAsync(taiKhoanUpdate));

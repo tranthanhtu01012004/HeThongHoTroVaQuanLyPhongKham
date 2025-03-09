@@ -11,7 +11,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             {
                 MaTaiKhoan = dto.MaTaiKhoan,
                 TenDangNhap = dto.TenDangNhap,
-                MatKhau = dto.MatKhau
+                MatKhau = dto.MatKhau,
+                MaVaiTro = dto.MaVaiTro
             };
         }
 
@@ -19,6 +20,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
         {
             entity.MaTaiKhoan = dto.MaTaiKhoan;
             entity.TenDangNhap = dto.TenDangNhap;
+            entity.MaVaiTro = dto.MaVaiTro;
             entity.MatKhau = dto.MatKhau;
         }
 
@@ -28,7 +30,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             {
                 MaTaiKhoan = entity.MaTaiKhoan,
                 TenDangNhap = entity.TenDangNhap,
-                MatKhau = entity.MatKhau
+                MatKhau = entity.MatKhau,
+                MaVaiTro = entity.MaVaiTro
             };
         }
     }

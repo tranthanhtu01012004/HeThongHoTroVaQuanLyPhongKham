@@ -35,18 +35,18 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         {
             var taiKhoan = await _taiKhoanRepository.FindByNameAsync(taiKhoanDTO.TenDangNhap);
             if (taiKhoan == null)
-                throw new NotFoundException($"Không tìm thấy tài khoản với tên đăng nhập {taiKhoanDTO.TenDangNhap}");
+                throw new NotFoundException($"Tài khoản với tên đăng nhập {taiKhoanDTO.TenDangNhap} không tồn tại");
 
             if (!_passwordHasher.VerifyPassword(taiKhoanDTO.MatKhau, taiKhoan.MatKhau))
                 throw new UnauthorizedException("Mật khẩu không đúng");
 
             var token = _jwtService.GenerateToken(taiKhoan);
-            var roles = new List<string> { taiKhoan.MaVaiTroNavigation?.Ten ?? "" };
+            var role = taiKhoan.MaVaiTroNavigation?.Ten ?? string.Empty;
 
             return new LoginResponse
             {
                 Token = token,
-                Roles = roles
+                Role = role
             };
         }
     }
