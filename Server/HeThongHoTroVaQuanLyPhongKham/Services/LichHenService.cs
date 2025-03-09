@@ -82,9 +82,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 await _lichHenRepository.UpdateAsync(lichHenUpdate));
         }
 
-        public async Task<LichHenDTO> UpdateTrangThaiAsync(int maLichHen, LichHenUpdateDTO dto)
+        public async Task<LichHenDTO> UpdateTrangThaiAsync(LichHenUpdateDTO dto)
         {
-            var lichHen = await GetByIdAsync(maLichHen);
+            var lichHen = await GetByIdAsync(dto.MaLichHen);
 
             lichHen.TrangThai = dto.TrangThai;
 

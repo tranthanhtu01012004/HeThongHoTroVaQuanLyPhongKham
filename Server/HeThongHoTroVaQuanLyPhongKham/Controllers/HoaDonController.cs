@@ -116,7 +116,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                     return BadRequest("Id không khớp");
 
                 return Ok(ApiResponse<HoaDonDTO>.Success(
-                    await _hoaDonService.UpdateTrangThaiAsync(id, hoaDonDTO), $"Cập nhật hóa đơn với mã hóa đơn [{id}] - trạng thái [{hoaDonDTO.TrangThaiThanhToan}] thành công"));
+                    await _hoaDonService.UpdateTrangThaiAsync(hoaDonDTO), $"Cập nhật hóa đơn với mã hóa đơn [{id}] - trạng thái [{hoaDonDTO.TrangThaiThanhToan}] thành công"));
             }
             catch (NotFoundException ex)
             {
@@ -140,7 +140,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                     return BadRequest("Id không khớp");
 
                 return Ok(ApiResponse<HoaDonDTO>.Success(
-                    await _hoaDonService.UpdateTongTienAsync(id, hoaDonDTO), $"Cập nhật hóa đơn với mã hóa đơn [{id}] - tổng tiền [{hoaDonDTO.TongTien}] thành công"));
+                    await _hoaDonService.UpdateTongTienAsync(hoaDonDTO), $"Cập nhật hóa đơn với mã hóa đơn [{id}] - tổng tiền [{hoaDonDTO.TongTien}] thành công"));
             }
             catch (NotFoundException ex)
             {
