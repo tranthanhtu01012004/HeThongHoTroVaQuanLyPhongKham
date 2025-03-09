@@ -1,4 +1,5 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
@@ -10,6 +11,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             int? maNhanVien = null,
             int? maPhong = null
         );
-        Task<LichHenDTO> UpdateTrangThaiAsync(int maLichHen, string trangThai);
+        Task<LichHenDTO> UpdateTrangThaiAsync(int maLichHen, LichHenUpdateDTO dto);
     }
 }

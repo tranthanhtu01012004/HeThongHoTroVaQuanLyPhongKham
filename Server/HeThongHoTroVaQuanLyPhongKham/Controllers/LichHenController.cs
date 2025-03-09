@@ -1,6 +1,7 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -43,15 +44,17 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPatch("{id:int}/status")]
-        public async Task<IActionResult> UpdateTrangThai([FromRoute] int id, [FromBody] string trangThai)
+        public async Task<IActionResult> UpdateTrangThai([FromRoute] int id, [FromBody] LichHenUpdateDTO dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
+                if (id != dto.MaLichHen)
+                    return BadRequest("Id không khớp");
 
                 return Ok(ApiResponse<LichHenDTO>.Success(
-                    await _lichHenService.UpdateTrangThaiAsync(id, trangThai), $"Cập nhật lịch hẹn với mã lịch hẹn [{id}] thành công"));
+                    await _lichHenService.UpdateTrangThaiAsync(id, dto), $"Cập nhật lịch hẹn với mã lịch hẹn [{id}] - trạng thái [{dto.TrangThai}] thành công"));
             }
             catch (NotFoundException ex)
             {

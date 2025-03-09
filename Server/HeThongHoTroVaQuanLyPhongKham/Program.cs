@@ -34,6 +34,7 @@ builder.Services.AddScoped<IMapper<PhongKhamNhanVienDTO, TblPhongKhamNhanVien>, 
 builder.Services.AddScoped<IMapper<DichVuYTeDTO, TblDichVuYTe>, DichVuYTeMapper>();
 builder.Services.AddScoped<IMapper<ThuocDTO, TblThuoc>, ThuocMapper>();
 builder.Services.AddScoped<IMapper<LichHenDTO, TblLichHen>, LichHenMapper>();
+builder.Services.AddScoped<IMapper<HoaDonDTO, TblHoaDon>, HoaDonMapper>();
 
 // Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -49,6 +50,7 @@ builder.Services.AddScoped<IService<PhongKhamNhanVienDTO>, PhongKhamNhanVienServ
 builder.Services.AddScoped<IService<DichVuYTeDTO>, DichVuYTeService>();
 builder.Services.AddScoped<IService<ThuocDTO>, ThuocService>();
 builder.Services.AddScoped<ILichHenService, LichHenService>();
+builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 
 // Cấu hình JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
