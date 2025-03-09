@@ -5,14 +5,12 @@ using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
     [Route("api/admin/appointments")]
     [ApiController]
-    [Authorize(Roles = "QuanLy")]
     public class LichHenController : ControllerBase
     {
         private readonly ILichHenService _lichHenService;
@@ -23,6 +21,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,LeTan,NhanVienHanhChinh")]
         public async Task<IActionResult> GetAll(
             [FromQuery] int page = 1, [FromQuery] int pageSize = 10,
             [FromQuery] DateTime? ngayHen = null,
@@ -44,6 +43,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPatch("{id:int}/status")]
+        [Authorize(Roles = "QuanLy,BacSi,LeTan,NhanVienHanhChinh")]
         public async Task<IActionResult> UpdateTrangThai([FromRoute] int id, [FromBody] LichHenUpdateDTO dto)
         {
             try
@@ -67,6 +67,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,LeTan,NhanVienHanhChinh,KhachHang")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -84,6 +85,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "KhachHang,LeTan,NhanVienHanhChinh,QuanLy,BacSi")]
         public async Task<IActionResult> Create([FromBody] LichHenDTO dto)
         {
             try
@@ -108,6 +110,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi,LeTan,NhanVienHanhChinh")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] LichHenDTO dto)
         {
             try
@@ -132,6 +135,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try

@@ -3,6 +3,6 @@
     public class LoginResponse
     {
         public string Token { get; set; } = null!;
-        public IEnumerable<string> Roles { get; set; } = Enumerable.Empty<string>();
+        public string Role { get; set; } = string.Empty;
     }
 }

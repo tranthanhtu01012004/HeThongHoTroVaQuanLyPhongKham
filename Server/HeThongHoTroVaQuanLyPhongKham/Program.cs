@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using HeThongHoTroVaQuanLydonThuoc.Services;
 using HeThongHoTroVaQuanLyPhongKham.Data;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
@@ -38,6 +39,7 @@ builder.Services.AddScoped<IMapper<ThuocDTO, TblThuoc>, ThuocMapper>();
 builder.Services.AddScoped<IMapper<LichHenDTO, TblLichHen>, LichHenMapper>();
 builder.Services.AddScoped<IMapper<HoaDonDTO, TblHoaDon>, HoaDonMapper>();
 builder.Services.AddScoped<IMapper<HoSoYTeDTO, TblHoSoYTe>, HoSoYTeMapper>();
+builder.Services.AddScoped<IMapper<DonThuocDTO, TblDonThuoc>, DonThuocMapper>();
 
 // Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -55,6 +57,7 @@ builder.Services.AddScoped<IService<ThuocDTO>, ThuocService>();
 builder.Services.AddScoped<ILichHenService, LichHenService>();
 builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 builder.Services.AddScoped<IHoSoYTeService, HoSoYTeService>();
+builder.Services.AddScoped<IDonThuocService, DonThuocService>();
 
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
@@ -75,7 +78,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
         };
-    });
+    }
+);
 
 var app = builder.Build();
 
@@ -88,13 +92,13 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseAuthentication();
+app.UseAuthentication(); // Xác thực JWT 
 
 // Authorization
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.UseMiddleware<AuthorizationMiddleware>();
+app.UseMiddleware<ExceptionHandlingMiddleware>(); // Xử lý ngoại lệ
+app.UseMiddleware<AuthorizationMiddleware>(); // Kiểm tra quyền tùy chỉnh
 
-app.UseAuthorization();
+app.UseAuthorization(); // Áp dụng policy của ASP.NET Core
 
 app.MapControllers();
 

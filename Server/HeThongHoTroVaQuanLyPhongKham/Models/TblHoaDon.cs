@@ -11,7 +11,7 @@ public partial class TblHoaDon
 
     public decimal TongTien { get; set; }
 
-    public DateTime NgayThanhToan { get; set; }
+    public DateTime? NgayThanhToan { get; set; }
 
     public string TrangThaiThanhToan { get; set; } = null!;
 

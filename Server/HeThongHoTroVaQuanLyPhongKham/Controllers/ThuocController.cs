@@ -10,7 +10,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
     [Route("api/admin/medicines")]
     [ApiController]
-    [Authorize(Roles = "QuanLy")]
     public class ThuocController : ControllerBase
     {
         private readonly IService<ThuocDTO> _thuocService;
@@ -21,6 +20,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "QuanLy,BacSi,DuocSi")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
@@ -39,6 +39,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi,DuocSi")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -57,6 +58,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "QuanLy,DuocSi")]
         public async Task<IActionResult> Create([FromBody] ThuocDTO thuocDto)
         {
             try
@@ -81,6 +83,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "QuanLy,DuocSi")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] ThuocDTO ThuocDTO)
         {
             try
@@ -104,6 +107,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "QuanLy,DuocSi")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try

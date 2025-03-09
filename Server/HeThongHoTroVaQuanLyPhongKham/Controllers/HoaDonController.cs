@@ -11,7 +11,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
     [Route("api/admin/invoices")]
     [ApiController]
-    [Authorize(Roles = "QuanLy")]
     public class HoaDonController : ControllerBase
     {
         private readonly IHoaDonService _hoaDonService;
@@ -22,6 +21,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "QuanLy,KeToan,NhanVienHanhChinh")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
@@ -40,6 +40,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "QuanLy,KeToan,NhanVienHanhChinh,KhachHang")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -58,6 +59,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "QuanLy,KeToan")]
         public async Task<IActionResult> Create([FromBody] HoaDonDTO hoaDonDTO)
         {
             try
@@ -82,6 +84,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "QuanLy,KeToan")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] HoaDonDTO hoaDonDTO)
         {
             try
@@ -105,6 +108,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPatch("{id:int}/status")]
+        [Authorize(Roles = "QuanLy,KeToan")]
         public async Task<IActionResult> UpdateTrangThaiThanhToan([FromRoute] int id, [FromBody] HoaDonUpdateDTO hoaDonDTO)
         {
             try
@@ -129,6 +133,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPatch("{id:int}/total-amount")]
+        [Authorize(Roles = "QuanLy,KeToan")]
         public async Task<IActionResult> UpdateTongTien([FromRoute] int id, [FromBody] HoaDonUpdateDTO hoaDonDTO)
         {
             try
@@ -153,6 +158,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "QuanLy,KeToan")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try

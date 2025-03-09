@@ -21,6 +21,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "QuanLy,BacSi,KyThuatVienXetNghiem")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
@@ -39,6 +40,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}")]
+        [Authorize(Roles = "QuanLy,BacSi,KyThuatVienXetNghiem")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -57,6 +59,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "QuanLy")]
         public async Task<IActionResult> Create([FromBody] DichVuYTeDTO dichVuYTeDTO)
         {
             try
@@ -81,6 +84,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPut("{id:int}")]
+        [Authorize(Roles = "QuanLy")]
         public async Task<IActionResult> Update([FromRoute] int id, [FromBody] DichVuYTeDTO DichVuYTeDTO)
         {
             try
@@ -104,6 +108,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpDelete("{id:int}")]
+        [Authorize(Roles = "QuanLy")]
         public async Task<IActionResult> Delete([FromRoute] int id)
         {
             try
