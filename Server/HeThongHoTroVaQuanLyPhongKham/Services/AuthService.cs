@@ -3,6 +3,7 @@ using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
+using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class AuthService : IAuthService
@@ -11,12 +12,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         private readonly IMapper<TaiKhoanDTO, TblTaiKhoan> _taiKhoanMapping;
         private readonly IJwtService _jwtService;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public AuthService(ITaiKhoanRepository taiKhoanRepository, IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, IJwtService jwtService)
+        public AuthService(ITaiKhoanRepository taiKhoanRepository, IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, IJwtService jwtService, IPasswordHasher passwordHasher)
         {
             _taiKhoanRepository = taiKhoanRepository;
             _taiKhoanMapping = taiKhoanMapping;
             _jwtService = jwtService;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<TaiKhoanDTO> GetUserWithRole(TaiKhoanDTO taiKhoanDTO)
@@ -34,7 +37,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             if (taiKhoan == null)
                 throw new NotFoundException($"Không tìm thấy tài khoản với tên đăng nhập {taiKhoanDTO.TenDangNhap}");
 
-            if (taiKhoanDTO.MatKhau != taiKhoan.MatKhau)
+            if (!_passwordHasher.VerifyPassword(taiKhoanDTO.MatKhau, taiKhoan.MatKhau))
                 throw new UnauthorizedException("Mật khẩu không đúng");
 
             var token = _jwtService.GenerateToken(taiKhoan);

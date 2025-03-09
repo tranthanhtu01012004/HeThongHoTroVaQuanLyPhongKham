@@ -3,9 +3,11 @@ using HeThongHoTroVaQuanLyPhongKham.Data;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
+using HeThongHoTroVaQuanLyPhongKham.Middlewares;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -54,6 +56,10 @@ builder.Services.AddScoped<ILichHenService, LichHenService>();
 builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 builder.Services.AddScoped<IHoSoYTeService, HoSoYTeService>();
 
+// Đăng ký IPasswordHasher
+builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+
+
 // Cấu hình JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -83,6 +89,11 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
+
+// Authorization
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<AuthorizationMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();

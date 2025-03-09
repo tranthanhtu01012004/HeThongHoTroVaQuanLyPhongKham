@@ -3,6 +3,7 @@ using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
+using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class TaiKhoanService : BaseService, IService<TaiKhoanDTO>
@@ -10,12 +11,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IRepository<TblTaiKhoan> _taiKhoanRepository;
         private readonly IMapper<TaiKhoanDTO, TblTaiKhoan> _taiKhoanMapping;
         private readonly ITaiKhoanRepository _taiKhoanRepo;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public TaiKhoanService(IRepository<TblTaiKhoan> taiKhoanRepository, IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepo)
+        public TaiKhoanService(IRepository<TblTaiKhoan> taiKhoanRepository, IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepo, IPasswordHasher passwordHasher)
         {
             _taiKhoanRepository = taiKhoanRepository;
             _taiKhoanMapping = taiKhoanMapping;
             _taiKhoanRepo = taiKhoanRepo;
+            _passwordHasher = passwordHasher;
         }
 
         public async Task<TaiKhoanDTO> AddAsync(TaiKhoanDTO dto)
@@ -25,8 +28,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 string.Equals(taiKhoanExisting.TenDangNhap, dto.TenDangNhap, StringComparison.OrdinalIgnoreCase))
                 throw new DuplicateEntityException($"Tài khoản với tên đăng nhập [{dto.TenDangNhap}] đã tồn tại.");
 
-            var taiKhoan = await _taiKhoanRepository.CreateAsync(_taiKhoanMapping.MapDtoToEntity(dto));
-            return _taiKhoanMapping.MapEntityToDto(taiKhoan);
+            var taiKhoanEntity = _taiKhoanMapping.MapDtoToEntity(dto);
+            taiKhoanEntity.MatKhau = _passwordHasher.HashPassword(dto.MatKhau);
+
+            return _taiKhoanMapping.MapEntityToDto(
+                await _taiKhoanRepository.CreateAsync(taiKhoanEntity));
         }
 
         public async Task DeleteAsync(int id)

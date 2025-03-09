@@ -2,8 +2,10 @@
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
@@ -20,21 +22,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             _taiKhoanService = taiKhoanService;
         }
 
-
-        /// <summary>
-        /// Đăng nhập hệ thống và trả về token JWT cùng vai trò.
-        /// </summary>
-        /// <param name="taiKhoanDTO">Thông tin đăng nhập (tên đăng nhập và mật khẩu).</param>
-        /// <returns>Token và danh sách vai trò nếu đăng nhập thành công.</returns>
-        /// <response code="200">Đăng nhập thành công, trả về token và vai trò.</response>
-        /// <response code="400">Dữ liệu đầu vào không hợp lệ.</response>
-        /// <response code="401">Tên đăng nhập hoặc mật khẩu không đúng.</response>
-        /// <response code="404">Không tìm thấy tài khoản.</response>
         [HttpPost("login")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody] TaiKhoanDTO taiKhoanDTO)
         {
             try
@@ -43,7 +32,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                     return BadRequest(ModelState);
 
                 var loginResponse = await _authService.Login(taiKhoanDTO);
-                return Ok(loginResponse);
+                return Ok(ApiResponse<LoginResponse>.Success(loginResponse, "Đăng nhập thành công."));
             }
             catch (NotFoundException ex)
             {
@@ -55,11 +44,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { Message = "Đã xảy ra lỗi trong quá trình đăng nhập.", Details = ex.Message });
+                return StatusCode(500, new { Message = "Đã xảy ra lỗi trong quá trình đăng nhập." });
             }
         }
 
         [HttpPost("register")]
+        [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] TaiKhoanDTO taiKhoanDTO)
         {
             try
