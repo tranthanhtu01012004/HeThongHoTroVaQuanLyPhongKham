@@ -1,5 +1,6 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
@@ -81,11 +82,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 await _lichHenRepository.UpdateAsync(lichHenUpdate));
         }
 
-        public async Task<LichHenDTO> UpdateTrangThaiAsync(int maLichHen, string trangThai)
+        public async Task<LichHenDTO> UpdateTrangThaiAsync(int maLichHen, LichHenUpdateDTO dto)
         {
             var lichHen = await GetByIdAsync(maLichHen);
 
-            lichHen.TrangThai = trangThai;
+            lichHen.TrangThai = dto.TrangThai;
 
             return _lichHenMapping.MapEntityToDto(
                 await _lichHenRepository.UpdateAsync(

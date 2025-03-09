@@ -81,7 +81,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.Property(e => e.MaDichVuYte).HasColumnName("maDichVuYTe");
             entity.Property(e => e.ChiPhi)
-                .HasColumnType("decimal(10, 2)")
+                .HasColumnType("decimal(15, 2)")
                 .HasColumnName("chiPhi");
             entity.Property(e => e.Ten)
                 .HasMaxLength(100)
@@ -151,7 +151,7 @@ public partial class ApplicationDbContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("ngayThanhToan");
             entity.Property(e => e.TongTien)
-                .HasColumnType("decimal(10, 2)")
+                .HasColumnType("decimal(15, 2)")
                 .HasColumnName("tongTien");
             entity.Property(e => e.TrangThaiThanhToan)
                 .HasMaxLength(50)
@@ -314,6 +314,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.MaVaiTroNavigation).WithMany(p => p.TblTaiKhoans)
                 .HasForeignKey(d => d.MaVaiTro)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tbl_tai_khoan_vai_tro");
         });
 

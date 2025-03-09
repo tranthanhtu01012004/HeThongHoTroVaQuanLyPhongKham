@@ -13,7 +13,7 @@ public partial class TblTaiKhoan
 
     public string MatKhau { get; set; } = null!;
 
-    public virtual TblVaiTro MaVaiTroNavigation { get; set; } = null!;
+    public virtual TblVaiTro? MaVaiTroNavigation { get; set; }
 
     public virtual ICollection<TblNhanVien> TblNhanViens { get; set; } = new List<TblNhanVien>();
 }
