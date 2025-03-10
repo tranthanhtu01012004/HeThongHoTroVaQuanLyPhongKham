@@ -10,8 +10,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [Range(1, int.MaxValue, ErrorMessage = "Mã hồ sơ y tế phải là số dương")]
         public int MaHoSoYTe { get; set; }
 
-        [Required(ErrorMessage = "Liều lượng là bắt buộc")]
-        [StringLength(500, MinimumLength = 1, ErrorMessage = "Liều lượng phải từ 1 đến 500 ký tự")]
-        public string LieuLuong { get; set; } = null!;
+        [Required(ErrorMessage = "Ngày kê đơn là bắt buộc")]
+        [DataType(DataType.DateTime, ErrorMessage = "Ngày kê đơn không đúng định dạng")]
+        public DateTime NgayKeDon { get; set; }
+
+        public List<DonThuocChiTietDTO> ChiTietThuoc { get; set; } = new List<DonThuocChiTietDTO>();
     }
 }

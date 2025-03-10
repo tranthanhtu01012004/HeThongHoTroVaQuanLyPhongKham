@@ -70,5 +70,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
             _logger.LogInformation($"Đã lấy danh sách {typeof(T).Name} với truy vấn - trang {page} với {pageSize} bản ghi.");
             return entities;
         }
+
+        public async Task<T> FindByIdWithQueryAsync(IQueryable<T> query, int id, string keyPropertyName)
+        {
+            return await query
+                .Where(e => EF.Property<int>(e, keyPropertyName) == id)
+                .FirstOrDefaultAsync();
+        }
     }
 }

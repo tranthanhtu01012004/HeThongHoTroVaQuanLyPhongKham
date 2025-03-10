@@ -22,7 +22,7 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<TblDonThuoc> TblDonThuocs { get; set; }
 
-    public virtual DbSet<TblDonThuocThuoc> TblDonThuocThuocs { get; set; }
+    public virtual DbSet<TblDonThuocChiTiet> TblDonThuocChiTiets { get; set; }
 
     public virtual DbSet<TblHoSoYTe> TblHoSoYTes { get; set; }
 
@@ -95,31 +95,37 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("tbl_don_thuoc");
 
             entity.Property(e => e.MaDonThuoc).HasColumnName("maDonThuoc");
-            entity.Property(e => e.LieuLuong).HasColumnName("lieuLuong");
             entity.Property(e => e.MaHoSoYte).HasColumnName("maHoSoYTe");
+            entity.Property(e => e.NgayKeDon)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime")
+                .HasColumnName("ngayKeDon");
 
             entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblDonThuocs)
                 .HasForeignKey(d => d.MaHoSoYte)
                 .HasConstraintName("fk_tbl_don_thuoc_ho_so_y_te");
         });
 
-        modelBuilder.Entity<TblDonThuocThuoc>(entity =>
+        modelBuilder.Entity<TblDonThuocChiTiet>(entity =>
         {
-            entity.HasKey(e => new { e.MaDonThuoc, e.MaThuoc }).HasName("pk_tbl_don_thuoc_thuoc");
+            entity.HasKey(e => new { e.MaDonThuoc, e.MaThuoc }).HasName("pk_tbl_don_thuoc_chi_tiet");
 
-            entity.ToTable("tbl_don_thuoc_thuoc");
+            entity.ToTable("tbl_don_thuoc_chi_tiet");
 
             entity.Property(e => e.MaDonThuoc).HasColumnName("maDonThuoc");
             entity.Property(e => e.MaThuoc).HasColumnName("maThuoc");
+            entity.Property(e => e.CachDung)
+                .HasMaxLength(200)
+                .HasColumnName("cachDung");
             entity.Property(e => e.SoLuong).HasColumnName("soLuong");
 
-            entity.HasOne(d => d.MaDonThuocNavigation).WithMany(p => p.TblDonThuocThuocs)
+            entity.HasOne(d => d.MaDonThuocNavigation).WithMany(p => p.TblDonThuocChiTiets)
                 .HasForeignKey(d => d.MaDonThuoc)
-                .HasConstraintName("fk_tbl_don_thuoc_thuoc_don_thuoc");
+                .HasConstraintName("fk_tbl_don_thuoc_chi_tiet_don_thuoc");
 
-            entity.HasOne(d => d.MaThuocNavigation).WithMany(p => p.TblDonThuocThuocs)
+            entity.HasOne(d => d.MaThuocNavigation).WithMany(p => p.TblDonThuocChiTiets)
                 .HasForeignKey(d => d.MaThuoc)
-                .HasConstraintName("fk_tbl_don_thuoc_thuoc_thuoc");
+                .HasConstraintName("fk_tbl_don_thuoc_chi_tiet_thuoc");
         });
 
         modelBuilder.Entity<TblHoSoYTe>(entity =>
@@ -325,7 +331,13 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("tbl_thuoc");
 
             entity.Property(e => e.MaThuoc).HasColumnName("maThuoc");
-            entity.Property(e => e.MoTa).HasColumnName("moTa");
+            entity.Property(e => e.DonVi)
+                .HasMaxLength(20)
+                .HasDefaultValue("viên")
+                .HasColumnName("donVi");
+            entity.Property(e => e.MoTa)
+                .HasMaxLength(500)
+                .HasColumnName("moTa");
             entity.Property(e => e.Ten)
                 .HasMaxLength(100)
                 .HasColumnName("ten");

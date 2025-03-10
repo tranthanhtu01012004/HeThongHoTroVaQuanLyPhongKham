@@ -2,6 +2,7 @@
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,11 +13,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     [ApiController]
     public class DonThuocController : ControllerBase
     {
-        private readonly IDonThuocService _donThuocService;
+        private readonly IService<DonThuocDTO> _donThuocService;
+        private readonly IDonThuocChiTietService _DonThuocChiTietService;
 
-        public DonThuocController(IDonThuocService donThuocService)
+        public DonThuocController(IService<DonThuocDTO> donThuocService, IDonThuocChiTietService donThuocChiTietService)
         {
             _donThuocService = donThuocService;
+            _DonThuocChiTietService = donThuocChiTietService;
         }
 
         [HttpGet]
@@ -66,11 +69,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
+                var donThuoc = await _donThuocService.AddAsync(dto);
+                if (dto.ChiTietThuoc != null && dto.ChiTietThuoc.Any())
+                {
+                    foreach (var chiTiet in dto.ChiTietThuoc)
+                        chiTiet.MaDonThuoc = donThuoc.MaDonThuoc;
+
+                    await _DonThuocChiTietService.AddAsync(dto.ChiTietThuoc);
+                }
                 return CreatedAtAction(
                     nameof(GetById),
                     new { id = dto.MaDonThuoc },
                     ApiResponse<DonThuocDTO>.Success(
-                        await _donThuocService.AddAsync(dto), "Thêm đơn thuốc thành công."));
+                        donThuoc, "Thêm đơn thuốc thành công."));
             }
             catch (NotFoundException ex)
             {

@@ -8,6 +8,7 @@ using HeThongHoTroVaQuanLyPhongKham.Middlewares;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet;
 using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -40,6 +41,8 @@ builder.Services.AddScoped<IMapper<LichHenDTO, TblLichHen>, LichHenMapper>();
 builder.Services.AddScoped<IMapper<HoaDonDTO, TblHoaDon>, HoaDonMapper>();
 builder.Services.AddScoped<IMapper<HoSoYTeDTO, TblHoSoYTe>, HoSoYTeMapper>();
 builder.Services.AddScoped<IMapper<DonThuocDTO, TblDonThuoc>, DonThuocMapper>();
+builder.Services.AddScoped<IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet>, DonThuocChiTietMapper>();
+
 
 // Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -57,7 +60,8 @@ builder.Services.AddScoped<IService<ThuocDTO>, ThuocService>();
 builder.Services.AddScoped<ILichHenService, LichHenService>();
 builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 builder.Services.AddScoped<IHoSoYTeService, HoSoYTeService>();
-builder.Services.AddScoped<IDonThuocService, DonThuocService>();
+builder.Services.AddScoped<IService<DonThuocDTO>, DonThuocService>();
+builder.Services.AddScoped<IDonThuocChiTietService, DonThuocChiTietService>();
 
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
