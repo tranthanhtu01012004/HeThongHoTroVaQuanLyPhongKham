@@ -11,7 +11,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             {
                 MaThuoc = dto.MaThuoc,
                 Ten = dto.Ten,
-                MoTa = dto.MoTa
+                MoTa = dto.MoTa,
+                DonVi = dto.DonVi
             };
         }
 
@@ -20,6 +21,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             entity.MaThuoc = dto.MaThuoc;
             entity.Ten = dto.Ten;
             entity.MoTa = dto.MoTa;
+            entity.DonVi = dto.DonVi;
         }
 
         public ThuocDTO MapEntityToDto(TblThuoc entity)
@@ -28,7 +30,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             {
                 MaThuoc = entity.MaThuoc,
                 Ten = entity.Ten,
-                MoTa = entity.MoTa
+                MoTa = entity.MoTa,
+                DonVi = entity.DonVi
             };
         }
     }

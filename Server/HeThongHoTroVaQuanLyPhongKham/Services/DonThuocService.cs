@@ -4,10 +4,11 @@ using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLydonThuoc.Services
 {
-    public class DonThuocService: BaseService, IDonThuocService
+    public class DonThuocService: BaseService, IService<DonThuocDTO>
     {
         private readonly IRepository<TblDonThuoc> _donThuocRepository;
         private readonly IMapper<DonThuocDTO, TblDonThuoc> _donThuocMapping;
@@ -41,7 +42,10 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
 
         public async Task<DonThuocDTO> GetByIdAsync(int id)
         {
-            var donThuoc = await _donThuocRepository.FindByIdAsync(id, "MaDonThuoc");
+            var query = _donThuocRepository.GetQueryable();
+            query = query.Include(d => d.TblDonThuocChiTiets);
+
+            var donThuoc = await _donThuocRepository.FindByIdWithQueryAsync(query, id, "MaDonThuoc");
             if (donThuoc is null)
                 throw new NotFoundException($"Đơn thuốc với ID [{id}] không tồn tại.");
 

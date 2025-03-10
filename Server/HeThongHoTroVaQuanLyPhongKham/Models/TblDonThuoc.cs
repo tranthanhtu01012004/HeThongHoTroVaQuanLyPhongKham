@@ -9,9 +9,9 @@ public partial class TblDonThuoc
 
     public int MaHoSoYte { get; set; }
 
-    public string LieuLuong { get; set; } = null!;
+    public DateTime NgayKeDon { get; set; }
 
     public virtual TblHoSoYTe MaHoSoYteNavigation { get; set; } = null!;
 
-    public virtual ICollection<TblDonThuocThuoc> TblDonThuocThuocs { get; set; } = new List<TblDonThuocThuoc>();
+    public virtual ICollection<TblDonThuocChiTiet> TblDonThuocChiTiets { get; set; } = new List<TblDonThuocChiTiet>();
 }

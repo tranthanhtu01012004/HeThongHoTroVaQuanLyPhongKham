@@ -11,5 +11,7 @@ public partial class TblThuoc
 
     public string MoTa { get; set; } = null!;
 
-    public virtual ICollection<TblDonThuocThuoc> TblDonThuocThuocs { get; set; } = new List<TblDonThuocThuoc>();
+    public string DonVi { get; set; } = null!;
+
+    public virtual ICollection<TblDonThuocChiTiet> TblDonThuocChiTiets { get; set; } = new List<TblDonThuocChiTiet>();
 }

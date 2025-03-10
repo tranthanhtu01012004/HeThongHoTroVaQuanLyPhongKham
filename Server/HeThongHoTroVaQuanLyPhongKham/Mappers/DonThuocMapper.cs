@@ -5,13 +5,23 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
 {
     public class DonThuocMapper : IMapper<DonThuocDTO, TblDonThuoc>
     {
+        private readonly IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> _donThuocChiTietMapping;
+
+        public DonThuocMapper(IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> donThuocChiTietMapping)
+        {
+            _donThuocChiTietMapping = donThuocChiTietMapping;
+        }
+
         public TblDonThuoc MapDtoToEntity(DonThuocDTO dto)
         {
             return new TblDonThuoc
             {
                 MaDonThuoc = dto.MaDonThuoc,
                 MaHoSoYte = dto.MaHoSoYTe,
-                LieuLuong = dto.LieuLuong
+                NgayKeDon = dto.NgayKeDon,
+                TblDonThuocChiTiets = dto.ChiTietThuoc?
+                                        .Select(ct => _donThuocChiTietMapping.MapDtoToEntity(ct))
+                                            .ToList() ?? new List<TblDonThuocChiTiet>()
             };
         }
 
@@ -19,7 +29,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
         {
             entity.MaDonThuoc = dto.MaDonThuoc;
             entity.MaHoSoYte = dto.MaHoSoYTe;
-            entity.LieuLuong = dto.LieuLuong;
+            entity.NgayKeDon = dto.NgayKeDon;
+            entity.TblDonThuocChiTiets = dto.ChiTietThuoc?
+                .Select(ct => _donThuocChiTietMapping.MapDtoToEntity(ct))
+                    .ToList() ?? new List<TblDonThuocChiTiet>();
         }
 
         public DonThuocDTO MapEntityToDto(TblDonThuoc entity)
@@ -28,7 +41,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             {
                 MaDonThuoc = entity.MaDonThuoc,
                 MaHoSoYTe = entity.MaHoSoYte,
-                LieuLuong = entity.LieuLuong
+                NgayKeDon = entity.NgayKeDon,
+                ChiTietThuoc = entity.TblDonThuocChiTiets?
+                    .Select(ct => _donThuocChiTietMapping.MapEntityToDto(ct))
+                        .ToList() ?? new List<DonThuocChiTietDTO>()
             };
         }
     }
