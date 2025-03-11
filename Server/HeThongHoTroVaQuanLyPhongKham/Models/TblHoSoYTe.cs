@@ -17,6 +17,8 @@ public partial class TblHoSoYTe
 
     public virtual TblBenhNhan MaBenhNhanNavigation { get; set; } = null!;
 
+    public virtual ICollection<TblDonThuoc> TblDonThuocs { get; set; } = new List<TblDonThuoc>();
+
     public virtual ICollection<TblKetQuaDieuTri> TblKetQuaDieuTris { get; set; } = new List<TblKetQuaDieuTri>();
 
     public virtual ICollection<TblKetQuaXetNghiem> TblKetQuaXetNghiems { get; set; } = new List<TblKetQuaXetNghiem>();
