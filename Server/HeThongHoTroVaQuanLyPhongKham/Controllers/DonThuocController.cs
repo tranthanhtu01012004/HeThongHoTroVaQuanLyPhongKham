@@ -14,12 +14,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     public class DonThuocController : ControllerBase
     {
         private readonly IService<DonThuocDTO> _donThuocService;
-        private readonly IDonThuocChiTietService _DonThuocChiTietService;
+        private readonly IDonThuocChiTietService _donThuocChiTietService;
 
         public DonThuocController(IService<DonThuocDTO> donThuocService, IDonThuocChiTietService donThuocChiTietService)
         {
             _donThuocService = donThuocService;
-            _DonThuocChiTietService = donThuocChiTietService;
+            _donThuocChiTietService = donThuocChiTietService;
         }
 
         [HttpGet]
@@ -70,12 +70,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                     return BadRequest(ModelState);
 
                 var donThuoc = await _donThuocService.AddAsync(dto);
-                if (dto.ChiTietThuoc != null && dto.ChiTietThuoc.Any())
+                if (dto.ChiTietThuocList != null && dto.ChiTietThuocList.Any())
                 {
-                    foreach (var chiTiet in dto.ChiTietThuoc)
+                    foreach (var chiTiet in dto.ChiTietThuocList)
                         chiTiet.MaDonThuoc = donThuoc.MaDonThuoc;
 
-                    await _DonThuocChiTietService.AddAsync(dto.ChiTietThuoc);
+                    await _donThuocChiTietService.AddAsync(dto.ChiTietThuocList);
                 }
                 return CreatedAtAction(
                     nameof(GetById),

@@ -28,6 +28,10 @@ public partial class ApplicationDbContext : DbContext
 
     public virtual DbSet<TblHoaDon> TblHoaDons { get; set; }
 
+    public virtual DbSet<TblKetQuaDieuTri> TblKetQuaDieuTris { get; set; }
+
+    public virtual DbSet<TblKetQuaXetNghiem> TblKetQuaXetNghiems { get; set; }
+
     public virtual DbSet<TblLichHen> TblLichHens { get; set; }
 
     public virtual DbSet<TblLichSuThayDoi> TblLichSuThayDois { get; set; }
@@ -41,6 +45,8 @@ public partial class ApplicationDbContext : DbContext
     public virtual DbSet<TblTaiKhoan> TblTaiKhoans { get; set; }
 
     public virtual DbSet<TblThuoc> TblThuocs { get; set; }
+
+    public virtual DbSet<TblTrieuChung> TblTrieuChungs { get; set; }
 
     public virtual DbSet<TblVaiTro> TblVaiTros { get; set; }
 
@@ -60,7 +66,9 @@ public partial class ApplicationDbContext : DbContext
             entity.HasIndex(e => e.SoDienThoai, "uq_tbl_benh_nhan_soDienThoai").IsUnique();
 
             entity.Property(e => e.MaBenhNhan).HasColumnName("maBenhNhan");
-            entity.Property(e => e.DiaChi).HasColumnName("diaChi");
+            entity.Property(e => e.DiaChi)
+                .HasMaxLength(1000)
+                .HasColumnName("diaChi");
             entity.Property(e => e.Email)
                 .HasMaxLength(100)
                 .IsUnicode(false)
@@ -95,29 +103,29 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("tbl_don_thuoc");
 
             entity.Property(e => e.MaDonThuoc).HasColumnName("maDonThuoc");
-            entity.Property(e => e.MaHoSoYte).HasColumnName("maHoSoYTe");
             entity.Property(e => e.NgayKeDon)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("ngayKeDon");
-
-            entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblDonThuocs)
-                .HasForeignKey(d => d.MaHoSoYte)
-                .HasConstraintName("fk_tbl_don_thuoc_ho_so_y_te");
         });
 
         modelBuilder.Entity<TblDonThuocChiTiet>(entity =>
         {
-            entity.HasKey(e => new { e.MaDonThuoc, e.MaThuoc }).HasName("pk_tbl_don_thuoc_chi_tiet");
+            entity.HasKey(e => new { e.MaDonThuocChiTiet, e.MaDonThuoc, e.MaThuoc }).HasName("pk_tbl_don_thuoc_chi_tiet");
 
             entity.ToTable("tbl_don_thuoc_chi_tiet");
 
+            entity.Property(e => e.MaDonThuocChiTiet)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("maDonThuocChiTiet");
             entity.Property(e => e.MaDonThuoc).HasColumnName("maDonThuoc");
             entity.Property(e => e.MaThuoc).HasColumnName("maThuoc");
             entity.Property(e => e.CachDung)
                 .HasMaxLength(200)
                 .HasColumnName("cachDung");
+            entity.Property(e => e.LieuLuong).HasMaxLength(50);
             entity.Property(e => e.SoLuong).HasColumnName("soLuong");
+            entity.Property(e => e.TanSuat).HasMaxLength(50);
 
             entity.HasOne(d => d.MaDonThuocNavigation).WithMany(p => p.TblDonThuocChiTiets)
                 .HasForeignKey(d => d.MaDonThuoc)
@@ -135,9 +143,16 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("tbl_ho_so_y_te");
 
             entity.Property(e => e.MaHoSoYte).HasColumnName("maHoSoYTe");
-            entity.Property(e => e.ChuanDoan).HasColumnName("chuanDoan");
+            entity.Property(e => e.ChuanDoan)
+                .HasMaxLength(1000)
+                .HasColumnName("chuanDoan");
+            entity.Property(e => e.LichSuBenh)
+                .HasMaxLength(1000)
+                .HasColumnName("lichSuBenh");
             entity.Property(e => e.MaBenhNhan).HasColumnName("maBenhNhan");
-            entity.Property(e => e.PhuongPhapDieuTri).HasColumnName("phuongPhapDieuTri");
+            entity.Property(e => e.PhuongPhapDieuTri)
+                .HasMaxLength(1000)
+                .HasColumnName("phuongPhapDieuTri");
 
             entity.HasOne(d => d.MaBenhNhanNavigation).WithMany(p => p.TblHoSoYTes)
                 .HasForeignKey(d => d.MaBenhNhan)
@@ -167,6 +182,42 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.MaLichHenNavigation).WithMany(p => p.TblHoaDons)
                 .HasForeignKey(d => d.MaLichHen)
                 .HasConstraintName("fk_tbl_hoa_don_lich_hen");
+        });
+
+        modelBuilder.Entity<TblKetQuaDieuTri>(entity =>
+        {
+            entity.HasKey(e => e.MaKetQuaDieuTri).HasName("pk_tbl_ket_qua_dieu_tri");
+
+            entity.ToTable("tbl_ket_qua_dieu_tri");
+
+            entity.Property(e => e.HieuQua).HasMaxLength(500);
+            entity.Property(e => e.MaHoSoYte).HasColumnName("MaHoSoYTe");
+            entity.Property(e => e.NgayDanhGia).HasColumnType("datetime");
+            entity.Property(e => e.TacDungPhu).HasMaxLength(500);
+
+            entity.HasOne(d => d.MaDonThuocNavigation).WithMany(p => p.TblKetQuaDieuTris)
+                .HasForeignKey(d => d.MaDonThuoc)
+                .HasConstraintName("fk_tbl_ket_qua_dieu_tri_don_thuoc");
+
+            entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblKetQuaDieuTris)
+                .HasForeignKey(d => d.MaHoSoYte)
+                .HasConstraintName("fk_tbl_ket_qua_dieu_tri_ho_so_y_te");
+        });
+
+        modelBuilder.Entity<TblKetQuaXetNghiem>(entity =>
+        {
+            entity.HasKey(e => e.MaKetQua).HasName("pk_tbl_ket_qua_xet_nghiem");
+
+            entity.ToTable("tbl_ket_qua_xet_nghiem");
+
+            entity.Property(e => e.KetQua).HasMaxLength(500);
+            entity.Property(e => e.MaHoSoYte).HasColumnName("MaHoSoYTe");
+            entity.Property(e => e.NgayXetNghiem).HasColumnType("datetime");
+            entity.Property(e => e.TenXetNghiem).HasMaxLength(200);
+
+            entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblKetQuaXetNghiems)
+                .HasForeignKey(d => d.MaHoSoYte)
+                .HasConstraintName("fk_tbl_ket_qua_xet_nghiem_ho_so_y_te");
         });
 
         modelBuilder.Entity<TblLichHen>(entity =>
@@ -331,6 +382,7 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("tbl_thuoc");
 
             entity.Property(e => e.MaThuoc).HasColumnName("maThuoc");
+            entity.Property(e => e.ChongChiDinh).HasMaxLength(1000);
             entity.Property(e => e.DonVi)
                 .HasMaxLength(20)
                 .HasDefaultValue("viên")
@@ -341,6 +393,23 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.Ten)
                 .HasMaxLength(100)
                 .HasColumnName("ten");
+            entity.Property(e => e.TuongTacThuoc).HasMaxLength(1000);
+        });
+
+        modelBuilder.Entity<TblTrieuChung>(entity =>
+        {
+            entity.HasKey(e => e.MaTrieuChung).HasName("pk_tbl_trieu_chung");
+
+            entity.ToTable("tbl_trieu_chung");
+
+            entity.Property(e => e.MaHoSoYte).HasColumnName("MaHoSoYTe");
+            entity.Property(e => e.MoTa).HasMaxLength(500);
+            entity.Property(e => e.TenTrieuChung).HasMaxLength(200);
+            entity.Property(e => e.ThoiGianXuatHien).HasColumnType("datetime");
+
+            entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblTrieuChungs)
+                .HasForeignKey(d => d.MaHoSoYte)
+                .HasConstraintName("fk_tbl_trieu_chung_ho_so_y_te");
         });
 
         modelBuilder.Entity<TblVaiTro>(entity =>

@@ -42,7 +42,7 @@ builder.Services.AddScoped<IMapper<HoaDonDTO, TblHoaDon>, HoaDonMapper>();
 builder.Services.AddScoped<IMapper<HoSoYTeDTO, TblHoSoYTe>, HoSoYTeMapper>();
 builder.Services.AddScoped<IMapper<DonThuocDTO, TblDonThuoc>, DonThuocMapper>();
 builder.Services.AddScoped<IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet>, DonThuocChiTietMapper>();
-
+builder.Services.AddScoped<IMapper<BenhNhanDTO, TblBenhNhan>, BenhNhanMapper>();
 
 // Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -62,6 +62,7 @@ builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 builder.Services.AddScoped<IHoSoYTeService, HoSoYTeService>();
 builder.Services.AddScoped<IService<DonThuocDTO>, DonThuocService>();
 builder.Services.AddScoped<IDonThuocChiTietService, DonThuocChiTietService>();
+builder.Services.AddScoped<IService<BenhNhanDTO>, BenhNhanService>();
 
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();

@@ -73,6 +73,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
 
         public async Task<T> FindByIdWithQueryAsync(IQueryable<T> query, int id, string keyPropertyName)
         {
+            _logger.LogInformation($"Query SQL: {query.ToQueryString()}");
             return await query
                 .Where(e => EF.Property<int>(e, keyPropertyName) == id)
                 .FirstOrDefaultAsync();

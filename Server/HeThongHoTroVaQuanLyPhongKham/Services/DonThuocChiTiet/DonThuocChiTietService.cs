@@ -34,24 +34,38 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
             }
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            await _donThuocChiTietRepository.DeleteAsync(
+                _donThuocChiTietMapping.MapDtoToEntity(
+                    await GetByIdAsync(id)));
         }
 
-        public Task<IEnumerable<DonThuocChiTietDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<IEnumerable<DonThuocChiTietDTO>> GetAllAsync(int page, int pageSize)
         {
-            throw new NotImplementedException();
+            var pageSkip = CalculatePageSkip(page, pageSize);
+            var hoaDons = await _donThuocChiTietRepository.FindAllAsync(page, pageSize, pageSkip, "MaDonThuocChiTiet");
+            return hoaDons.Select(t => _donThuocChiTietMapping.MapEntityToDto(t));
         }
 
-        public Task<DonThuocChiTietDTO> GetByIdAsync(int id)
+        public async Task<DonThuocChiTietDTO> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var donThuocCt = await _donThuocChiTietRepository.FindByIdAsync(id, "MaDonThuocChiTiet");
+            if (donThuocCt is null)
+                throw new NotFoundException($"Đơn thuốc chi tiết với ID [{id}] không tồn tại.");
+
+            return _donThuocChiTietMapping.MapEntityToDto(donThuocCt);
         }
 
-        public Task<DonThuocChiTietDTO> UpdateAsync(DonThuocChiTietDTO dto)
+        public async Task<DonThuocChiTietDTO> UpdateAsync(DonThuocChiTietDTO dto)
         {
-            throw new NotImplementedException();
+            var donThuocCtUpdate = _donThuocChiTietMapping.MapDtoToEntity(
+                await GetByIdAsync(dto.MaDonThuocChiTiet));
+
+            _donThuocChiTietMapping.MapDtoToEntity(dto, donThuocCtUpdate);
+
+            return _donThuocChiTietMapping.MapEntityToDto(
+                await _donThuocChiTietRepository.UpdateAsync(donThuocCtUpdate));
         }
     }
 }

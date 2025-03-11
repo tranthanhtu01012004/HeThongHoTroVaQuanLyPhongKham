@@ -17,9 +17,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new TblDonThuoc
             {
                 MaDonThuoc = dto.MaDonThuoc,
-                MaHoSoYte = dto.MaHoSoYTe,
                 NgayKeDon = dto.NgayKeDon,
-                TblDonThuocChiTiets = dto.ChiTietThuoc?
+                TblDonThuocChiTiets = dto.ChiTietThuocList?
                                         .Select(ct => _donThuocChiTietMapping.MapDtoToEntity(ct))
                                             .ToList() ?? new List<TblDonThuocChiTiet>()
             };
@@ -28,9 +27,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
         public void MapDtoToEntity(DonThuocDTO dto, TblDonThuoc entity)
         {
             entity.MaDonThuoc = dto.MaDonThuoc;
-            entity.MaHoSoYte = dto.MaHoSoYTe;
             entity.NgayKeDon = dto.NgayKeDon;
-            entity.TblDonThuocChiTiets = dto.ChiTietThuoc?
+            entity.TblDonThuocChiTiets = dto.ChiTietThuocList?
                 .Select(ct => _donThuocChiTietMapping.MapDtoToEntity(ct))
                     .ToList() ?? new List<TblDonThuocChiTiet>();
         }
@@ -40,9 +38,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new DonThuocDTO
             {
                 MaDonThuoc = entity.MaDonThuoc,
-                MaHoSoYTe = entity.MaHoSoYte,
                 NgayKeDon = entity.NgayKeDon,
-                ChiTietThuoc = entity.TblDonThuocChiTiets?
+                ChiTietThuocList = entity.TblDonThuocChiTiets?
                     .Select(ct => _donThuocChiTietMapping.MapEntityToDto(ct))
                         .ToList() ?? new List<DonThuocChiTietDTO>()
             };
