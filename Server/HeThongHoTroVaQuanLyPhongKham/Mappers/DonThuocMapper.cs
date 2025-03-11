@@ -17,7 +17,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new TblDonThuoc
             {
                 MaDonThuoc = dto.MaDonThuoc,
-                MaHoSoYte = dto.MaHoSoYTe,
                 NgayKeDon = dto.NgayKeDon,
                 TblDonThuocChiTiets = dto.ChiTietThuoc?
                                         .Select(ct => _donThuocChiTietMapping.MapDtoToEntity(ct))
@@ -28,7 +27,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
         public void MapDtoToEntity(DonThuocDTO dto, TblDonThuoc entity)
         {
             entity.MaDonThuoc = dto.MaDonThuoc;
-            entity.MaHoSoYte = dto.MaHoSoYTe;
             entity.NgayKeDon = dto.NgayKeDon;
             entity.TblDonThuocChiTiets = dto.ChiTietThuoc?
                 .Select(ct => _donThuocChiTietMapping.MapDtoToEntity(ct))
@@ -40,7 +38,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new DonThuocDTO
             {
                 MaDonThuoc = entity.MaDonThuoc,
-                MaHoSoYTe = entity.MaHoSoYte,
                 NgayKeDon = entity.NgayKeDon,
                 ChiTietThuoc = entity.TblDonThuocChiTiets?
                     .Select(ct => _donThuocChiTietMapping.MapEntityToDto(ct))

@@ -1,6 +1,8 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
+using HeThongHoTroVaQuanLyPhongKham.Mappers;
+using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;

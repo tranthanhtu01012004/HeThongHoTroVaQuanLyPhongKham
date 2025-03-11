@@ -12,7 +12,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 MaHoSoYte = dto.MaHoSoYTe,
                 MaBenhNhan = dto.MaBenhNhan,
                 ChuanDoan = dto.ChuanDoan,
-                PhuongPhapDieuTri = dto.PhuongPhapDieuTri
+                PhuongPhapDieuTri = dto.PhuongPhapDieuTri,
+                LichSuBenh = dto.LichSuBenh
             };
         }
 
@@ -22,6 +23,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             entity.MaBenhNhan = dto.MaBenhNhan;
             entity.ChuanDoan = dto.ChuanDoan;
             entity.PhuongPhapDieuTri = dto.PhuongPhapDieuTri;
+            entity.LichSuBenh = dto.LichSuBenh;
         }
 
         public HoSoYTeDTO MapEntityToDto(TblHoSoYTe entity)
@@ -31,7 +33,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 MaHoSoYTe = entity.MaHoSoYte,
                 MaBenhNhan = entity.MaBenhNhan,
                 ChuanDoan = entity.ChuanDoan,
-                PhuongPhapDieuTri = entity.PhuongPhapDieuTri
+                PhuongPhapDieuTri = entity.PhuongPhapDieuTri,
+                LichSuBenh = entity.LichSuBenh
             };
         }
     }
