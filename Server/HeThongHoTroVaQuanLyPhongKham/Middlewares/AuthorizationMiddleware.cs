@@ -24,7 +24,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Middlewares
             }
 
             // Kiểm tra xác thực và phân quyền
-            if (context.Request.Path.StartsWithSegments("/api/admin"))
+            if (context.Request.Path.StartsWithSegments("/api"))
             {
                 if (!context.User.Identity.IsAuthenticated)
                     throw new UnauthorizedException("Bạn không có quyền truy cập vì chưa đăng nhập.");
