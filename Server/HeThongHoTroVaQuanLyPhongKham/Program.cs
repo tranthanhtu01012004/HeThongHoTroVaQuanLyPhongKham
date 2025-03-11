@@ -10,6 +10,7 @@ using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 using HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet;
 using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
+using HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -45,6 +46,7 @@ builder.Services.AddScoped<IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet>, DonT
 builder.Services.AddScoped<IMapper<BenhNhanDTO, TblBenhNhan>, BenhNhanMapper>();
 builder.Services.AddScoped<IMapper<TrieuChungDTO, TblTrieuChung>, TrieuChungMapper>();
 builder.Services.AddScoped<IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem>,KetQuaXetNghiemMapper>();
+builder.Services.AddScoped<IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri>, KetQuaDieuTriMapper>();
 
 // Repo
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
@@ -68,6 +70,7 @@ builder.Services.AddScoped<IService<BenhNhanDTO>, BenhNhanService>();
 builder.Services.AddScoped<IService<TrieuChungDTO>, TrieuChungService>();
 builder.Services.AddScoped<IService<HoSoYTeDTO>, HoSoYTeService>();
 builder.Services.AddScoped<IService<KetQuaXetNghiemDTO>, KetQuaXetNghiemService>();
+builder.Services.AddScoped<IService<KetQuaDieuTriDTO>, KetQuaDieuTriService>();
 
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();

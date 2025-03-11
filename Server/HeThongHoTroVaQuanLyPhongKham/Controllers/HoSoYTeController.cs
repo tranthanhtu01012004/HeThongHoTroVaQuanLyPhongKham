@@ -39,7 +39,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh,KhachHang")]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh,BenhNhan")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try

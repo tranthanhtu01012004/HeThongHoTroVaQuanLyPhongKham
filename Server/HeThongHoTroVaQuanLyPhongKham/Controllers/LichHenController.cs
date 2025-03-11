@@ -67,7 +67,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}")]
-        [Authorize(Roles = "QuanLy,BacSi,YTa,LeTan,NhanVienHanhChinh,KhachHang")]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,LeTan,NhanVienHanhChinh,BenhNhan")]
         public async Task<IActionResult> GetById([FromRoute] int id)
         {
             try
@@ -85,7 +85,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "KhachHang,LeTan,NhanVienHanhChinh,QuanLy,BacSi")]
+        [Authorize(Roles = "BenhNhan,LeTan,NhanVienHanhChinh,QuanLy,BacSi")]
         public async Task<IActionResult> Create([FromBody] LichHenDTO dto)
         {
             try

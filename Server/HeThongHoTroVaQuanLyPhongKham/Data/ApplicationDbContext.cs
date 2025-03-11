@@ -103,10 +103,15 @@ public partial class ApplicationDbContext : DbContext
             entity.ToTable("tbl_don_thuoc");
 
             entity.Property(e => e.MaDonThuoc).HasColumnName("maDonThuoc");
+            entity.Property(e => e.MaHoSoYte).HasColumnName("maHoSoYTe");
             entity.Property(e => e.NgayKeDon)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("ngayKeDon");
+
+            entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblDonThuocs)
+                .HasForeignKey(d => d.MaHoSoYte)
+                .HasConstraintName("fk_tbl_don_thuoc_ho_so_y_te");
         });
 
         modelBuilder.Entity<TblDonThuocChiTiet>(entity =>
@@ -197,10 +202,12 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.MaDonThuocNavigation).WithMany(p => p.TblKetQuaDieuTris)
                 .HasForeignKey(d => d.MaDonThuoc)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_tbl_ket_qua_dieu_tri_don_thuoc");
 
             entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblKetQuaDieuTris)
                 .HasForeignKey(d => d.MaHoSoYte)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_tbl_ket_qua_dieu_tri_ho_so_y_te");
         });
 
