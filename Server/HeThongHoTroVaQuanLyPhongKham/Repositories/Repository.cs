@@ -78,5 +78,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
                 .Where(e => EF.Property<int>(e, keyPropertyName) == id)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task DeleteAsync(IEnumerable<T> entities)
+        {
+            _context.Set<T>().RemoveRange(entities);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation($"Đã xóa {typeof(T).Name} thành công.");
+        }
     }
 }

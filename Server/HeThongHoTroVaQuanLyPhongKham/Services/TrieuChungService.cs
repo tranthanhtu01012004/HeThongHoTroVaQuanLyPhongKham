@@ -10,9 +10,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblTrieuChung> _trieuChungRepository;
         private readonly IMapper<TrieuChungDTO, TblTrieuChung> _trieuChungMapping;
-        private readonly IService<HoSoYTeDTO> _hoSoYTeService;
+        private readonly IHoSoYTeService _hoSoYTeService;
 
-        public TrieuChungService(IRepository<TblTrieuChung> trieuChungRepository, IMapper<TrieuChungDTO, TblTrieuChung> trieuChungMapping, IService<HoSoYTeDTO> hoSoYTeService)
+        public TrieuChungService(IRepository<TblTrieuChung> trieuChungRepository, IMapper<TrieuChungDTO, TblTrieuChung> trieuChungMapping, IHoSoYTeService hoSoYTeService)
         {
             _trieuChungRepository = trieuChungRepository;
             _trieuChungMapping = trieuChungMapping;

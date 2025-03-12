@@ -4,23 +4,31 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
+using HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class HoSoYTeService : BaseService, IHoSoYTeService
     {
         private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository;
-
         private readonly IMapper<HoSoYTeDTO, TblHoSoYTe> _hoSoYTeMapping;
+        private readonly IService<BenhNhanDTO> _benhNhanService;
+        private readonly IKetQuaDieuTriService _ketQuaDieuTriService;
+        private readonly IDonThuocService _donThuocService;
 
-        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping)
+        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping, IService<BenhNhanDTO> benhNhanService, IKetQuaDieuTriService ketQuaDieuTriService, IDonThuocService donThuocService)
         {
             _hoSoYTeRepository = hoSoYTeRepository;
             _hoSoYTeMapping = hoSoYTeMapping;
+            _benhNhanService = benhNhanService;
+            _ketQuaDieuTriService = ketQuaDieuTriService;
+            _donThuocService = donThuocService;
         }
 
         public async Task<HoSoYTeDTO> AddAsync(HoSoYTeDTO dto)
         {
+            await _benhNhanService.GetByIdAsync(dto.MaBenhNhan);
+
             return _hoSoYTeMapping.MapEntityToDto(
                 await _hoSoYTeRepository.CreateAsync(
                     _hoSoYTeMapping.MapDtoToEntity(dto)));
@@ -28,6 +36,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task DeleteAsync(int id)
         {
+            await _ketQuaDieuTriService.DeleteByMaHoSoYTeAsync(id);
+            await _donThuocService.DeleteByMaHoSoYTeAsync(id);
+
             await _hoSoYTeRepository.DeleteAsync(
                 _hoSoYTeMapping.MapDtoToEntity(
                     await GetByIdAsync(id)));
@@ -42,17 +53,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task<HoSoYTeDTO> GetByIdAsync(int id)
         {
-            var phongKham = await _hoSoYTeRepository.FindByIdAsync(id, "MaHoSoYte");
-            if (phongKham is null)
+            var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(id, "MaHoSoYte");
+            if (hoSoYTe is null)
                 throw new NotFoundException($"Hồ sơ y tế với ID [{id}] không tồn tại.");
 
-            return _hoSoYTeMapping.MapEntityToDto(phongKham);
+            return _hoSoYTeMapping.MapEntityToDto(hoSoYTe);
         }
 
         public async Task<HoSoYTeDTO> UpdateAsync(HoSoYTeDTO dto)
         {
             var hoSoYTeUpdate = _hoSoYTeMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaHoSoYTe));
+
+            await _benhNhanService.GetByIdAsync(dto.MaBenhNhan);
 
             _hoSoYTeMapping.MapDtoToEntity(dto, hoSoYTeUpdate);
 

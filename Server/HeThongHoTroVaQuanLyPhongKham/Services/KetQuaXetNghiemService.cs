@@ -10,9 +10,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblKetQuaXetNghiem> _ketQuaXetNghiemRepository;
         private readonly IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> _ketQuaXetNghiemMapping;
-        private readonly IService<HoSoYTeDTO> _hoSoYTeService;
+        private readonly IHoSoYTeService _hoSoYTeService;
 
-        public KetQuaXetNghiemService(IRepository<TblKetQuaXetNghiem> ketQuaXetNghiemRepository, IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> ketQuaXetNghiemMapping, IService<HoSoYTeDTO> hoSoYTeService)
+        public KetQuaXetNghiemService(IRepository<TblKetQuaXetNghiem> ketQuaXetNghiemRepository, IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> ketQuaXetNghiemMapping, IHoSoYTeService hoSoYTeService)
         {
             _ketQuaXetNghiemRepository = ketQuaXetNghiemRepository;
             _ketQuaXetNghiemMapping = ketQuaXetNghiemMapping;

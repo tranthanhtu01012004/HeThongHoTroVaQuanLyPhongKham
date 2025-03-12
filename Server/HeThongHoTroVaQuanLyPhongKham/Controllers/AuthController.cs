@@ -14,9 +14,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly IService<TaiKhoanDTO> _taiKhoanService;
+        private readonly ITaiKhoanService _taiKhoanService;
 
-        public AuthController(IAuthService authService, IService<TaiKhoanDTO> taiKhoanService)
+        public AuthController(IAuthService authService, ITaiKhoanService taiKhoanService)
         {
             _authService = authService;
             _taiKhoanService = taiKhoanService;

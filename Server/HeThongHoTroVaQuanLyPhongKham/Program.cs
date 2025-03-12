@@ -64,14 +64,15 @@ builder.Services.AddScoped<IService<DichVuYTeDTO>, DichVuYTeService>();
 builder.Services.AddScoped<IService<ThuocDTO>, ThuocService>();
 builder.Services.AddScoped<ILichHenService, LichHenService>();
 builder.Services.AddScoped<IHoaDonService, HoaDonService>();
+builder.Services.AddScoped<IService<HoSoYTeDTO>, HoSoYTeService>();
 builder.Services.AddScoped<IHoSoYTeService, HoSoYTeService>();
-builder.Services.AddScoped<IService<DonThuocDTO>, DonThuocService>();
 builder.Services.AddScoped<IDonThuocChiTietService, DonThuocChiTietService>();
 builder.Services.AddScoped<IService<BenhNhanDTO>, BenhNhanService>();
 builder.Services.AddScoped<IService<TrieuChungDTO>, TrieuChungService>();
-builder.Services.AddScoped<IService<HoSoYTeDTO>, HoSoYTeService>();
 builder.Services.AddScoped<IService<KetQuaXetNghiemDTO>, KetQuaXetNghiemService>();
-builder.Services.AddScoped<IService<KetQuaDieuTriDTO>, KetQuaDieuTriService>();
+builder.Services.AddScoped<IKetQuaDieuTriService, KetQuaDieuTriService>();
+builder.Services.AddScoped<IDonThuocService, DonThuocService>();
+builder.Services.AddScoped<IService<DonThuocDTO>, DonThuocService>();
 builder.Services.AddScoped<IService<VaiTroDTO>, VaiTroService>();
 
 // Đăng ký IPasswordHasher

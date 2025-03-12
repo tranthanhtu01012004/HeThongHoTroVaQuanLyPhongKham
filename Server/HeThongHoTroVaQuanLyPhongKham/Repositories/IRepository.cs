@@ -7,6 +7,7 @@
         Task<T> CreateAsync(T entity);
         Task<T> UpdateAsync(T entity);
         Task DeleteAsync(T entity);
+        Task DeleteAsync(IEnumerable<T> entities);
         IQueryable<T> GetQueryable();
         Task<IEnumerable<T>> FindAllWithQueryAsync(
             IQueryable<T> query,

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLydonThuoc.Services
 {
-    public class DonThuocService : BaseService, IService<DonThuocDTO>
+    public class DonThuocService : BaseService, IDonThuocService
     {
         private readonly IRepository<TblDonThuoc> _donThuocRepository;
         private readonly IMapper<DonThuocDTO, TblDonThuoc> _donThuocMapping;
@@ -32,6 +32,14 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
             await _donThuocRepository.DeleteAsync(
                 _donThuocMapping.MapDtoToEntity(
                     await GetByIdAsync(id)));
+        }
+
+        public async Task DeleteByMaHoSoYTeAsync(int id)
+        {
+            var donthuocs = await _donThuocRepository.GetQueryable()
+                                .Where(dt => dt.MaHoSoYte == id)
+                                .ToListAsync();
+            await _donThuocRepository.DeleteAsync(donthuocs);
         }
 
         public async Task<IEnumerable<DonThuocDTO>> GetAllAsync(int page, int pageSize)
