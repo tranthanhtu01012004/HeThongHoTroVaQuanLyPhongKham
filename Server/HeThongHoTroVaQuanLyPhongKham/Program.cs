@@ -70,11 +70,14 @@ builder.Services.AddScoped<IHoSoYTeService, HoSoYTeService>();
 builder.Services.AddScoped<IDonThuocChiTietService, DonThuocChiTietService>();
 builder.Services.AddScoped<IService<BenhNhanDTO>, BenhNhanService>();
 builder.Services.AddScoped<ITrieuChungService, TrieuChungService>();
+builder.Services.AddScoped<IService<TrieuChungDTO>, TrieuChungService>();
 builder.Services.AddScoped<IKetQuaXetNghiem, KetQuaXetNghiemService>();
 builder.Services.AddScoped<IKetQuaDieuTriService, KetQuaDieuTriService>();
 builder.Services.AddScoped<IDonThuocService, DonThuocService>();
 builder.Services.AddScoped<IService<DonThuocDTO>, DonThuocService>();
 builder.Services.AddScoped<IService<VaiTroDTO>, VaiTroService>();
+builder.Services.AddScoped<IService<KetQuaXetNghiemDTO>, KetQuaXetNghiemService>();
+builder.Services.AddScoped<IService<KetQuaDieuTriDTO>, KetQuaDieuTriService>();
 
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
