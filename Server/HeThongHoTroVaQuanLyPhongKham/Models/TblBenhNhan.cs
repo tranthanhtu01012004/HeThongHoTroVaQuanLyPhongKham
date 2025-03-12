@@ -15,8 +15,6 @@ public partial class TblBenhNhan
 
     public string SoDienThoai { get; set; } = null!;
 
-    public string? Email { get; set; }
-
     public virtual ICollection<TblHoSoYTe> TblHoSoYTes { get; set; } = new List<TblHoSoYTe>();
 
     public virtual ICollection<TblLichHen> TblLichHens { get; set; } = new List<TblLichHen>();

@@ -61,18 +61,12 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("tbl_benh_nhan");
 
-            entity.HasIndex(e => e.Email, "uq_tbl_benh_nhan_email").IsUnique();
-
             entity.HasIndex(e => e.SoDienThoai, "uq_tbl_benh_nhan_soDienThoai").IsUnique();
 
             entity.Property(e => e.MaBenhNhan).HasColumnName("maBenhNhan");
             entity.Property(e => e.DiaChi)
                 .HasMaxLength(1000)
                 .HasColumnName("diaChi");
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("email");
             entity.Property(e => e.GioiTinh).HasColumnName("gioiTinh");
             entity.Property(e => e.SoDienThoai)
                 .HasMaxLength(15)

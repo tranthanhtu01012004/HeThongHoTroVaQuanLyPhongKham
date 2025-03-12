@@ -19,9 +19,5 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [StringLength(15, MinimumLength = 10, ErrorMessage = "Số điện thoại phải từ 10 đến 15 ký tự")]
         [RegularExpression(@"^\d+$", ErrorMessage = "Số điện thoại chỉ được chứa chữ số")]
         public string SoDienThoai { get; set; } = null!;
-
-        [StringLength(100, ErrorMessage = "Email không được vượt quá 100 ký tự")]
-        [EmailAddress(ErrorMessage = "Email không đúng định dạng")]
-        public string? Email { get; set; }
     }
 }

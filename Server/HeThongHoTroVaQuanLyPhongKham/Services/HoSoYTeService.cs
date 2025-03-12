@@ -12,22 +12,29 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository;
         private readonly IMapper<HoSoYTeDTO, TblHoSoYTe> _hoSoYTeMapping;
-        private readonly IService<BenhNhanDTO> _benhNhanService;
+        //private readonly IService<BenhNhanDTO> _benhNhanService;
+        private readonly IRepository<TblBenhNhan> _benhNhanRepository; // Circular denpendency
         private readonly IKetQuaDieuTriService _ketQuaDieuTriService;
         private readonly IDonThuocService _donThuocService;
+        private readonly ITrieuChungService _trieuChungService;
+        private readonly IKetQuaXetNghiem _ketQuaXetNghiem;
 
-        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping, IService<BenhNhanDTO> benhNhanService, IKetQuaDieuTriService ketQuaDieuTriService, IDonThuocService donThuocService)
+        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping, IRepository<TblBenhNhan> benhNhanRepository, IKetQuaDieuTriService ketQuaDieuTriService, IDonThuocService donThuocService, ITrieuChungService trieuChungService, IKetQuaXetNghiem ketQuaXetNghiem)
         {
             _hoSoYTeRepository = hoSoYTeRepository;
             _hoSoYTeMapping = hoSoYTeMapping;
-            _benhNhanService = benhNhanService;
+            _benhNhanRepository = benhNhanRepository;
             _ketQuaDieuTriService = ketQuaDieuTriService;
             _donThuocService = donThuocService;
+            _trieuChungService = trieuChungService;
+            _ketQuaXetNghiem = ketQuaXetNghiem;
         }
 
         public async Task<HoSoYTeDTO> AddAsync(HoSoYTeDTO dto)
         {
-            await _benhNhanService.GetByIdAsync(dto.MaBenhNhan);
+            var benhNhan = await _benhNhanRepository.FindByIdAsync(dto.MaBenhNhan, "MaBenhNhan");
+            if (benhNhan is null)
+                throw new NotFoundException($"Bệnh nhân với ID [{dto.MaBenhNhan}] không tồn tại.");
 
             return _hoSoYTeMapping.MapEntityToDto(
                 await _hoSoYTeRepository.CreateAsync(
@@ -38,6 +45,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         {
             await _ketQuaDieuTriService.DeleteByMaHoSoYTeAsync(id);
             await _donThuocService.DeleteByMaHoSoYTeAsync(id);
+            await _trieuChungService.DeleteByMaHoSoYTeAsync(id);
+            await _ketQuaXetNghiem.DeleteByMaHoSoYTeAsync(id);
 
             await _hoSoYTeRepository.DeleteAsync(
                 _hoSoYTeMapping.MapDtoToEntity(
@@ -65,7 +74,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             var hoSoYTeUpdate = _hoSoYTeMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaHoSoYTe));
 
-            await _benhNhanService.GetByIdAsync(dto.MaBenhNhan);
+            var benhNhan = await _benhNhanRepository.FindByIdAsync(dto.MaBenhNhan, "MaBenhNhan");
+            if (benhNhan is null)
+                throw new NotFoundException($"Bệnh nhân với ID [{dto.MaBenhNhan}] không tồn tại.");
 
             _hoSoYTeMapping.MapDtoToEntity(dto, hoSoYTeUpdate);
 

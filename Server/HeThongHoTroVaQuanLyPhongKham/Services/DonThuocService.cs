@@ -50,11 +50,13 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
 
         public async Task DeleteAsync(int id)
         {
-            await _ketQuaDieuTriService.DeleteByMaHoSoYTeAsync(id);
+            var donThuoc = await GetByIdAsync(id);
+           
+            await _ketQuaDieuTriService.DeleteByMaHoSoYTeAsync(donThuoc.MaHoSoYte);
 
             await _donThuocRepository.DeleteAsync(
                 _donThuocMapping.MapDtoToEntity(
-                    await GetByIdAsync(id)));
+                    donThuoc));
         }
 
         public async Task DeleteByMaHoSoYTeAsync(int id)
@@ -62,7 +64,8 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
             var donthuocs = await _donThuocRepository.GetQueryable()
                                 .Where(dt => dt.MaHoSoYte == id)
                                 .ToListAsync();
-            await _donThuocRepository.DeleteAsync(donthuocs);
+            if (donthuocs.Any())
+                await _donThuocRepository.DeleteAsync(donthuocs);
         }
 
         public async Task<IEnumerable<DonThuocDTO>> GetAllAsync(int page, int pageSize)

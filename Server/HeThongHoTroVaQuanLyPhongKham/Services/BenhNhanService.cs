@@ -3,6 +3,8 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
+using HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
@@ -10,11 +12,15 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblBenhNhan> _benhNhanRepository;
         private readonly IMapper<BenhNhanDTO, TblBenhNhan> _benhNhanMapping;
+        private readonly IHoSoYTeService _hoSoYTeService;
+        private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository;
 
-        public BenhNhanService(IRepository<TblBenhNhan> benhNhanRepository, IMapper<BenhNhanDTO, TblBenhNhan> benhNhanMapping)
+        public BenhNhanService(IRepository<TblBenhNhan> benhNhanRepository, IMapper<BenhNhanDTO, TblBenhNhan> benhNhanMapping, IHoSoYTeService hoSoYTeService, IRepository<TblHoSoYTe> hoSoYTeRepository)
         {
             _benhNhanRepository = benhNhanRepository;
             _benhNhanMapping = benhNhanMapping;
+            _hoSoYTeService = hoSoYTeService;
+            _hoSoYTeRepository = hoSoYTeRepository;
         }
 
         public async Task<BenhNhanDTO> AddAsync(BenhNhanDTO dto)
@@ -26,6 +32,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task DeleteAsync(int id)
         {
+            var benhNhan = await GetByIdAsync(id);
+
+            var hoSoYTeList = await _hoSoYTeRepository.GetQueryable()
+                .Where(h => h.MaBenhNhan == id)
+                .ToListAsync();
+
+            if (hoSoYTeList.Any())
+                foreach (var hoSoYTe in hoSoYTeList)
+                    await _hoSoYTeService.DeleteAsync(hoSoYTe.MaHoSoYte);
+
             await _benhNhanRepository.DeleteAsync(
                 _benhNhanMapping.MapDtoToEntity(
                     await GetByIdAsync(id)));
