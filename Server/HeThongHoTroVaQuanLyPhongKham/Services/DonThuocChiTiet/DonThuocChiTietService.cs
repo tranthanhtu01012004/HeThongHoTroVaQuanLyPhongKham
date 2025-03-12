@@ -10,11 +10,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
     {
         private readonly IRepository<TblDonThuocChiTiet> _donThuocChiTietRepository;
         private readonly IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> _donThuocChiTietMapping;
+        private readonly IService<ThuocDTO> _thuocService;
 
-        public DonThuocChiTietService(IRepository<TblDonThuocChiTiet> donThuocChiTietRepository, IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> donThuocChiTietMapping)
+        public DonThuocChiTietService(IRepository<TblDonThuocChiTiet> donThuocChiTietRepository, IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> donThuocChiTietMapping, IService<ThuocDTO> thuocService)
         {
             _donThuocChiTietRepository = donThuocChiTietRepository;
             _donThuocChiTietMapping = donThuocChiTietMapping;
+            _thuocService = thuocService;
         }
 
         public async Task<DonThuocChiTietDTO> AddAsync(DonThuocChiTietDTO dto)
@@ -28,6 +30,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
         {
             foreach(var chiTiet in dto)
             {
+                await _thuocService.GetByIdAsync(chiTiet.MaThuoc);
+
                 await _donThuocChiTietRepository.CreateAsync(
                     _donThuocChiTietMapping.MapDtoToEntity(chiTiet)
                 );
@@ -61,6 +65,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
         {
             var donThuocCtUpdate = _donThuocChiTietMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaDonThuocChiTiet));
+
+            await _thuocService.GetByIdAsync(dto.MaThuoc);
 
             _donThuocChiTietMapping.MapDtoToEntity(dto, donThuocCtUpdate);
 

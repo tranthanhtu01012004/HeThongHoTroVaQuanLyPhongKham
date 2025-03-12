@@ -62,6 +62,7 @@ builder.Services.AddScoped<IService<PhongKhamDTO>, PhongKhamService>();
 builder.Services.AddScoped<IService<PhongKhamNhanVienDTO>, PhongKhamNhanVienService>();
 builder.Services.AddScoped<IService<DichVuYTeDTO>, DichVuYTeService>();
 builder.Services.AddScoped<IService<ThuocDTO>, ThuocService>();
+builder.Services.AddScoped<IThuocService, ThuocService>();
 builder.Services.AddScoped<ILichHenService, LichHenService>();
 builder.Services.AddScoped<IHoaDonService, HoaDonService>();
 builder.Services.AddScoped<IService<HoSoYTeDTO>, HoSoYTeService>();

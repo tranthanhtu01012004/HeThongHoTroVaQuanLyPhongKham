@@ -3,6 +3,7 @@
     public interface IRepository<T> where T : class
     {
         Task<IEnumerable<T>> FindAllAsync(int page, int pageSize, int pageSkip, string keyPropertyName);
+        Task<IEnumerable<T>> FindAllAsync(string keyPropertyName);
         Task<T> FindByIdAsync(int id, string keyPropertyName);
         Task<T> CreateAsync(T entity);
         Task<T> UpdateAsync(T entity);
