@@ -9,6 +9,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
         {
             return new TblPhongKhamNhanVien
             {
+                MaPhongKhamNhanVien = dto.MaPhongKhamNhanVien,
                 MaPhongKham = dto.MaPhongKham,
                 MaNhanVien = dto.MaNhanVien,
                 VaiTro = dto.VaiTro
@@ -17,13 +18,17 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
 
         public void MapDtoToEntity(PhongKhamNhanVienDTO dto, TblPhongKhamNhanVien entity)
         {
-            throw new NotImplementedException();
+            entity.MaPhongKhamNhanVien = dto.MaPhongKhamNhanVien;
+            entity.MaPhongKham = dto.MaPhongKham;
+            entity.MaNhanVien = dto.MaNhanVien;
+            entity.VaiTro = dto.VaiTro;
         }
 
         public PhongKhamNhanVienDTO MapEntityToDto(TblPhongKhamNhanVien entity)
         {
             return new PhongKhamNhanVienDTO
             {
+                MaPhongKhamNhanVien = entity.MaPhongKhamNhanVien,
                 MaPhongKham = entity.MaPhongKham,
                 MaNhanVien = entity.MaNhanVien,
                 VaiTro = entity.VaiTro

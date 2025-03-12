@@ -3,25 +3,29 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
-    public class TrieuChungService : BaseService, IService<TrieuChungDTO>
+    public class TrieuChungService : BaseService, ITrieuChungService
     {
         private readonly IRepository<TblTrieuChung> _trieuChungRepository;
         private readonly IMapper<TrieuChungDTO, TblTrieuChung> _trieuChungMapping;
-        private readonly IService<HoSoYTeDTO> _hoSoYTeService;
+        //private readonly IService<HoSoYTeDTO> _hoSoYTeService;
+        private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository; // Tranh Circular Dependency
 
-        public TrieuChungService(IRepository<TblTrieuChung> trieuChungRepository, IMapper<TrieuChungDTO, TblTrieuChung> trieuChungMapping, IService<HoSoYTeDTO> hoSoYTeService)
+        public TrieuChungService(IRepository<TblTrieuChung> trieuChungRepository, IMapper<TrieuChungDTO, TblTrieuChung> trieuChungMapping, IRepository<TblHoSoYTe> hoSoYTeRepository)
         {
             _trieuChungRepository = trieuChungRepository;
             _trieuChungMapping = trieuChungMapping;
-            _hoSoYTeService = hoSoYTeService;
+            _hoSoYTeRepository = hoSoYTeRepository;
         }
 
         public async Task<TrieuChungDTO> AddAsync(TrieuChungDTO dto)
         {
-            await _hoSoYTeService.GetByIdAsync(dto.MaHoSoYte);
+            var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(dto.MaHoSoYte, "MaHoSoYte");
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Hồ sơ y tế với ID [{dto.MaHoSoYte}] không tồn tại.");
 
             return _trieuChungMapping.MapEntityToDto(
                 await _trieuChungRepository.CreateAsync(
@@ -33,6 +37,15 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             await _trieuChungRepository.DeleteAsync(
                 _trieuChungMapping.MapDtoToEntity(
                     await GetByIdAsync(id)));
+        }
+
+        public async Task DeleteByMaHoSoYTeAsync(int id)
+        {
+            var trieuChungs = await _trieuChungRepository.GetQueryable()
+                            .Where(kq => kq.MaHoSoYte == id)
+                                .ToListAsync();
+            if (trieuChungs.Any())
+                await _trieuChungRepository.DeleteAsync(trieuChungs);
         }
 
         public async Task<IEnumerable<TrieuChungDTO>> GetAllAsync(int page, int pageSize)
@@ -55,6 +68,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         {
             var trieuChungUpdate = _trieuChungMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaTrieuChung));
+
+            var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(dto.MaHoSoYte, "MaHoSoYte");
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Hồ sơ y tế với ID [{dto.MaHoSoYte}] không tồn tại.");
 
             _trieuChungMapping.MapDtoToEntity(dto, trieuChungUpdate);
 

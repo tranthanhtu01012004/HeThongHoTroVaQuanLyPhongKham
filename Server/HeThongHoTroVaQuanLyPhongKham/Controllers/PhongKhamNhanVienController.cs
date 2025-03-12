@@ -20,6 +20,42 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             _phongKhamNhanVienService = phongKhamNhanVienService;
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                return Ok(ApiResponse<IEnumerable<PhongKhamNhanVienDTO>>.Success(
+                    await _phongKhamNhanVienService.GetAllAsync(page, pageSize)));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> GetById([FromRoute] int id)
+        {
+            try
+            {
+                return Ok(ApiResponse<PhongKhamNhanVienDTO>.Success(
+                    await _phongKhamNhanVienService.GetByIdAsync(id), $"Tìm thấy PhongKhamNhanVien với ID [{id}]."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] PhongKhamNhanVienDTO dto)
         {
@@ -31,12 +67,55 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 return Ok(ApiResponse<PhongKhamNhanVienDTO>.Success(
                     await _phongKhamNhanVienService.AddAsync(dto), "Thêm dữ liệu cho PhongKhamNhanVien thành công."));
 
-            } catch (NotFoundException ex)
+            }
+            catch (NotFoundException ex)
             {
                 return NotFound(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
-            } catch (Exception ex)
+            }
+            catch (Exception ex)
             {
                 return BadRequest(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] PhongKhamNhanVienDTO dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                if (id != dto.MaPhongKhamNhanVien)
+                    return BadRequest("Id không khớp");
+
+                return Ok(ApiResponse<PhongKhamNhanVienDTO>.Success(
+                    await _phongKhamNhanVienService.UpdateAsync(dto), $"Cập nhật PhongKhamNhanVien với ID [{id}] thành công."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            try
+            {
+                await _phongKhamNhanVienService.DeleteAsync(id);
+                return NoContent();
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<PhongKhamNhanVienDTO>.Fail(ex.Message));
             }
         }
     }

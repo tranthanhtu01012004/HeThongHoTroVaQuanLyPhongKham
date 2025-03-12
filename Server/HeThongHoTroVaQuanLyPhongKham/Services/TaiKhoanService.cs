@@ -4,26 +4,27 @@ using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
-    public class TaiKhoanService : BaseService, IService<TaiKhoanDTO>
+    public class TaiKhoanService : BaseService, ITaiKhoanService
     {
-        private readonly IRepository<TblTaiKhoan> _taiKhoanRepository;
         private readonly IMapper<TaiKhoanDTO, TblTaiKhoan> _taiKhoanMapping;
-        private readonly ITaiKhoanRepository _taiKhoanRepo;
+        private readonly ITaiKhoanRepository _taiKhoanRepository;
         private readonly IPasswordHasher _passwordHasher;
+        private readonly IService<VaiTroDTO> _vaiTroService;
 
-        public TaiKhoanService(IRepository<TblTaiKhoan> taiKhoanRepository, IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepo, IPasswordHasher passwordHasher)
+        public TaiKhoanService(IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepository, IPasswordHasher passwordHasher, IService<VaiTroDTO> vaiTroService)
         {
-            _taiKhoanRepository = taiKhoanRepository;
             _taiKhoanMapping = taiKhoanMapping;
-            _taiKhoanRepo = taiKhoanRepo;
+            _taiKhoanRepository = taiKhoanRepository;
             _passwordHasher = passwordHasher;
+            _vaiTroService = vaiTroService;
         }
 
         public async Task<TaiKhoanDTO> AddAsync(TaiKhoanDTO dto)
         {
-            var taiKhoanExisting = await _taiKhoanRepo.FindByNameAsync(dto.TenDangNhap);
+            var taiKhoanExisting = await _taiKhoanRepository.FindByNameAsync(dto.TenDangNhap);
             if (taiKhoanExisting != null && 
                 string.Equals(taiKhoanExisting.TenDangNhap, dto.TenDangNhap, StringComparison.OrdinalIgnoreCase))
                 throw new DuplicateEntityException($"Tài khoản với tên đăng nhập [{dto.TenDangNhap}] đã tồn tại.");
@@ -60,16 +61,27 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             return _taiKhoanMapping.MapEntityToDto(taiKhoan);
         }
 
-        public async Task<TaiKhoanDTO> UpdateAsync(TaiKhoanDTO dto)
+        public async Task<TaiKhoanDTO> UpdateAsync(TaiKhoanUpdateDTO dto)
         {
-            var taiKhoanUpdate = _taiKhoanMapping.MapDtoToEntity(
-                await GetByIdAsync(dto.MaTaiKhoan));
+            var taiKhoanUpdate = await GetByIdAsync(dto.MaTaiKhoan);
 
-            _taiKhoanMapping.MapDtoToEntity(dto, taiKhoanUpdate);
-            taiKhoanUpdate.MatKhau = _passwordHasher.HashPassword(dto.MatKhau);
+            if (dto.MaVaiTro != null)
+            {
+                await _vaiTroService.GetByIdAsync((int)dto.MaVaiTro);
+                taiKhoanUpdate.MaVaiTro = dto.MaVaiTro;
+            }
+
+            if (dto.MatKhau != null)
+                taiKhoanUpdate.MatKhau = _passwordHasher.HashPassword(dto.MatKhau);
 
             return _taiKhoanMapping.MapEntityToDto(
-                await _taiKhoanRepository.UpdateAsync(taiKhoanUpdate));
+                await _taiKhoanRepository.UpdateAsync(
+                    _taiKhoanMapping.MapDtoToEntity(taiKhoanUpdate)));
+        }
+
+        public Task<TaiKhoanDTO> UpdateAsync(TaiKhoanDTO dto)
+        {
+            throw new NotImplementedException();
         }
     }
 }

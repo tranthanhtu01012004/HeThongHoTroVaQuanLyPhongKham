@@ -1,4 +1,5 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
@@ -11,15 +12,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblHoaDon> _hoaDonRepository;
         private readonly IMapper<HoaDonDTO, TblHoaDon> _hoaDonMapping;
+        private readonly ILichHenService _lichHenService;
 
-        public HoaDonService(IRepository<TblHoaDon> hoaDonRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping)
+        public HoaDonService(IRepository<TblHoaDon> hoaDonRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping, ILichHenService lichHenService)
         {
             _hoaDonRepository = hoaDonRepository;
             _hoaDonMapping = hoaDonMapping;
+            _lichHenService = lichHenService;
         }
 
         public async Task<HoaDonDTO> AddAsync(HoaDonDTO dto)
         {
+            await _lichHenService.GetByIdAsync(dto.MaLichHen);
+
             return _hoaDonMapping.MapEntityToDto(
                 await _hoaDonRepository.CreateAsync(
                     _hoaDonMapping.MapDtoToEntity(dto)));
@@ -52,6 +57,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         {
             var hoaDonUpdate = _hoaDonMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaHoaDon));
+
+            await _lichHenService.GetByIdAsync(dto.MaLichHen);
 
             _hoaDonMapping.MapDtoToEntity(dto, hoaDonUpdate);
 

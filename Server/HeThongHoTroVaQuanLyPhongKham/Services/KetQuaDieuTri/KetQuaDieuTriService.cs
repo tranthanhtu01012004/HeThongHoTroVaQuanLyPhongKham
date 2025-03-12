@@ -1,30 +1,39 @@
-﻿using HeThongHoTroVaQuanLyPhongKham.Dtos;
+﻿using HeThongHoTroVaQuanLydonThuoc.Services;
+using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri
 {
-    public class KetQuaDieuTriService : BaseService, IService<KetQuaDieuTriDTO>
+    public class KetQuaDieuTriService : BaseService, IKetQuaDieuTriService
     {
         private readonly IRepository<TblKetQuaDieuTri> _ketQuaDieuTriRepository;
         private readonly IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> _ketQuaDieuTriMapping;
-        private readonly IService<HoSoYTeDTO> _hoSoYTeService;
-        private readonly IService<DonThuocDTO> _donThuocService;
+        private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository;
+        private readonly IRepository<TblDonThuoc> _donThuocRepository;
 
-        public KetQuaDieuTriService(IRepository<TblKetQuaDieuTri> ketQuaDieuTriRepository, IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> ketQuaDieuTriMapping, IService<HoSoYTeDTO> hoSoYTeService, IService<DonThuocDTO> donThuocService)
+        public KetQuaDieuTriService(IRepository<TblKetQuaDieuTri> ketQuaDieuTriRepository, IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> ketQuaDieuTriMapping, IRepository<TblHoSoYTe> hoSoYTeRepository, IRepository<TblDonThuoc> donThuocRepository)
         {
             _ketQuaDieuTriRepository = ketQuaDieuTriRepository;
             _ketQuaDieuTriMapping = ketQuaDieuTriMapping;
-            _hoSoYTeService = hoSoYTeService;
-            _donThuocService = donThuocService;
+            _hoSoYTeRepository = hoSoYTeRepository;
+            _donThuocRepository = donThuocRepository;
         }
 
         public async Task<KetQuaDieuTriDTO> AddAsync(KetQuaDieuTriDTO dto)
         {
-            await _hoSoYTeService.GetByIdAsync(dto.MaHoSoYte);
-            await _donThuocService.GetByIdAsync(dto.MaDonThuoc);
+            // Su dung Repo cua HoSoYTe thay vi Service de tranh loi 'circular dependency'
+            var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(dto.MaHoSoYte, "MaHoSoYte");
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Hồ sơ y tế với ID [{dto.MaHoSoYte}] không tồn tại.");
+
+            // tuong tu
+            var donThuoc = await _donThuocRepository.FindByIdAsync(dto.MaDonThuoc, "MaDonThuoc");
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Mã đơn thuốc với ID [{dto.MaDonThuoc}] không tồn tại.");
 
             return _ketQuaDieuTriMapping.MapEntityToDto(
                 await _ketQuaDieuTriRepository.CreateAsync(
@@ -36,6 +45,15 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri
             await _ketQuaDieuTriRepository.DeleteAsync(
                 _ketQuaDieuTriMapping.MapDtoToEntity(
                     await GetByIdAsync(id)));
+        }
+
+        public async Task DeleteByMaHoSoYTeAsync(int id)
+        {
+            var ketQuaDieuTris = await _ketQuaDieuTriRepository.GetQueryable()
+                                        .Where(kq => kq.MaHoSoYte == id)
+                                            .ToListAsync();
+            if (ketQuaDieuTris.Any())
+                await _ketQuaDieuTriRepository.DeleteAsync(ketQuaDieuTris);
         }
 
         public async Task<IEnumerable<KetQuaDieuTriDTO>> GetAllAsync(int page, int pageSize)
@@ -56,8 +74,15 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri
 
         public async Task<KetQuaDieuTriDTO> UpdateAsync(KetQuaDieuTriDTO dto)
         {
-            await _hoSoYTeService.GetByIdAsync(dto.MaHoSoYte);
-            await _donThuocService.GetByIdAsync(dto.MaDonThuoc);
+            // Su dung Repo cua HoSoYTe thay vi Service de tranh loi 'circular dependency'
+            var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(dto.MaHoSoYte, "MaHoSoYte");
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Hồ sơ y tế với ID [{dto.MaHoSoYte}] không tồn tại.");
+
+            // tuong tu
+            var donThuoc = await _donThuocRepository.FindByIdAsync(dto.MaDonThuoc, "MaDonThuoc");
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Mã đơn thuốc với ID [{dto.MaDonThuoc}] không tồn tại.");
 
             var kqDieuTriUpdate = _ketQuaDieuTriMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaKetQuaDieuTri));

@@ -13,15 +13,32 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblLichHen> _lichHenRepository;
         private readonly IMapper<LichHenDTO, TblLichHen> _lichHenMapping;
+        //private readonly IService<BenhNhanDTO> _benhNhanService;
+        private readonly IRepository<TblBenhNhan> _benhNhanRepository; // Circular denpendency
+        private readonly IService<NhanVienDTO> _nhanVienService;
+        private readonly IService<DichVuYTeDTO> _dichVuYTeService;
+        private readonly IService<PhongKhamDTO> _phongKhamService;
 
-        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping)
+        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IService<DichVuYTeDTO> dichVuYTeService, IService<PhongKhamDTO> phongKhamService)
         {
             _lichHenRepository = lichHenRepository;
             _lichHenMapping = lichHenMapping;
+            _benhNhanRepository = benhNhanRepository;
+            _nhanVienService = nhanVienService;
+            _dichVuYTeService = dichVuYTeService;
+            _phongKhamService = phongKhamService;
         }
 
         public async Task<LichHenDTO> AddAsync(LichHenDTO dto)
         {
+            var benhNhan = await _benhNhanRepository.FindByIdAsync(dto.MaBenhNhan, "MaBenhNhan");
+            if (benhNhan is null)
+                throw new NotFoundException($"Bệnh nhân với ID [{dto.MaBenhNhan}] không tồn tại.");
+
+            await _nhanVienService.GetByIdAsync(dto.MaNhanVien);
+            await _dichVuYTeService.GetByIdAsync(dto.MaDichVuYTe);
+            await _phongKhamService.GetByIdAsync(dto.MaPhongKham);
+
             return _lichHenMapping.MapEntityToDto(
                 await _lichHenRepository.CreateAsync(
                     _lichHenMapping.MapDtoToEntity(dto)));
@@ -75,6 +92,15 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         {
             var lichHenUpdate = _lichHenMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaLichHen));
+            var lichHen = await GetByIdAsync(dto.MaLichHen);
+
+            var benhNhan = await _benhNhanRepository.FindByIdAsync(dto.MaBenhNhan, "MaBenhNhan");
+            if (benhNhan is null)
+                throw new NotFoundException($"Bệnh nhân với ID [{dto.MaBenhNhan}] không tồn tại.");
+
+            await _nhanVienService.GetByIdAsync(dto.MaNhanVien);
+            await _dichVuYTeService.GetByIdAsync(dto.MaDichVuYTe);
+            await _phongKhamService.GetByIdAsync(dto.MaPhongKham);
 
             _lichHenMapping.MapDtoToEntity(dto, lichHenUpdate);
 

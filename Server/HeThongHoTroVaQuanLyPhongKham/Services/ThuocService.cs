@@ -6,7 +6,7 @@ using HeThongHoTroVaQuanLyPhongKham.Repositories;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
-    public class ThuocService : BaseService, IService<ThuocDTO>
+    public class ThuocService : BaseService, IThuocService
     {
         private readonly IRepository<TblThuoc> _thuocRepository;
         private readonly IMapper<ThuocDTO, TblThuoc> _thuocMapping;
@@ -29,6 +29,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             await _thuocRepository.DeleteAsync(
                 _thuocMapping.MapDtoToEntity(
                     await GetByIdAsync(id)));
+        }
+
+        public async Task<IEnumerable<ThuocDTO>> GetAllAsync()
+        {
+            var thuocs = await _thuocRepository.FindAllAsync("MaThuoc");
+            return thuocs.Select(t => _thuocMapping.MapEntityToDto(t));
         }
 
         public async Task<IEnumerable<ThuocDTO>> GetAllAsync(int page, int pageSize)

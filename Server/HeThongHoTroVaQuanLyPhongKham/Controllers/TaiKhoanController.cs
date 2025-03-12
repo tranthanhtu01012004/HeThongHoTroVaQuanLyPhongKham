@@ -1,5 +1,6 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -13,9 +14,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     [Authorize(Roles = "QuanLy")]
     public class TaiKhoanController : ControllerBase
     {
-        private readonly IService<TaiKhoanDTO> _taiKhoanService;
+        private readonly ITaiKhoanService _taiKhoanService;
 
-        public TaiKhoanController(IService<TaiKhoanDTO> taiKhoanService)
+        public TaiKhoanController(ITaiKhoanService taiKhoanService)
         {
             _taiKhoanService = taiKhoanService;
         }
@@ -52,19 +53,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpPut("{id:int}")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] TaiKhoanDTO taiKhoanDTO)
+        [HttpPatch("{id:int}")]
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] TaiKhoanUpdateDTO dto)
         {
             try
             {
                 if (!ModelState.IsValid)
                     return BadRequest(ModelState);
 
-                if (id != taiKhoanDTO.MaTaiKhoan)
+                if (id != dto.MaTaiKhoan)
                     return BadRequest("Id không khớp");
 
                 return Ok(ApiResponse<TaiKhoanDTO>.Success(
-                    await _taiKhoanService.UpdateAsync(taiKhoanDTO), $"Cập nhật tài khoản với ID [{id}] thành công."));
+                    await _taiKhoanService.UpdateAsync(dto), $"Cập nhật tài khoản với ID [{id}] thành công."));
             } catch (NotFoundException ex)
             {
                 return NotFound(ApiResponse<TaiKhoanDTO>.Fail(ex.Message));

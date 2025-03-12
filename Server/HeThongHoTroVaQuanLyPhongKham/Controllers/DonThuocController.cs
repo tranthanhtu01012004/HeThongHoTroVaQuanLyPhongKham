@@ -13,10 +13,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     [ApiController]
     public class DonThuocController : ControllerBase
     {
-        private readonly IService<DonThuocDTO> _donThuocService;
+        private readonly IDonThuocService _donThuocService;
         private readonly IDonThuocChiTietService _donThuocChiTietService;
 
-        public DonThuocController(IService<DonThuocDTO> donThuocService, IDonThuocChiTietService donThuocChiTietService)
+        public DonThuocController(IDonThuocService donThuocService, IDonThuocChiTietService donThuocChiTietService)
         {
             _donThuocService = donThuocService;
             _donThuocChiTietService = donThuocChiTietService;

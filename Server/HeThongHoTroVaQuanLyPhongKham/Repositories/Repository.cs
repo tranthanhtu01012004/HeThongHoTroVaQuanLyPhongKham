@@ -78,5 +78,21 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
                 .Where(e => EF.Property<int>(e, keyPropertyName) == id)
                 .FirstOrDefaultAsync();
         }
+
+        public async Task DeleteAsync(IEnumerable<T> entities)
+        {
+            _context.Set<T>().RemoveRange(entities);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation($"Đã xóa {typeof(T).Name} thành công.");
+        }
+
+        public async Task<IEnumerable<T>> FindAllAsync(string keyPropertyName)
+        {
+            var entities = await _context.Set<T>()
+                .OrderBy(e => EF.Property<int>(e, keyPropertyName))
+                .ToListAsync();
+            _logger.LogInformation($"Đã lấy danh sách {typeof(T).Name}.");
+            return entities;
+        }
     }
 }

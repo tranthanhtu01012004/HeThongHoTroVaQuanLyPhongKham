@@ -23,35 +23,49 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task<PhongKhamNhanVienDTO> AddAsync(PhongKhamNhanVienDTO dto)
         {
-            var nhanVien = await _nhanVienService.GetByIdAsync(dto.MaNhanVien);
-            var phongKham = await _phongKhamService.GetByIdAsync(dto.MaPhongKham);
-
-            if (nhanVien is null || nhanVien is null)
-                throw new NotFoundException("Phòng khám hoặc nhân viên không tồn tại.");
+            await _nhanVienService.GetByIdAsync(dto.MaNhanVien);
+            await _phongKhamService.GetByIdAsync(dto.MaPhongKham);
 
             return _phongKhamNhanVienMapping.MapEntityToDto(
                 await _phongKhamNhanVienRepository.CreateAsync(
                 _phongKhamNhanVienMapping.MapDtoToEntity(dto)));
         }
 
-        public Task DeleteAsync(int id)
+        public async Task DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            await _phongKhamNhanVienRepository.DeleteAsync(
+                _phongKhamNhanVienMapping.MapDtoToEntity(
+                    await GetByIdAsync(id)));
         }
 
-        public Task<IEnumerable<PhongKhamNhanVienDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<IEnumerable<PhongKhamNhanVienDTO>> GetAllAsync(int page, int pageSize)
         {
-            throw new NotImplementedException();
+            var pageSkip = CalculatePageSkip(page, pageSize);
+            var phongKhamNhanViens = await _phongKhamNhanVienRepository.FindAllAsync(page, pageSize, pageSkip, "MaPhongKhamNhanVien");
+            return phongKhamNhanViens.Select(t => _phongKhamNhanVienMapping.MapEntityToDto(t));
         }
 
-        public Task<PhongKhamNhanVienDTO> GetByIdAsync(int id)
+        public async Task<PhongKhamNhanVienDTO> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var phongKhamNhanVien = await _phongKhamNhanVienRepository.FindByIdAsync(id, "MaPhongKhamNhanVien");
+            if (phongKhamNhanVien is null)
+                throw new NotFoundException($"PhongKhamNhanVien với ID [{id}] không tồn tại.");
+
+            return _phongKhamNhanVienMapping.MapEntityToDto(phongKhamNhanVien);
         }
 
-        public Task<PhongKhamNhanVienDTO> UpdateAsync(PhongKhamNhanVienDTO dto)
+        public async Task<PhongKhamNhanVienDTO> UpdateAsync(PhongKhamNhanVienDTO dto)
         {
-            throw new NotImplementedException();
+            var phongKhamNhanVienUpdate = _phongKhamNhanVienMapping.MapDtoToEntity(
+                await GetByIdAsync(dto.MaPhongKhamNhanVien));
+
+            await _nhanVienService.GetByIdAsync(dto.MaNhanVien);
+            await _phongKhamService.GetByIdAsync(dto.MaPhongKham);
+
+            _phongKhamNhanVienMapping.MapDtoToEntity(dto, phongKhamNhanVienUpdate);
+
+            return _phongKhamNhanVienMapping.MapEntityToDto(
+                await _phongKhamNhanVienRepository.UpdateAsync(phongKhamNhanVienUpdate));
         }
     }
 }
