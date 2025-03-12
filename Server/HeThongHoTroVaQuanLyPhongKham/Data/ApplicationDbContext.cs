@@ -338,10 +338,13 @@ public partial class ApplicationDbContext : DbContext
 
         modelBuilder.Entity<TblPhongKhamNhanVien>(entity =>
         {
-            entity.HasKey(e => new { e.MaPhongKham, e.MaNhanVien }).HasName("pk_tbl_phong_kham_nhan_vien");
+            entity.HasKey(e => new { e.MaPhongKhamNhanVien, e.MaPhongKham, e.MaNhanVien }).HasName("pk_tbl_phong_kham_nhan_vien");
 
             entity.ToTable("tbl_phong_kham_nhan_vien");
 
+            entity.Property(e => e.MaPhongKhamNhanVien)
+                .ValueGeneratedOnAdd()
+                .HasColumnName("maPhongKhamNhanVien");
             entity.Property(e => e.MaPhongKham).HasColumnName("maPhongKham");
             entity.Property(e => e.MaNhanVien).HasColumnName("maNhanVien");
             entity.Property(e => e.VaiTro)

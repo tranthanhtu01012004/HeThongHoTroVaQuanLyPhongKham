@@ -5,6 +5,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Models;
 
 public partial class TblPhongKhamNhanVien
 {
+    public int MaPhongKhamNhanVien { get; set; }
+
     public int MaPhongKham { get; set; }
 
     public int MaNhanVien { get; set; }
