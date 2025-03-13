@@ -82,6 +82,18 @@ builder.Services.AddScoped<IService<KetQuaDieuTriDTO>, KetQuaDieuTriService>();
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
+// Cấu hình CORS
+// Tai lieu tham khao: https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-9.0
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAngularApp", builder =>
+    {
+        builder.WithOrigins("http://localhost:4200")
+               .AllowAnyHeader()
+               .AllowAnyMethod();
+    });
+});
+
 
 // Cấu hình JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -111,6 +123,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+// Enable CORS
+app.UseCors("AllowAngularApp");
 
 app.UseAuthentication(); // Xác thực JWT 
 
