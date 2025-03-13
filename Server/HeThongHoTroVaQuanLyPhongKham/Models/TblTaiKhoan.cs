@@ -15,5 +15,7 @@ public partial class TblTaiKhoan
 
     public virtual TblVaiTro? MaVaiTroNavigation { get; set; }
 
-    public virtual ICollection<TblNhanVien> TblNhanViens { get; set; } = new List<TblNhanVien>();
+    public virtual TblBenhNhan? TblBenhNhan { get; set; }
+
+    public virtual TblNhanVien? TblNhanVien { get; set; }
 }
