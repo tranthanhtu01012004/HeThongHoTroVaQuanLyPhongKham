@@ -68,14 +68,18 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
                 await _donThuocRepository.DeleteAsync(donthuocs);
         }
 
-        public async Task<IEnumerable<DonThuocDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<DonThuocDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _donThuocRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
+            var pageSkip = CalculatePageSkip(page, pageSize);
+
             var query = _donThuocRepository.GetQueryable();
             query = query.Include(d => d.TblDonThuocChiTiets);
 
-            var pageSkip = CalculatePageSkip(page, pageSize);
             var donThuocs = await _donThuocRepository.FindAllWithQueryAsync(query, page, pageSize, pageSkip, "MaDonThuoc");
-            return donThuocs.Select(t => _donThuocMapping.MapEntityToDto(t));
+            var dtoList = donThuocs.Select(t => _donThuocMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<DonThuocDTO> GetByIdAsync(int id)

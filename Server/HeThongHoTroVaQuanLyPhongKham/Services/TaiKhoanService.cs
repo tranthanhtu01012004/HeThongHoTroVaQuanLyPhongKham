@@ -45,11 +45,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<TaiKhoanDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<TaiKhoanDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _taiKhoanRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
             var taiKhoans = await _taiKhoanRepository.FindAllAsync(page, pageSize, pageSkip, "MaTaiKhoan");
-            return taiKhoans.Select(t => _taiKhoanMapping.MapEntityToDto(t));
+            var dtoList = taiKhoans.Select(t => _taiKhoanMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<TaiKhoanDTO> GetByIdAsync(int id)

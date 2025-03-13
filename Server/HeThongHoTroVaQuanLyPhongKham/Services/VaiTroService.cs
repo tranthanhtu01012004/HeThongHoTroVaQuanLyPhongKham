@@ -31,11 +31,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<VaiTroDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<VaiTroDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _vaiTroRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
             var vaiTros = await _vaiTroRepository.FindAllAsync(page, pageSize, pageSkip, "MaVaiTro");
-            return vaiTros.Select(t => _vaiTroMapping.MapEntityToDto(t));
+            var dtoList = vaiTros.Select(t => _vaiTroMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<VaiTroDTO> GetByIdAsync(int id)

@@ -79,5 +79,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
             return _donThuocChiTietMapping.MapEntityToDto(
                 await _donThuocChiTietRepository.UpdateAsync(donThuocCtUpdate));
         }
+
+        Task<(IEnumerable<DonThuocChiTietDTO> Items, int TotalItems, int TotalPages)> IService<DonThuocChiTietDTO>.GetAllAsync(int page, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

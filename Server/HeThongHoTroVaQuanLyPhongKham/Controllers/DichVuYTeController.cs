@@ -12,7 +12,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
     [Route("api/admin/healthcare-services")]
     [ApiController]
-    [Authorize(Roles = "QuanLy")]
     public class DichVuYTeController : ControllerBase
     {
         private readonly IService<DichVuYTeDTO> _dichVuYTeService;
@@ -23,21 +22,21 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "QuanLy,BacSi,KyThuatVienXetNghiem")]
+        [Authorize(Roles = "QuanLy,BacSi,KyThuatVienXetNghiem,BenhNhan")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<DichVuYTeDTO>>.Success(
-                    await _dichVuYTeService.GetAllAsync(page, pageSize)));
+                var (items, totalItems, totalPages) = await _dichVuYTeService.GetAllAsync(page, pageSize);
+                return Ok(ApiResponse<IEnumerable<DichVuYTeDTO>>.Success(items, page, pageSize, totalPages, totalItems));
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<DichVuYTeDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<string>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<DichVuYTeDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<string>.Fail(ex.Message));
             }
         }
 

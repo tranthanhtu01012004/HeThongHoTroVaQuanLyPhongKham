@@ -26,8 +26,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<HoaDonDTO>>.Success(
-                    await _hoaDonService.GetAllAsync(page, pageSize)));
+                var (items, totalItems, totalPages) = await _hoaDonService.GetAllAsync(page, pageSize);
+                return Ok(ApiResponse<IEnumerable<HoaDonDTO>>.Success(items, page, pageSize, totalPages, totalItems));
             }
             catch (NotFoundException ex)
             {

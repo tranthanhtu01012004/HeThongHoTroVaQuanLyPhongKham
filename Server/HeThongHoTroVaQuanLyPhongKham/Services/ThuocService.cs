@@ -37,11 +37,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             return thuocs.Select(t => _thuocMapping.MapEntityToDto(t));
         }
 
-        public async Task<IEnumerable<ThuocDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<ThuocDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _thuocRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
             var thuocs = await _thuocRepository.FindAllAsync(page, pageSize, pageSkip, "MaThuoc");
-            return thuocs.Select(t => _thuocMapping.MapEntityToDto(t));
+            var dtoList = thuocs.Select(t => _thuocMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<ThuocDTO> GetByIdAsync(int id)

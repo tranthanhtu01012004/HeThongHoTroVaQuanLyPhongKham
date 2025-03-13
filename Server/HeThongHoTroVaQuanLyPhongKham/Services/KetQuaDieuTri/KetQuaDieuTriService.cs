@@ -92,5 +92,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri
             return _ketQuaDieuTriMapping.MapEntityToDto(
                 await _ketQuaDieuTriRepository.UpdateAsync(kqDieuTriUpdate));
         }
+
+        Task<(IEnumerable<KetQuaDieuTriDTO> Items, int TotalItems, int TotalPages)> IService<KetQuaDieuTriDTO>.GetAllAsync(int page, int pageSize)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -26,8 +26,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<TaiKhoanDTO>>.Success(
-                    await _taiKhoanService.GetAllAsync(page, pageSize)));
+                var (items, totalItems, totalPages) = await _taiKhoanService.GetAllAsync(page, pageSize);
+                return Ok(ApiResponse<IEnumerable<TaiKhoanDTO>>.Success(items, page, pageSize, totalPages, totalItems));
             } catch (NotFoundException ex)
             {
                 return NotFound(ApiResponse<TaiKhoanDTO>.Fail(ex.Message));

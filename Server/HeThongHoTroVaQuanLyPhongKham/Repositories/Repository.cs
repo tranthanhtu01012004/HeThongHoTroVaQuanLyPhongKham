@@ -94,5 +94,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
             _logger.LogInformation($"Đã lấy danh sách {typeof(T).Name}.");
             return entities;
         }
+
+        public async Task<int> CountAsync()
+        {
+            return await _context.Set<T>().CountAsync();
+        }
     }
 }

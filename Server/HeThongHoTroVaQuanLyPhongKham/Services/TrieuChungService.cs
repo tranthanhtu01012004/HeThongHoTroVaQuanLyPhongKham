@@ -48,11 +48,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 await _trieuChungRepository.DeleteAsync(trieuChungs);
         }
 
-        public async Task<IEnumerable<TrieuChungDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<TrieuChungDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _trieuChungRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
             var trieuChungs = await _trieuChungRepository.FindAllAsync(page, pageSize, pageSkip, "MaTrieuChung");
-            return trieuChungs.Select(t => _trieuChungMapping.MapEntityToDto(t));
+            var dtoList = trieuChungs.Select(t => _trieuChungMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<TrieuChungDTO> GetByIdAsync(int id)
