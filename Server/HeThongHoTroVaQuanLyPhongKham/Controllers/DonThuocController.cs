@@ -29,7 +29,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             try
             {
                 var (items, totalItems, totalPages) = await _donThuocService.GetAllAsync(page, pageSize);
-                return Ok(ApiResponse<IEnumerable<DonThuocDTO>>.Success(items, page, pageSize, totalPages, totalItems));
+                return Ok(ApiResponse<IEnumerable<DonThuocDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách đơn thuốc - trang {page} với {pageSize} bản ghi."));
             }
             catch (NotFoundException ex)
             {

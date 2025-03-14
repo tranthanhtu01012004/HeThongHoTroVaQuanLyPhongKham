@@ -1,16 +1,16 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginService } from '../../../services/login/login.service';
 import { LoginStore } from '../../../store/LoginStore';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorHandlerService } from '../../../commons/ErrorHandlerService';
 import { ILoginInformation } from '../../../interfaces/Auth/ILoginInformation';
 import { Router } from '@angular/router';
 import { NotificationComponent } from '../notification/notification.component';
-import { LoginData } from '../../../responses/LoginData';
+import { ILogin } from '../../../interfaces/login/ILogin';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { AuthService } from '../../../services/Auth/AuthService';
+import { ErrorNotificationService } from '../../../services/handle-error/ErrorNotificationService';
 
 @Component({
   selector: 'app-dang-nhap',
@@ -21,7 +21,14 @@ import { AuthService } from '../../../services/Auth/AuthService';
     NotificationComponent
 ],
   templateUrl: './dang-nhap.component.html',
-  styleUrl: './dang-nhap.component.css'
+  styleUrls: [
+    './dang-nhap.component.css',
+    "/public/assets/users/bootstrap/owl.carousel.min.css",
+    "/public/assets/users/bootstrap/tempusdominus-bootstrap-4.min.css",
+    "/public/assets/users/bootstrap/bootstrap.min.css",
+    "/public/assets/users/css/style.css"
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class DangNhapComponent {
   loginForm: FormGroup;
@@ -32,9 +39,9 @@ export class DangNhapComponent {
     private fb: FormBuilder,
     private loginService: LoginService,
     private loginStore: LoginStore,
-    private errorHandler: ErrorHandlerService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    public errorNotificationService: ErrorNotificationService
   ) {
     this.loginForm = this.fb.group({
       tenDangNhap: ['', Validators.required],
@@ -51,22 +58,22 @@ export class DangNhapComponent {
           this.handleLoginResponse(response);
         },
         error: (err: HttpErrorResponse) => {
-          this.handleError(err);
+          this.errorNotificationService.handleError(err);
         }
       });
     } else {
-      this.showFormValidationErrors();
+      this.errorNotificationService.showFormValidationErrors();
     }
   }
   
-  private handleLoginResponse(response: ApiResponse<LoginData>): void {
+  private handleLoginResponse(response: ApiResponse<ILogin>): void {
     if (response.status && response.data) {
       // Set token
       this.authService.setToken(response.data.token);
       console.log('Token set thành công cho localStorage:', response.data.token);
 
       this.loginStore.setAuthenticated(true);
-      this.clearNotifications();
+      this.errorNotificationService.clearNotifications();
       console.log('Login successful:', response);
       this.router.navigate(['/dich-vu']);
     } else {
@@ -74,24 +81,5 @@ export class DangNhapComponent {
       this.showNotification = true;
       console.log('Login failed:', response.message);
     }
-  }
-  private handleError(error: HttpErrorResponse): void {
-    this.errorMessages = this.errorHandler.handleError(error);
-    this.showNotification = true;
-    console.error('Login error:', error);
-  }
-
-  private showFormValidationErrors(): void {
-    this.errorMessages = ['Vui lòng điền đầy đủ thông tin đăng nhập'];
-    this.showNotification = true;
-  }
-
-  private clearNotifications(): void {
-    this.showNotification = false;
-    this.errorMessages = [];
-  }
-
-  closeNotification(): void {
-    this.clearNotifications();
   }
 }

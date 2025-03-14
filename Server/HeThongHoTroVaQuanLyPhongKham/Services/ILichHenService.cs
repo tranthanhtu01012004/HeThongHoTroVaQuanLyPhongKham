@@ -5,7 +5,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public interface ILichHenService : IService<LichHenDTO>
     {
-        Task<IEnumerable<LichHenDTO>> GetAllAsync(
+        Task<(IEnumerable<LichHenDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(
             int page, int pageSize,
             DateTime? ngayHen = null,
             int? maNhanVien = null,

@@ -22,7 +22,7 @@
     </div>
 </div>
 <app-notification 
-      [message]="errorMessages.join(', ')" 
-      [isVisible]="showNotification" 
-      (close)="closeNotification()">
+    [message]="errorNotificationService.errorMessages.join(', ')" 
+    [isVisible]="errorNotificationService.showNotification" 
+    (close)="errorNotificationService.closeNotification()">
 </app-notification>

@@ -122,11 +122,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 _lichHenMapping.MapDtoToEntity(lichHen)));
         }
 
-        Task<IEnumerable<LichHenDTO>> ILichHenService.GetAllAsync(int page, int pageSize, DateTime? ngayHen, int? maNhanVien, int? maPhong)
-        {
-            throw new NotImplementedException();
-        }
-
         Task<(IEnumerable<LichHenDTO> Items, int TotalItems, int TotalPages)> IService<LichHenDTO>.GetAllAsync(int page, int pageSize)
         {
             throw new NotImplementedException();

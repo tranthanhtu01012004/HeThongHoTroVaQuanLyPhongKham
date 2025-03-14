@@ -27,7 +27,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             try
             {
                 var (items, totalItems, totalPages) = await _taiKhoanService.GetAllAsync(page, pageSize);
-                return Ok(ApiResponse<IEnumerable<TaiKhoanDTO>>.Success(items, page, pageSize, totalPages, totalItems));
+                return Ok(ApiResponse<IEnumerable<TaiKhoanDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách tài khoản - trang {page} với {pageSize} bản ghi."));
             } catch (NotFoundException ex)
             {
                 return NotFound(ApiResponse<TaiKhoanDTO>.Fail(ex.Message));

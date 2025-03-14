@@ -1,4 +1,4 @@
-export interface LoginData {
+export interface ILogin {
   token: string;
   role: string;
 }

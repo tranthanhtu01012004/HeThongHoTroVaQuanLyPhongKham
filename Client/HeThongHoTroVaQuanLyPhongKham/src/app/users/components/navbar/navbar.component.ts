@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../services/Auth/AuthService';
 
@@ -8,7 +8,14 @@ import { AuthService } from '../../../services/Auth/AuthService';
   standalone: true,
   imports: [RouterLink, RouterLinkActive, CommonModule],
   templateUrl: './navbar.component.html',
-  styleUrl: './navbar.component.css'
+  styleUrls: [
+    "./navbar.component.css",
+    "/public/assets/users/bootstrap/owl.carousel.min.css",
+    "/public/assets/users/bootstrap/tempusdominus-bootstrap-4.min.css",
+    "/public/assets/users/bootstrap/bootstrap.min.css",
+    "/public/assets/users/css/style.css"
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class NavbarComponent {
   constructor(

@@ -26,7 +26,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             try
             {
                 var (items, totalItems, totalPages) = await _thuocService.GetAllAsync(page, pageSize);
-                return Ok(ApiResponse<IEnumerable<ThuocDTO>>.Success(items, page, pageSize, totalPages, totalItems));
+                return Ok(ApiResponse<IEnumerable<ThuocDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách thuốc - trang {page} với {pageSize} bản ghi."));
             }
             catch (NotFoundException ex)
             {
