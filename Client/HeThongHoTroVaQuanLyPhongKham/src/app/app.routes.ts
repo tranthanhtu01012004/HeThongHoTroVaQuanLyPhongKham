@@ -10,6 +10,7 @@ import { PhongKhamComponent } from './admins/components/phong-kham/phong-kham.co
 import { DichVuYTeComponent } from './admins/components/dich-vu-y-te/dich-vu-y-te.component';
 import { adminAuthGuard } from './guards/adminAuthGuard';
 import { UnauthorizedComponent } from './users/components/unauthorized/unauthorized.component';
+import { authGuard } from './guards/authGuards';
 
 export const routes: Routes = [
   { 
@@ -19,7 +20,7 @@ export const routes: Routes = [
       { path: '', component: TrangChuComponent },
       { path: 'gioi-thieu', component: GioiThieuComponent },
       { path: 'dich-vu', component: DichVuComponent },
-      { path: 'lich-hen', component: LichHenComponent },
+      { path: 'lich-hen', component: LichHenComponent, canActivate: [authGuard] },
       { path: 'dang-nhap', component: DangNhapComponent },
       { path: 'unauthorized', component: UnauthorizedComponent}
     ]

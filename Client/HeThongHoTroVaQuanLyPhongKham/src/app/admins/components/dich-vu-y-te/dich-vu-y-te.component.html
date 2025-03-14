@@ -1,51 +1,79 @@
 <style>
-    .table th {
-      text-align: center;
-      background: #5073fb;
-      color: #fff;
-      border-left: solid 1px;
-    }
-    .table td {
-      text-align: center;
-      border: solid 1px;
-      border-bottom: none;
-      border-left: none;
-    }
-  
-    .table tr:hover {
-      background: #f1f1f1;
-    }
-  
-    .title {
-      display: flex;
-      justify-content: flex-end;
-    }
-  </style>
-  <h2 class="section--title">Quản Lý Phòng Khám</h2>
-  <div class="recent--patients">
-      <div class="title">
-          <button class="add"><i class="ri-add-line"></i>Thêm dịch vụ y tế</button>
-    </div>
-      <div class="table table-striped">
-        <table>
-            <thead>
-                <tr>
-                    <th>Mã dịch vụ y tế</th>
-                    <th>Tên dịch vụ</th>
-                    <th>Chi phí</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let dichVu of data">
-                    <td>{{ dichVu.maDichVuYTe }}</td>
-                    <td>{{ dichVu.ten }}</td>
-                    <td>{{ dichVu.chiPhi | currency:'VND':'symbol':'1.0-0' }}</td>
-                    <td>
-                      <a class="edit"><i class="ri-edit-line edit"></i></a> 
-                      <a class="delete"><i class="ri-delete-bin-line delete"></i></a>
-                  </td>
-                </tr>
-            </tbody>
-        </table>
+  .form-group {
+      margin: 10px 0;
+  }
+  button {
+      margin: 0 10px;
+  }
+</style>
+<app-notification></app-notification>
+<h2 class="section--title mt-2">Quản Lý dịch vụ y tế</h2>
+<div class="recent--patients">
+  <div class="title" [hasPermission]="'QuanLy'">
+        <button class="add" (click)="addService()">
+          <span class="lock-icon"></span>
+          Thêm dịch vụ y tế
+        </button>
   </div>
+  <div *ngIf="showForm" class="form-container">
+    <h3>{{ editMode ? 'Chỉnh sửa dịch vụ' : 'Thêm dịch vụ mới' }}</h3>
+    <form [formGroup]="serviceForm" (ngSubmit)="saveService()">
+      <div class="form-group" hidden>
+        <label>Mã dịch vụ</label>
+        <input formControlName="maDichVuYTe" readonly>
+      </div>
+      <div class="form-group">
+        <label>Tên dịch vụ</label>
+        <input formControlName="ten">
+      </div>
+      <div class="form-group">
+        <label>Chi phí (VND)</label>
+        <input type="number" formControlName="chiPhi">
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <button type="button" (click)="cancelForm()" class="btn btn-secondary">Hủy</button>
+      </div>
+    </form>
+  </div>
+
+<div class="table table-striped">
+      <table>
+          <thead>
+              <tr>
+                  <th>Mã dịch vụ y tế</th>
+                  <th>Tên dịch vụ</th>
+                  <th>Chi phí</th>
+                  <th>Action</th>
+              </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dichVu of data">
+              <td>{{ dichVu.maDichVuYTe }}</td>
+              <td>{{ dichVu.ten }}</td>
+              <td>{{ dichVu.chiPhi | currency:'VND':'symbol':'1.0-0' }}</td>
+              <td>
+                <button [hasPermission]="'QuanLy'" (click)="editService(dichVu)" class="btn btn-warning" style="margin-right: 10px;">
+                  <span class="lock-icon"></span>
+                  Sửa
+                </button>
+                <button [hasPermission]="'QuanLy'" (click)="deleteService(dichVu.maDichVuYTe)" class="btn btn-danger" style="margin-left: 10px;">
+                  <span class="lock-icon"></span>
+                  Xóa
+                </button>
+              </td>
+            </tr>
+          </tbody>
+      </table>
+</div>
+<div class="mt-5" *ngIf="data.length > 0">
+  <mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[3, 6, 9]"
+    [pageIndex]="pageIndex"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+  </mat-paginator>
+</div>
+</div>

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, Output, ViewEncapsulation } from '@angular/core';
-import { ErrorNotificationService } from '../../../services/handle-error/ErrorNotificationService';
+import { Component, ViewEncapsulation } from '@angular/core';
+import { NotificationService } from '../../../services/handle-error/NotificationService';
 
 @Component({
   selector: 'app-notification',
@@ -17,7 +17,7 @@ import { ErrorNotificationService } from '../../../services/handle-error/ErrorNo
   encapsulation: ViewEncapsulation.None
 })
 export class NotificationComponent {
-  constructor(public notificationService: ErrorNotificationService) {}
+  constructor(public notificationService: NotificationService) {}
 
   get message(): string {
     return this.notificationService.messages.join(', ');

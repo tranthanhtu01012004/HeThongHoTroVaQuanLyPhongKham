@@ -1,5 +1,5 @@
 export interface IDichVuYTe {
-    maDichVuYTe?: number;
+    maDichVuYTe: number;
     ten: string;
     chiPhi: number;
   }

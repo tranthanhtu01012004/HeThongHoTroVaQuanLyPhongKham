@@ -132,7 +132,7 @@ img {
     left: 0;
     height: 100%;
     width: 300px;
-    background-color: #31b0c1 !important;
+    background-color: #78c5cf !important;
     padding: 30px;
     display: flex;
     flex-direction: column;
@@ -602,3 +602,24 @@ th {
         padding: 10px;
     }
 }
+.table th {
+    text-align: center;
+    background: #5073fb;
+    color: #fff;
+    border-left: solid 1px;
+  }
+  .table td {
+    text-align: center;
+    border: solid 1px;
+    border-bottom: none;
+    border-left: none;
+  }
+
+  .table tr:hover {
+    background: #f1f1f1;
+  }
+
+  .title {
+    display: flex;
+    justify-content: flex-end;
+  }

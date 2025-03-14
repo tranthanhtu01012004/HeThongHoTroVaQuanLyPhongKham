@@ -11,7 +11,7 @@ import { ILogin } from '../../../interfaces/login/ILogin';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { AuthService } from '../../../services/Auth/AuthService';
 import { RegisterService } from '../../../services/register/register.service';
-import { ErrorNotificationService } from '../../../services/handle-error/ErrorNotificationService';
+import { NotificationService } from '../../../services/handle-error/NotificationService';
 
 @Component({
   selector: 'app-dang-nhap',
@@ -42,7 +42,7 @@ export class DangNhapComponent {
     private loginStore: LoginStore,
     private router: Router,
     private authService: AuthService,
-    public notificationService: ErrorNotificationService,
+    public notificationService: NotificationService,
     private route: ActivatedRoute,
     private registerService: RegisterService
   ) {
@@ -52,13 +52,13 @@ export class DangNhapComponent {
     });
   }
 
-  // Getter để truy cập dễ dàng vào các form controls
+  // Getter để truy cập vào các form controls
   get f() {
     return this.loginForm.controls;
   }
 
   onLogin(): void {
-    this.submitted = true; // Đánh dấu form đã được submit
+    this.submitted = true;
 
     if (this.loginForm.valid) {
       this.isLoading = true;
@@ -78,7 +78,7 @@ export class DangNhapComponent {
   }
 
   onRegister(): void {
-    this.submitted = true; // Đánh dấu form đã được submit
+    this.submitted = true;
 
     if (this.loginForm.valid) {
       this.isLoading = true;

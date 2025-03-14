@@ -1,22 +1,34 @@
-import { Injectable } from "@angular/core";
+import { isPlatformBrowser } from "@angular/common";
+import { Inject, Injectable, PLATFORM_ID } from "@angular/core";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
     private readonly TOKEN_KEY = 'auth_token';
-    private readonly ROLE_KEY = 'auth_role';
+
+    constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
     setToken(token: string): void {
-        localStorage.setItem(this.TOKEN_KEY,token);
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.setItem(this.TOKEN_KEY, token);
+            console.log('Set token thanh cong');
+        }
     }
 
     getToken(): string | null {
-        return localStorage.getItem(this.TOKEN_KEY);
+        if (isPlatformBrowser(this.platformId)) {
+            let token = localStorage.getItem(this.TOKEN_KEY);
+            console.log('Lay token tu localStorage:', token);
+            return token;
+          }
+        return null;
     }
 
     removeToken(): void {
-        localStorage.removeItem(this.TOKEN_KEY);
+        if (isPlatformBrowser(this.platformId)) {
+            localStorage.removeItem(this.TOKEN_KEY);
+        }
     }
 
     getRoleFromToken(): string | null {

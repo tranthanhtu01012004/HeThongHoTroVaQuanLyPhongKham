@@ -5,7 +5,7 @@ import { ErrorHandlerService } from "./ErrorHandlerService";
 @Injectable({
     providedIn: 'root'
   })
-export class ErrorNotificationService {
+export class NotificationService {
   showNotification: boolean = false;
   messages: string[] = [];
   messageType: 'error' | 'success' | 'info' = 'error';
@@ -19,6 +19,10 @@ export class ErrorNotificationService {
     this.messages = errorMessages.filter(msg => msg && msg.trim() !== '');
     this.messageType = 'error';
     this.showNotification = true;
+
+    this.timeoutId = setTimeout(() => {
+      this.closeNotification();
+    }, 5000);
   }
 
   public showSuccess(messages: string | string[]): void {
@@ -47,6 +51,10 @@ export class ErrorNotificationService {
     this.messages = this.errorHandler.handleError(error) || ['Đã xảy ra lỗi không xác định.'];
     this.messageType = 'error';
     this.showNotification = true;
+
+    this.timeoutId = setTimeout(() => {
+      this.closeNotification();
+    }, 3000);
   }
 
   public showFormValidationErrors(): void {
