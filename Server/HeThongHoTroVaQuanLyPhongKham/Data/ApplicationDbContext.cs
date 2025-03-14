@@ -63,16 +63,24 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => e.SoDienThoai, "uq_tbl_benh_nhan_soDienThoai").IsUnique();
 
+            entity.HasIndex(e => e.MaTaiKhoan, "uq_tbl_benh_nhan_taikhoan").IsUnique();
+
             entity.Property(e => e.MaBenhNhan).HasColumnName("maBenhNhan");
             entity.Property(e => e.DiaChi)
                 .HasMaxLength(1000)
                 .HasColumnName("diaChi");
             entity.Property(e => e.GioiTinh).HasColumnName("gioiTinh");
+            entity.Property(e => e.MaTaiKhoan).HasColumnName("maTaiKhoan");
             entity.Property(e => e.SoDienThoai)
                 .HasMaxLength(15)
                 .IsUnicode(false)
                 .HasColumnName("soDienThoai");
             entity.Property(e => e.Tuoi).HasColumnName("tuoi");
+
+            entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.TblBenhNhan)
+                .HasForeignKey<TblBenhNhan>(d => d.MaTaiKhoan)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("fk_tbl_benh_nhan_tai_khoan");
         });
 
         modelBuilder.Entity<TblDichVuYTe>(entity =>
@@ -291,6 +299,8 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasIndex(e => e.SoDienThoai, "uq_tbl_nhan_vien_soDienThoai").IsUnique();
 
+            entity.HasIndex(e => e.MaTaiKhoan, "uq_tbl_nhan_vien_taikhoan").IsUnique();
+
             entity.Property(e => e.MaNhanVien).HasColumnName("maNhanVien");
             entity.Property(e => e.CaLamViec)
                 .HasMaxLength(50)
@@ -311,8 +321,8 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(100)
                 .HasColumnName("ten");
 
-            entity.HasOne(d => d.MaTaiKhoanNavigation).WithMany(p => p.TblNhanViens)
-                .HasForeignKey(d => d.MaTaiKhoan)
+            entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.TblNhanVien)
+                .HasForeignKey<TblNhanVien>(d => d.MaTaiKhoan)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tbl_nhan_vien_tai_khoan");
         });

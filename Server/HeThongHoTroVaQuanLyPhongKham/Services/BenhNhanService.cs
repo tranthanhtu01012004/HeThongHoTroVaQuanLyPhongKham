@@ -47,11 +47,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<BenhNhanDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<BenhNhanDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _benhNhanRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
-            var benhNhans = await _benhNhanRepository.FindAllAsync(page, pageSize, pageSkip, "MaBenhNhan");
-            return benhNhans.Select(t => _benhNhanMapping.MapEntityToDto(t));
+
+            var dichVuYTes = await _benhNhanRepository.FindAllAsync(page, pageSize, pageSkip, "MaBenhNhan");
+            var dtoList = dichVuYTes.Select(t => _benhNhanMapping.MapEntityToDto(t));
+
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<BenhNhanDTO> GetByIdAsync(int id)

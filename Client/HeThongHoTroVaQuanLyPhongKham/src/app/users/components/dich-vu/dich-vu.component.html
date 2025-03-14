@@ -1,84 +1,38 @@
-    <!-- Services Start -->
-    <div class="container-fluid py-5">
-        <div class="container">
-            <div class="text-center mx-auto mb-5" style="max-width: 500px;">
-                <h5 class="d-inline-block text-primary text-uppercase border-bottom border-5">Dịch Vụ</h5>
-                <h1 class="display-4">Dịch Vụ Y Tế Xuất Sắc</h1>
+<!-- Services Start -->
+<div class="container-fluid py-5">
+    <div class="container">
+      <div class="text-center mx-auto mb-5" style="max-width: 500px;">
+        <h5 class="d-inline-block text-primary text-uppercase border-bottom border-5">Dịch Vụ</h5>
+        <h1 class="display-4">DANH SÁCH DỊCH VỤ Y TẾ</h1>
+      </div>
+      <div class="row g-5">
+        <div class="col-lg-4 col-md-6" *ngFor="let service of data">
+          <div class="service-item bg-light rounded d-flex flex-column align-items-center justify-content-center text-center">
+            <div class="service-icon mb-4">
+              <i class="fa fa-2x fa-user-md text-white"></i>
             </div>
-            <div class="row g-5">
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-item bg-light rounded d-flex flex-column align-items-center justify-content-center text-center">
-                        <div class="service-icon mb-4">
-                            <i class="fa fa-2x fa-user-md text-white"></i>
-                        </div>
-                        <h4 class="mb-3">Chăm Sóc Khẩn Cấp</h4>
-                        <p class="m-0">Kasd dolor no lorem nonumy sit labore tempor at justo rebum rebum stet, justo elitr dolor amet sit</p>
-                        <a class="btn btn-lg btn-primary rounded-pill" href="">
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-item bg-light rounded d-flex flex-column align-items-center justify-content-center text-center">
-                        <div class="service-icon mb-4">
-                            <i class="fa fa-2x fa-procedures text-white"></i>
-                        </div>
-                        <h4 class="mb-3">Phẫu Thuật & Thủ Thuật</h4>
-                        <p class="m-0">Kasd dolor no lorem nonumy sit labore tempor at justo rebum rebum stet, justo elitr dolor amet sit</p>
-                        <a class="btn btn-lg btn-primary rounded-pill" href="">
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-item bg-light rounded d-flex flex-column align-items-center justify-content-center text-center">
-                        <div class="service-icon mb-4">
-                            <i class="fa fa-2x fa-stethoscope text-white"></i>
-                        </div>
-                        <h4 class="mb-3">Kiểm Tra Ngoài Trời</h4>
-                        <p class="m-0">Kasd dolor no lorem nonumy sit labore tempor at justo rebum rebum stet, justo elitr dolor amet sit</p>
-                        <a class="btn btn-lg btn-primary rounded-pill" href="">
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-item bg-light rounded d-flex flex-column align-items-center justify-content-center text-center">
-                        <div class="service-icon mb-4">
-                            <i class="fa fa-2x fa-ambulance text-white"></i>
-                        </div>
-                        <h4 class="mb-3">Dịch Vụ Xe Cứu Thương</h4>
-                        <p class="m-0">Kasd dolor no lorem nonumy sit labore tempor at justo rebum rebum stet, justo elitr dolor amet sit</p>
-                        <a class="btn btn-lg btn-primary rounded-pill" href="">
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-item bg-light rounded d-flex flex-column align-items-center justify-content-center text-center">
-                        <div class="service-icon mb-4">
-                            <i class="fa fa-2x fa-pills text-white"></i>
-                        </div>
-                        <h4 class="mb-3">Thuốc & Nhà Thuốc</h4>
-                        <p class="m-0">Kasd dolor no lorem nonumy sit labore tempor at justo rebum rebum stet, justo elitr dolor amet sit</p>
-                        <a class="btn btn-lg btn-primary rounded-pill" href="">
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-                <div class="col-lg-4 col-md-6">
-                    <div class="service-item bg-light rounded d-flex flex-column align-items-center justify-content-center text-center">
-                        <div class="service-icon mb-4">
-                            <i class="fa fa-2x fa-microscope text-white"></i>
-                        </div>
-                        <h4 class="mb-3">Xét Nghiệm Máu</h4>
-                        <p class="m-0">Kasd dolor no lorem nonumy sit labore tempor at justo rebum rebum stet, justo elitr dolor amet sit</p>
-                        <a class="btn btn-lg btn-primary rounded-pill" href="">
-                            <i class="bi bi-arrow-right"></i>
-                        </a>
-                    </div>
-                </div>
-            </div>
+            <h4 class="mb-3">{{ service.ten }}</h4>
+            <p class="m-0">Chi phí: {{ service.chiPhi | currency:'VND':'symbol':'1.0-0' }}</p>
+            <a class="btn btn-lg btn-primary rounded-pill" href="">
+              <i class="bi bi-arrow-right"></i>
+            </a>
+          </div>
         </div>
+        <div class="col-12 text-center" *ngIf="data.length === 0">
+          <p>Chưa có dịch vụ nào được tải.</p>
+        </div>
+      </div>
+      <!-- Phân trang -->
+      <div class="mt-5" *ngIf="data.length > 0">
+        <mat-paginator
+          [length]="totalItems"
+          [pageSize]="pageSize"
+          [pageSizeOptions]="[3, 6, 9]"
+          [pageIndex]="pageIndex"
+          (page)="onPageChange($event)"
+          showFirstLastButtons>
+        </mat-paginator>
+      </div>
     </div>
-    <!-- Services End -->
+  </div>
+  <!-- Services End -->

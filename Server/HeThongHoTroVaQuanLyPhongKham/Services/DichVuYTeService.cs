@@ -31,11 +31,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<DichVuYTeDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<DichVuYTeDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _dichVuYTeRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
+
             var dichVuYTes = await _dichVuYTeRepository.FindAllAsync(page, pageSize, pageSkip, "MaDichVuYte");
-            return dichVuYTes.Select(t => _dichVuYTeMapping.MapEntityToDto(t));
+            var dtoList = dichVuYTes.Select(t => _dichVuYTeMapping.MapEntityToDto(t));
+
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<DichVuYTeDTO> GetByIdAsync(int id)

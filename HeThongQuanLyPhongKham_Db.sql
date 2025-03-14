@@ -42,7 +42,8 @@ CREATE TABLE tbl_nhan_vien (
     CONSTRAINT pk_tbl_nhan_vien PRIMARY KEY (maNhanVien),
     CONSTRAINT uq_tbl_nhan_vien_soDienThoai UNIQUE (soDienThoai),
     CONSTRAINT uq_tbl_nhan_vien_email UNIQUE (email),
-    CONSTRAINT ck_tbl_nhan_vien_soDienThoai CHECK (LEN(soDienThoai) >= 10)
+    CONSTRAINT ck_tbl_nhan_vien_soDienThoai CHECK (LEN(soDienThoai) >= 10),
+	CONSTRAINT uq_tbl_nhan_vien_taikhoan UNIQUE (maTaiKhoan)
 );
 GO
 
@@ -76,23 +77,23 @@ CREATE TABLE tbl_lich_hen (
     ngayHen         DATETIME        NOT NULL,
     trangThai       NVARCHAR(50)    NOT NULL,
     CONSTRAINT pk_tbl_lich_hen PRIMARY KEY (maLichHen),
-    CONSTRAINT ck_tbl_lich_hen_ngayHen CHECK (ngayHen >= GETDATE()) -- Ngày hẹn phải sau hoặc bằng hiện tại
+	CONSTRAINT ck_tbl_lich_hen_ngayHen CHECK (ngayHen >= GETDATE()) -- Ngày hẹn phải sau hoặc bằng hiện tại
 );
 GO
 
 -- Bảng BenhNhan
 CREATE TABLE tbl_benh_nhan (
-    maBenhNhan         INT             NOT NULL IDENTITY(1,1),
-    tuoi               INT             NULL,
-    gioiTinh           BIT             NOT NULL,
-    diaChi             NVARCHAR(1000)   NULL,
-    soDienThoai        VARCHAR(15)     NOT NULL,
-    email              VARCHAR(100)    NULL,
+    maBenhNhan			INT				NOT NULL IDENTITY(1,1),
+	maTaiKhoan			INT				NOT NULL,
+    tuoi				INT				NULL,
+    gioiTinh			BIT				NULL,
+    diaChi				NVARCHAR(1000)  NULL,
+    soDienThoai			VARCHAR(15)		NULL,
     CONSTRAINT pk_tbl_benh_nhan PRIMARY KEY (maBenhNhan),
     CONSTRAINT uq_tbl_benh_nhan_soDienThoai UNIQUE (soDienThoai),
-    CONSTRAINT uq_tbl_benh_nhan_email UNIQUE (email),
     CONSTRAINT ck_tbl_benh_nhan_tuoi CHECK (tuoi >= 0),
-    CONSTRAINT ck_tbl_benh_nhan_gioiTinh CHECK (gioiTinh IN (0, 1))
+    CONSTRAINT ck_tbl_benh_nhan_gioiTinh CHECK (gioiTinh IN (0, 1)),
+	CONSTRAINT uq_tbl_benh_nhan_taikhoan UNIQUE (maTaiKhoan)
 );
 GO
 
@@ -240,6 +241,13 @@ ALTER TABLE tbl_tai_khoan
 			ON UPDATE CASCADE;
 GO
 
+-- Khóa ngoại cho tbl_benh_nhan
+ALTER TABLE tbl_benh_nhan
+	ADD CONSTRAINT fk_tbl_benh_nhan_tai_khoan FOREIGN KEY (maTaiKhoan) REFERENCES tbl_tai_khoan (maTaiKhoan)
+		ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
+GO
+
 -- Khóa ngoại cho tbl_phong_kham_nhan_vien
 ALTER TABLE tbl_phong_kham_nhan_vien
 	ADD CONSTRAINT fk_tbl_phong_kham_nhan_vien_phong_kham FOREIGN KEY (maPhongKham) REFERENCES tbl_phong_kham (maPhongKham)
@@ -342,7 +350,24 @@ INSERT INTO tbl_tai_khoan (maVaiTro, tenDangNhap, matKhau) VALUES
     (6, 'duocsiphan001', '$2a$11$7CcjA8ONrr0Z7aJAj3Pp7eLH5Tbbz.hb32OveWv3imQf.OWXA3bSK'),-- DuocSi	-- pass: duocsiphan001
     (7, 'ketoantruong', '$2a$11$AWZAIMOmEQMSD3v3le3Ecuow1UkqaOqljqtqB694AbOVGEoPso9Wm'),-- KeToan	-- pass: ketoantruong001
     (9, 'trolybui', '$2a$11$wxI3CAXYNJlwXXLukvjkQuf9VBDrDEEN7dbktzNjuP2f.Xt2DxUZq'),    -- TroLyBacSy	-- pass: trolybui001
-    (10, 'hanhchinhnguyen', '$2a$11$iCR.hgsaPLOnLsrmexD8.upGYJkQ8k02BSDnY5/16wCHaaixZV75y');      -- NhanVienHanhChinh	-- pass: hanhchinhnguyen001
+    (10, 'hanhchinhnguyen', '$2a$11$iCR.hgsaPLOnLsrmexD8.upGYJkQ8k02BSDnY5/16wCHaaixZV75y'),
+	(8, 'benhnhan1', 'benhnhan1'),
+    (8, 'benhnhan2', 'benhnhan2'),
+    (8, 'benhnhan3', 'benhnhan3'),
+    (8, 'benhnhan4', 'benhnhan4'),
+    (8, 'benhnhan5', 'benhnhan5'),
+    (8, 'benhnhan6', 'benhnhan6'),
+    (8, 'benhnhan7', 'benhnhan7'),
+    (8, 'benhnhan8', 'benhnhan8'),
+    (8, 'benhnhan9', 'benhnhan9'),
+    (8, 'benhnhan10', 'benhnhan10'),
+    (8, 'benhnhan11', 'benhnhan11'),
+    (8, 'benhnhan12', 'benhnhan12'),
+    (8, 'benhnhan13', 'benhnhan13'),
+    (8, 'benhnhan14', 'benhnhan14'),
+    (8, 'benhnhan15', 'benhnhan15'),
+	(8, 'benhnhan16', 'benhnhan16'),
+    (8, 'benhnhan17', 'benhnhan17');
 GO
 
 -- Chèn dữ liệu vào tbl_nhan_vien
@@ -416,22 +441,22 @@ INSERT INTO tbl_dich_vu_y_te (ten, chiPhi) VALUES
 GO
 
 -- Chèn dữ liệu vào tbl_benh_nhan
-INSERT INTO tbl_benh_nhan (tuoi, gioiTinh, diaChi, soDienThoai, email) VALUES
-    (30, 1, N'123 Đường Láng, Hà Nội', '0911111111', 'bn1@gmail.com'),
-    (45, 0, N'45 Lê Lợi, TP.HCM', '0922222222', 'bn2@gmail.com'),
-    (25, 1, N'67 Trần Phú, Đà Nẵng', '0933333333', 'bn3@gmail.com'),
-    (60, 0, N'89 Nguyễn Huệ, Huế', '0944444444', 'bn4@gmail.com'),
-    (10, 1, N'12 Hùng Vương, Nha Trang', '0955555555', 'bn5@gmail.com'),
-    (35, 0, N'34 Điện Biên Phủ, Hà Nội', '0966666666', 'bn6@gmail.com'),
-    (50, 1, N'56 Phạm Ngũ Lão, TP.HCM', '0977777777', 'bn7@gmail.com'),
-    (28, 0, N'78 Lý Thường Kiệt, Đà Nẵng', '0988888888', 'bn8@gmail.com'),
-    (70, 1, N'90 Hai Bà Trưng, Huế', '0999999999', 'bn9@gmail.com'),
-    (15, 0, N'23 Nguyễn Trãi, Nha Trang', '0910000000', 'bn10@gmail.com'),
-    (40, 1, N'45 Lê Đại Hành, Hà Nội', '0921111111', 'bn11@gmail.com'),
-    (55, 0, N'67 Nguyễn Thị Minh Khai, TP.HCM', '0932222222', 'bn12@gmail.com'),
-    (33, 1, N'89 Bùi Thị Xuân, Đà Nẵng', '0943333333', 'bn13@gmail.com'),
-    (22, 0, N'12 Trần Hưng Đạo, Huế', '0954444444', 'bn14@gmail.com'),
-    (65, 1, N'34 Lê Hồng Phong, Nha Trang', '0965555555', 'bn15@gmail.com');
+INSERT INTO tbl_benh_nhan (maTaiKhoan, tuoi, gioiTinh, diaChi, soDienThoai) VALUES
+	(13, 30, 1, N'123 Đường Láng, Hà Nội', '0911111111'),
+    (14, 45, 0, N'45 Lê Lợi, TP.HCM', '0922222222'),
+    (15, 25, 1, N'67 Trần Phú, Đà Nẵng', '0933333333'),
+    (16, 60, 0, N'89 Nguyễn Huệ, Huế', '0944444444'),
+    (17, 10, 1, N'12 Hùng Vương, Nha Trang', '0955555555'),
+    (18, 35, 0, N'34 Điện Biên Phủ, Hà Nội', '0966666666'),
+    (19, 50, 1, N'56 Phạm Ngũ Lão, TP.HCM', '0977777777'),
+    (20, 28, 0, N'78 Lý Thường Kiệt, Đà Nẵng', '0988888888'),
+    (21, 70, 1, N'90 Hai Bà Trưng, Huế', '0999999999'),
+    (22, 15, 0, N'23 Nguyễn Trãi, Nha Trang', '0910000000'),
+    (23, 40, 1, N'45 Lê Đại Hành, Hà Nội', '0921111111'),
+    (24, 55, 0, N'67 Nguyễn Thị Minh Khai, TP.HCM', '0932222222'),
+    (25, 33, 1, N'89 Bùi Thị Xuân, Đà Nẵng', '0943333333'),
+    (26, 22, 0, N'12 Trần Hưng Đạo, Huế', '0954444444'),
+    (27, 65, 1, N'34 Lê Hồng Phong, Nha Trang', '0965555555');
 GO
 
 -- Chèn dữ liệu vào tbl_lich_hen

@@ -51,13 +51,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<LichHenDTO>> GetAllAsync(
+        public async Task<(IEnumerable<LichHenDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(
             int page, int pageSize, 
             DateTime? ngayHen = null, 
             int? maNhanVien = null, 
             int? maPhong = null)
         {
             var query = _lichHenRepository.GetQueryable();
+            var totalItems = await _lichHenRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
+            var pageSkip = CalculatePageSkip(page, pageSize);
 
             if (ngayHen.HasValue)
                 query = query.Where(lh => lh.NgayHen.Date == ngayHen.Value.Date);
@@ -68,10 +71,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             if (maPhong.HasValue)
                 query = query.Where(lh => lh.MaPhongKham == maPhong.Value);
 
-            var pageSkip = CalculatePageSkip(page, pageSize);
             var lichHens = await _lichHenRepository.FindAllWithQueryAsync(query, page, pageSize, pageSkip, "MaLichHen");
 
-            return lichHens.Select(lh => _lichHenMapping.MapEntityToDto(lh));
+            var dtoList = lichHens.Select(lh => _lichHenMapping.MapEntityToDto(lh));
+            return (dtoList, totalItems, totalPages);
         }
 
         public Task<IEnumerable<LichHenDTO>> GetAllAsync(int page, int pageSize)
@@ -117,6 +120,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             return _lichHenMapping.MapEntityToDto(
                 await _lichHenRepository.UpdateAsync(
                 _lichHenMapping.MapDtoToEntity(lichHen)));
+        }
+
+        Task<(IEnumerable<LichHenDTO> Items, int TotalItems, int TotalPages)> IService<LichHenDTO>.GetAllAsync(int page, int pageSize)
+        {
+            throw new NotImplementedException();
         }
     }
 }

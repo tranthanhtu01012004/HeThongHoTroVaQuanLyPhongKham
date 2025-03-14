@@ -5,6 +5,7 @@ using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
+using HeThongHoTroVaQuanLyPhongKham.Common;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class TaiKhoanService : BaseService, ITaiKhoanService
@@ -13,13 +14,17 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly ITaiKhoanRepository _taiKhoanRepository;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IService<VaiTroDTO> _vaiTroService;
+        private readonly IService<BenhNhanDTO> _benhNhanService;
+        private readonly IMapper<BenhNhanDTO, TblBenhNhan> _benhNhanMapping;
 
-        public TaiKhoanService(IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepository, IPasswordHasher passwordHasher, IService<VaiTroDTO> vaiTroService)
+        public TaiKhoanService(IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepository, IPasswordHasher passwordHasher, IService<VaiTroDTO> vaiTroService, IService<BenhNhanDTO> benhNhanService, IMapper<BenhNhanDTO, TblBenhNhan> benhNhanMapping)
         {
             _taiKhoanMapping = taiKhoanMapping;
             _taiKhoanRepository = taiKhoanRepository;
             _passwordHasher = passwordHasher;
             _vaiTroService = vaiTroService;
+            _benhNhanService = benhNhanService;
+            _benhNhanMapping = benhNhanMapping;
         }
 
         public async Task<TaiKhoanDTO> AddAsync(TaiKhoanDTO dto)
@@ -31,11 +36,21 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
             var taiKhoanEntity = _taiKhoanMapping.MapDtoToEntity(dto);
 
-            taiKhoanEntity.MaVaiTro = dto.TenDangNhap.ToLower().Equals("admin") ? 1 : null;
+            taiKhoanEntity.MaVaiTro = dto.TenDangNhap.ToLower().Equals("admin") ? (int)VaiTro.QuanLy : (int)VaiTro.BenhNhan;
             taiKhoanEntity.MatKhau = _passwordHasher.HashPassword(dto.MatKhau);
 
-            return _taiKhoanMapping.MapEntityToDto(
-                await _taiKhoanRepository.CreateAsync(taiKhoanEntity));
+            var taiKhoan = await _taiKhoanRepository.CreateAsync(taiKhoanEntity);
+
+            if (taiKhoan.MaVaiTro == (int)VaiTro.BenhNhan)
+            {
+                var benhNhan = new BenhNhanDTO
+                {
+                    MaTaiKhoan = taiKhoan.MaTaiKhoan
+                };
+                await _benhNhanService.AddAsync(benhNhan);
+            }
+
+            return _taiKhoanMapping.MapEntityToDto(taiKhoan);
         }
 
         public async Task DeleteAsync(int id)
@@ -45,11 +60,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<TaiKhoanDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<TaiKhoanDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _taiKhoanRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
             var taiKhoans = await _taiKhoanRepository.FindAllAsync(page, pageSize, pageSkip, "MaTaiKhoan");
-            return taiKhoans.Select(t => _taiKhoanMapping.MapEntityToDto(t));
+            var dtoList = taiKhoans.Select(t => _taiKhoanMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<TaiKhoanDTO> GetByIdAsync(int id)

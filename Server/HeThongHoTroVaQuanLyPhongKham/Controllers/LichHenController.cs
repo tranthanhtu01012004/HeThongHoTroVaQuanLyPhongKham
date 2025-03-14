@@ -30,15 +30,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<LichHenDTO>>.Success(await _lichHenService.GetAllAsync(page, pageSize, ngayHen, maNhanVien, maPhong), $"Đã lấy danh sách lịch hẹn - trang {page} với {pageSize} bản ghi."));
+                var (items, totalItems, totalPages) = await _lichHenService.GetAllAsync(page, pageSize);
+                return Ok(ApiResponse<IEnumerable<LichHenDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách lịch hẹn - trang {page} với {pageSize} bản ghi."));
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<DichVuYTeDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<string>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<DichVuYTeDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<string>.Fail(ex.Message));
             }
         }
 
@@ -58,11 +59,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<LichHenDTO>.Fail(ex.Message));
+                return NotFound(ApiResponse<string>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<LichHenDTO>.Fail(ex.Message));
+                return BadRequest(ApiResponse<string>.Fail(ex.Message));
             }
         }
 

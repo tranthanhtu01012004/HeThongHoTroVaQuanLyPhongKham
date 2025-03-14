@@ -1,16 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { LoginService } from '../../../services/login/login.service';
 import { LoginStore } from '../../../store/LoginStore';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ErrorHandlerService } from '../../../commons/ErrorHandlerService';
 import { ILoginInformation } from '../../../interfaces/Auth/ILoginInformation';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationComponent } from '../notification/notification.component';
-import { LoginData } from '../../../responses/LoginData';
+import { ILogin } from '../../../interfaces/login/ILogin';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { AuthService } from '../../../services/Auth/AuthService';
+import { RegisterService } from '../../../services/register/register.service';
+import { ErrorNotificationService } from '../../../services/handle-error/ErrorNotificationService';
 
 @Component({
   selector: 'app-dang-nhap',
@@ -21,20 +22,29 @@ import { AuthService } from '../../../services/Auth/AuthService';
     NotificationComponent
 ],
   templateUrl: './dang-nhap.component.html',
-  styleUrl: './dang-nhap.component.css'
+  styleUrls: [
+    './dang-nhap.component.css',
+    "/public/assets/users/bootstrap/owl.carousel.min.css",
+    "/public/assets/users/bootstrap/tempusdominus-bootstrap-4.min.css",
+    "/public/assets/users/bootstrap/bootstrap.min.css",
+    "/public/assets/users/css/style.css"
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class DangNhapComponent {
   loginForm: FormGroup;
-  showNotification: boolean = false;
-  errorMessages: string[] = [];
+  isLoading: boolean = false;
+  submitted: boolean = false;
 
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
     private loginStore: LoginStore,
-    private errorHandler: ErrorHandlerService,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    public notificationService: ErrorNotificationService,
+    private route: ActivatedRoute,
+    private registerService: RegisterService
   ) {
     this.loginForm = this.fb.group({
       tenDangNhap: ['', Validators.required],
@@ -42,56 +52,95 @@ export class DangNhapComponent {
     });
   }
 
-  onSubmit(): void {
-    if (this.loginForm.valid) {
-      const loginInfor: ILoginInformation = this.loginForm.value;
+  // Getter để truy cập dễ dàng vào các form controls
+  get f() {
+    return this.loginForm.controls;
+  }
 
-      this.loginService.login(loginInfor).subscribe({
+  onLogin(): void {
+    this.submitted = true; // Đánh dấu form đã được submit
+
+    if (this.loginForm.valid) {
+      this.isLoading = true;
+      const loginInfo: ILoginInformation = this.loginForm.value;
+
+      this.loginService.login(loginInfo).subscribe({
         next: (response) => {
           this.handleLoginResponse(response);
+          this.isLoading = false;
         },
         error: (err: HttpErrorResponse) => {
-          this.handleError(err);
+          this.notificationService.handleError(err);
+          this.isLoading = false;
         }
       });
-    } else {
-      this.showFormValidationErrors();
     }
   }
-  
-  private handleLoginResponse(response: ApiResponse<LoginData>): void {
+
+  onRegister(): void {
+    this.submitted = true; // Đánh dấu form đã được submit
+
+    if (this.loginForm.valid) {
+      this.isLoading = true;
+      const registerInfo: ILoginInformation = this.loginForm.value;
+
+      this.registerService.register(registerInfo).subscribe({
+        next: (response) => {
+          this.handleRegisterResponse(response);
+          this.isLoading = false;
+        },
+        error: (err: HttpErrorResponse) => {
+          this.notificationService.handleError(err);
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  private handleLoginResponse(response: ApiResponse<ILogin>): void {
     if (response.status && response.data) {
       // Set token
       this.authService.setToken(response.data.token);
-      console.log('Token set thành công cho localStorage:', response.data.token);
+      console.log('Token và role đã được lưu vào localStorage:', response.data);
 
+      
+      // Cập nhật trạng thái đăng nhập trong LoginStore
       this.loginStore.setAuthenticated(true);
-      this.clearNotifications();
+
+      const role = this.authService.getRoleFromToken();
+      if (role)
+        this.loginStore.setRole(role);
+      else {
+        console.warn('Không tìm thấy role trong token');
+        this.notificationService.showError('Không tìm thấy vai trò trong token.');
+        return;
+      }
+
+      this.notificationService.clearNotifications();
       console.log('Login successful:', response);
-      this.router.navigate(['/dich-vu']);
+
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+      if (returnUrl) {
+        this.router.navigateByUrl(returnUrl);
+      } else {
+        if (role !== 'BenhNhan') {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/dich-vu']);
+        }
+      }
     } else {
-      this.errorMessages = [response.message || 'Đăng nhập thất bại'];
-      this.showNotification = true;
-      console.log('Login failed:', response.message);
+      this.notificationService.showError(response.message || 'Đăng nhập thất bại');
     }
   }
-  private handleError(error: HttpErrorResponse): void {
-    this.errorMessages = this.errorHandler.handleError(error);
-    this.showNotification = true;
-    console.error('Login error:', error);
-  }
 
-  private showFormValidationErrors(): void {
-    this.errorMessages = ['Vui lòng điền đầy đủ thông tin đăng nhập'];
-    this.showNotification = true;
-  }
-
-  private clearNotifications(): void {
-    this.showNotification = false;
-    this.errorMessages = [];
-  }
-
-  closeNotification(): void {
-    this.clearNotifications();
+  private handleRegisterResponse(response: ApiResponse<ILogin>): void {
+    if (response.status && response.data) {
+      this.notificationService.showSuccess('Đăng ký thành công! Vui lòng đăng nhập để tiếp tục.');
+      this.loginForm.reset();
+      this.submitted = false; // Reset trạng thái submitted sau khi đăng ký thành công
+    } else {
+      this.notificationService.showError(response.message || 'Đăng ký thất bại');
+    }
   }
 }

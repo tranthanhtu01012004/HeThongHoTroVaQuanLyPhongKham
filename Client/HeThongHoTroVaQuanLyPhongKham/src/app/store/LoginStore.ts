@@ -7,9 +7,16 @@ import { BehaviorSubject } from "rxjs";
 
 export class LoginStore {
     private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
-    isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+    private roleSubject = new BehaviorSubject<string>('');
 
+    isAuthenticated$ = this.isAuthenticatedSubject.asObservable();
+    role$ = this.roleSubject.asObservable();
+    
     setAuthenticated(status: boolean): void {
         this.isAuthenticatedSubject.next(status);
     }
+
+    setRole(role: string): void {
+        this.roleSubject.next(role);
+      }
 }

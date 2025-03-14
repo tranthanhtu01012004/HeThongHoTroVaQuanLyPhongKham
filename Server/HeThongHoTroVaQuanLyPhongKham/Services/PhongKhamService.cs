@@ -31,11 +31,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<PhongKhamDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<PhongKhamDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _phongKhamRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
             var phongKhams = await _phongKhamRepository.FindAllAsync(page, pageSize, pageSkip, "MaPhongKham");
-            return phongKhams.Select(t => _phongKhamMapping.MapEntityToDto(t));
+            var dtoList = phongKhams.Select(t => _phongKhamMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<PhongKhamDTO> GetByIdAsync(int id)

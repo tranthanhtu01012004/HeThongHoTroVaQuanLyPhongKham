@@ -37,11 +37,15 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                     await GetByIdAsync(id)));
         }
 
-        public async Task<IEnumerable<HoaDonDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<HoaDonDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _hoaDonRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
-            var hoaDons = await _hoaDonRepository.FindAllAsync(page, pageSize, pageSkip, "MaHoaDon");
-            return hoaDons.Select(t => _hoaDonMapping.MapEntityToDto(t));
+
+            var hoaDons = await _hoaDonRepository.FindAllAsync(page, pageSize, pageSkip, "MaDonThuoc");
+            var dtoList = hoaDons.Select(t => _hoaDonMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<HoaDonDTO> GetByIdAsync(int id)

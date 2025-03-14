@@ -26,8 +26,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<KetQuaDieuTriDTO>>.Success(
-                    await _ketQuaDieuTriSerice.GetAllAsync(page, pageSize)));
+                var (items, totalItems, totalPages) = await _ketQuaDieuTriSerice.GetAllAsync(page, pageSize);
+                return Ok(ApiResponse<IEnumerable<KetQuaDieuTriDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách kết quả điều trị - trang {page} với {pageSize} bản ghi."));
             }
             catch (NotFoundException ex)
             {

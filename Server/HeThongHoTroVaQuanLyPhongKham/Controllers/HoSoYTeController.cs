@@ -25,8 +25,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<HoSoYTeDTO>>.Success(
-                    await _hoSoYTeService.GetAllAsync(page, pageSize)));
+                var (items, totalItems, totalPages) = await _hoSoYTeService.GetAllAsync(page, pageSize);
+                return Ok(ApiResponse<IEnumerable<HoSoYTeDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách hồ sơ y tế - trang {page} với {pageSize} bản ghi."));
             }
             catch (NotFoundException ex)
             {

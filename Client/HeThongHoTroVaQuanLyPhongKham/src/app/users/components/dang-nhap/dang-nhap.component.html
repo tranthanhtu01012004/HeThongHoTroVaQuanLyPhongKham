@@ -1,28 +1,52 @@
 <div class="container-fluid py-5" style="width: 50%;">
     <div class="bg-light text-center rounded p-5 mt-5">
-        <h1 class="mb-4">Đăng nhập</h1>
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-            <div class="row g-3">
-                <div class="col-12">
-                    <input type="text" class="form-control bg-white border-0" placeholder="Nhập tài khoản" formControlName="tenDangNhap" style="height: 55px;">
-                </div>
-                <div class="col-12">
-                    <input type="text" class="form-control bg-white border-0" placeholder="Nhập mật khẩu" formControlName="matKhau" style="height: 55px;">
-                </div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <button class="btn btn-primary w-100 py-3" type="submit" [disabled]="loginForm.invalid">Đăng nhập</button>
-                    </div>
-                    <div class="col-6">
-                        <button class="btn btn-success w-100 py-3">Đăng ký</button>
-                    </div>
-                </div>
+      <h1 class="mb-4">Đăng nhập</h1>
+      <form [formGroup]="loginForm">
+        <div class="row g-3">
+          <div class="col-12">
+            <input
+              type="text"
+              class="form-control bg-white border-0"
+              [ngClass]="{'is-invalid': submitted && f['tenDangNhap'].errors}"
+              placeholder="Nhập tài khoản"
+              formControlName="tenDangNhap"
+              style="height: 55px;"
+            />
+          </div>
+          <div class="col-12">
+            <input
+              type="text"
+              class="form-control bg-white border-0"
+              [ngClass]="{'is-invalid': submitted && f['matKhau'].errors}"
+              placeholder="Nhập mật khẩu"
+              formControlName="matKhau"
+              style="height: 55px;"
+            />
+          </div>
+          <div class="row mt-3">
+            <div class="col-6">
+              <button
+                class="btn btn-primary w-100 py-3"
+                type="button"
+                (click)="onLogin()"
+                [disabled]="loginForm.invalid && submitted || isLoading"
+              >
+                {{ isLoading ? 'Đang xử lý...' : 'Đăng nhập' }}
+              </button>
             </div>
-        </form>
+            <div class="col-6">
+              <button
+                class="btn btn-success w-100 py-3"
+                type="button"
+                (click)="onRegister()"
+                [disabled]="loginForm.invalid && submitted || isLoading"
+              >
+                {{ isLoading ? 'Đang xử lý...' : 'Đăng ký' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
 </div>
-<app-notification 
-      [message]="errorMessages.join(', ')" 
-      [isVisible]="showNotification" 
-      (close)="closeNotification()">
-</app-notification>
+<app-notification></app-notification>

@@ -30,11 +30,7 @@
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css",
-              "src/styles.css",
-              "public/assets/users/bootstrap/owl.carousel.min.css",
-              "public/assets/users/bootstrap/tempusdominus-bootstrap-4.min.css",
-              "public/assets/users/bootstrap/bootstrap.min.css",
-              "public/assets/users/css/style.css"
+              "src/styles.css"
             ],
             "scripts": [],
             "server": "src/main.server.ts",
@@ -99,11 +95,7 @@
             ],
             "styles": [
               "@angular/material/prebuilt-themes/azure-blue.css",
-              "src/styles.css",
-              "public/assets/users/bootstrap/owl.carousel.min.css",
-              "public/assets/users/bootstrap/tempusdominus-bootstrap-4.min.css",
-              "public/assets/users/bootstrap/bootstrap.min.css",
-              "public/assets/users/css/style.css"
+              "src/styles.css"
             ],
             "scripts": []
           }

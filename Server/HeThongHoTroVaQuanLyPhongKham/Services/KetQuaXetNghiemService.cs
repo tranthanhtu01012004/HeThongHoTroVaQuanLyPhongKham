@@ -48,11 +48,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 await _ketQuaXetNghiemRepository.DeleteAsync(kqXns);
         }
 
-        public async Task<IEnumerable<KetQuaXetNghiemDTO>> GetAllAsync(int page, int pageSize)
+        public async Task<(IEnumerable<KetQuaXetNghiemDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
         {
+            var totalItems = await _ketQuaXetNghiemRepository.CountAsync();
+            var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
             var ketQuaXetNghiem = await _ketQuaXetNghiemRepository.FindAllAsync(page, pageSize, pageSkip, "MaKetQua");
-            return ketQuaXetNghiem.Select(t => _ketQuaXetNghiemMapping.MapEntityToDto(t));
+            var dtoList = ketQuaXetNghiem.Select(t => _ketQuaXetNghiemMapping.MapEntityToDto(t));
+            return (dtoList, totalItems, totalPages);
         }
 
         public async Task<KetQuaXetNghiemDTO> GetByIdAsync(int id)

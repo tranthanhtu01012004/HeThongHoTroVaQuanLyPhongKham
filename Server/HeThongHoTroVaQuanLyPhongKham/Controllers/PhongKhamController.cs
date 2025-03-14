@@ -25,8 +25,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                return Ok(ApiResponse<IEnumerable<PhongKhamDTO>>.Success(
-                    await _phongKhamService.GetAllAsync(page, pageSize)));
+                var (items, totalItems, totalPages) = await _phongKhamService.GetAllAsync(page, pageSize);
+                return Ok(ApiResponse<IEnumerable<PhongKhamDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách phòng khám - trang {page} với {pageSize} bản ghi."));
             }
             catch (NotFoundException ex)
             {

@@ -10,6 +10,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new TblBenhNhan
             {
                 MaBenhNhan = dto.MaBenhNhan,
+                MaTaiKhoan = dto.MaTaiKhoan,
                 Tuoi = dto.Tuoi,
                 GioiTinh = dto.GioiTinh,
                 DiaChi = dto.DiaChi,
@@ -24,6 +25,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             entity.GioiTinh = dto.GioiTinh;
             entity.DiaChi = dto.DiaChi;
             entity.SoDienThoai = dto.SoDienThoai;
+            entity.MaTaiKhoan = dto.MaTaiKhoan;
         }
 
         public BenhNhanDTO MapEntityToDto(TblBenhNhan entity)
@@ -31,6 +33,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new BenhNhanDTO
             {
                 MaBenhNhan = entity.MaBenhNhan,
+                MaTaiKhoan = entity.MaTaiKhoan,
                 Tuoi = entity.Tuoi,
                 GioiTinh = entity.GioiTinh,
                 DiaChi = entity.DiaChi,
