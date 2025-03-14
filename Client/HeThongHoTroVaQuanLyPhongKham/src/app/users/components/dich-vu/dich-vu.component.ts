@@ -39,7 +39,7 @@ export class DichVuComponent implements OnInit {
       next: (response: ApiResponse<IDichVuYTe[]>) => {
         if (response.status && response.data) {
           this.data = response.data;
-          this.totalItems = response.totalItems || response.data.length; // Dùng totalItems nếu API trả, nếu không thì dùng length
+          this.totalItems = response.totalItems || response.data.length;
           console.log('Services loaded:', this.data);
         }
       },

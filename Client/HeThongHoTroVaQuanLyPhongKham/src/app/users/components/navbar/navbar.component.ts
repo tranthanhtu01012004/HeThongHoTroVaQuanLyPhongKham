@@ -29,7 +29,7 @@ export class NavbarComponent {
     this.authService.removeToken();
     this.loginStore.setAuthenticated(false);
     this.loginStore.setRole('');
-    console.log('Login successful:', this.authService.getToken());
+    console.log('Logout successful:', this.authService.getToken());
     this.router.navigate(['/dang-nhap']);
   }
 }

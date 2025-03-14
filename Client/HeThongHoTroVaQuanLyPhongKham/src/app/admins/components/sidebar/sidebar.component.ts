@@ -1,5 +1,7 @@
-import { Component, ViewEncapsulation } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../../services/Auth/AuthService';
+import { LoginStore } from '../../../store/LoginStore';
 
 @Component({
   selector: 'app-sidebar',
@@ -12,6 +14,28 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   ],
   encapsulation: ViewEncapsulation.None
 })
-export class SidebarComponent {
+export class SidebarComponent implements OnInit{
+  role: string = '';
+  constructor(
+      public authService: AuthService,
+      private router: Router,
+      private loginStore: LoginStore
+    ) { }
+  
+  ngOnInit(): void {
+    this.loadRole();
+  }
 
+  loadRole(): void {
+    const role = this.authService.getRoleFromToken();
+    this.role = role ? role : '';
+  }
+  
+  logout(): void {
+    this.authService.removeToken();
+    this.loginStore.setAuthenticated(false);
+    this.loginStore.setRole('');
+    console.log('Logout successful:', this.authService.getToken());
+    this.router.navigate(['/dang-nhap']);
+  }
 }

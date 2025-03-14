@@ -8,26 +8,48 @@ import { ErrorHandlerService } from "./ErrorHandlerService";
 export class NotificationService {
   showNotification: boolean = false;
   messages: string[] = [];
-  messageType: 'error' | 'success' | 'info' = 'error'; // Định nghĩa kiểu union cho messageType
-  private timeoutId: any = null;
-  private returnUrl: string | null = null;
-  private confirmationCallback: ((confirmed: boolean) => void) | null = null;
+  messageType: 'error' | 'success' | 'info' = 'error';
+  private timeoutId: any = null; // Lưu trữ ID của setTimeout
 
   constructor(private errorHandler: ErrorHandlerService) {}
 
   public showError(messages: string | string[]): void {
-    this.clearTimeoutIfExists();
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
     const errorMessages = Array.isArray(messages) ? messages : [messages];
     this.messages = errorMessages.filter(msg => msg && msg.trim() !== '');
     this.messageType = 'error';
     this.showNotification = true;
+
+    this.timeoutId = setTimeout(() => {
+      this.closeNotification();
+    }, 5000);
   }
 
   public showSuccess(messages: string | string[]): void {
-    this.clearTimeoutIfExists();
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
     const successMessages = Array.isArray(messages) ? messages : [messages];
     this.messages = successMessages.filter(msg => msg && msg.trim() !== '');
     this.messageType = 'success';
+    this.showNotification = true;
+
+    // Tự động đóng sau 3 giây
+    this.timeoutId = setTimeout(() => {
+      this.closeNotification();
+    }, 3000);
+  }
+
+  public showInfo(messages: string | string[]): void {
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
+    const infoMessages = Array.isArray(messages) ? messages : [messages];
+    this.messages = infoMessages.filter(msg => msg && msg.trim() !== '');
+    this.messageType = 'info';
+    this.showNotification = true;
+  }
+
+  public handleError(error: HttpErrorResponse): void {
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
+    this.messages = this.errorHandler.handleError(error) || ['Đã xảy ra lỗi không xác định.'];
+    this.messageType = 'error';
     this.showNotification = true;
 
     this.timeoutId = setTimeout(() => {
@@ -35,32 +57,8 @@ export class NotificationService {
     }, 3000);
   }
 
-  public showInfo(messages: string | string[], confirmable: boolean = false): void {
-    this.clearTimeoutIfExists();
-    const infoMessages = Array.isArray(messages) ? messages : [messages];
-    this.messages = infoMessages.filter(msg => msg && msg.trim() !== '');
-    this.messageType = 'info';
-    this.showNotification = true;
-
-    if (confirmable) {
-      this.confirmationCallback = (confirmed: boolean) => {
-        if (confirmed) {
-          this.navigateToLogin();
-        }
-        this.closeNotification();
-      };
-    }
-  }
-
-  public handleError(error: HttpErrorResponse): void {
-    this.clearTimeoutIfExists();
-    this.messages = this.errorHandler.handleError(error) || ['Đã xảy ra lỗi không xác định.'];
-    this.messageType = 'error';
-    this.showNotification = true;
-  }
-
   public showFormValidationErrors(): void {
-    this.clearTimeoutIfExists();
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
     this.messages = ['Vui lòng điền đầy đủ thông tin'];
     this.messageType = 'error';
     this.showNotification = true;
@@ -71,26 +69,10 @@ export class NotificationService {
     this.messages = [];
     this.messageType = 'error';
     this.clearTimeoutIfExists();
-    this.confirmationCallback = null;
   }
 
-  public closeNotification(confirmed: boolean = false): void {
-    if (this.confirmationCallback) {
-      this.confirmationCallback(confirmed);
-    }
+  public closeNotification(): void {
     this.clearNotifications();
-  }
-
-  public setReturnUrl(url: string): void {
-    this.returnUrl = url;
-  }
-
-  private navigateToLogin(): void {
-    if (this.returnUrl) {
-      window.location.href = `/dang-nhap?returnUrl=${encodeURIComponent(this.returnUrl)}`;
-    } else {
-      window.location.href = '/dang-nhap';
-    }
   }
 
   private clearTimeoutIfExists(): void {
