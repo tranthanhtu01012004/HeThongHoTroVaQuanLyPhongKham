@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../services/Auth/AuthService';
 import { LoginStore } from '../../../store/LoginStore';
+import { HasPermissionDirective } from '../../../directive/has-per-mission.directive';
 
 @Component({
   selector: 'app-sidebar',

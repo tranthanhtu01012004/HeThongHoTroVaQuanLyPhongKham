@@ -1,5 +1,5 @@
 export interface IPhongKham {
-    MaPhongKham: number;
-    SucChua: number;
-    Loai: string;
+    maPhongKham: number;
+    sucChua: number;
+    loai: string;
 }

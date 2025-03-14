@@ -1,59 +1,26 @@
- .add {
-    padding: 10px 20px;
-    background-color: #28a745;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .add:hover {
-    background-color: #218838;
-  }
-  
-  .edit,
-  .delete {
-    margin: 0 5px;
-    cursor: pointer;
-    color: #007bff;
-  }
-  
-  .edit:hover {
-    color: #0056b3;
-  }
-  
-  .delete:hover {
-    color: #dc3545;
-  }
-  
-  .form-container {
-    margin-bottom: 20px;
-    padding: 15px;
-    background: #f9f9f9;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-  }
-  
-  .form-container label {
-    display: block;
-    margin-bottom: 5px;
-  }
-  
-  .form-container input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-  }
-  
-  .form-container .buttons {
-    margin-top: 10px;
-  }
-  
-  .form-container button {
-    padding: 8px 15px;
-    margin-right: 10px;
-  }
-  
-  .mt-5 {
-    margin-top: 20px;
-  }
+.add, .btn {
+  position: relative;
+  padding: 6px 12px;
+  margin-right: 10px;
+}
+
+button[disabled] {
+  opacity: 0.6; /* Làm mờ khi bị khóa */
+  cursor: not-allowed;
+}
+
+.lock-icon {
+  display: none; /* Ẩn mặc định */
+  margin-right: 5px;
+}
+
+.locked .lock-icon {
+  display: inline-block; /* Hiển thị khi bị khóa */
+}
+
+.locked .lock-icon::before {
+  content: '\f023'; /* FontAwesome lock icon */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 20px;
+}

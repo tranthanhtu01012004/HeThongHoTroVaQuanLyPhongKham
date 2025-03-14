@@ -10,7 +10,9 @@ export class ErrorHandlerService implements IErrorHandler {
         const errorMessages: string[] = [];
     
         if (error.status === 400 && error.error) {
-          if (error.error.errors) {
+          if (typeof error.error === 'string') {
+            errorMessages.push(error.error);
+          } else if (error.error.errors) {
             const errorObj = error.error.errors;
             Object.keys(errorObj).forEach(key => {
               errorMessages.push(...errorObj[key]);

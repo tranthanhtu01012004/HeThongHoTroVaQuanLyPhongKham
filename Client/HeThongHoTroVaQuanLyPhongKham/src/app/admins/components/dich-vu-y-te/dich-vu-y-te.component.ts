@@ -6,17 +6,21 @@ import { ApiResponse } from '../../../commons/ApiResponse';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../../services/handle-error/NotificationService';
 import { HttpErrorResponse } from '@angular/common/http';
-import { ApiErrorResponse } from '../../../commons/ApiErrorResponse';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NotificationComponent } from "../../../users/components/notification/notification.component";
 import { Router } from '@angular/router';
+import { HasPermissionDirective } from '../../../directive/has-per-mission.directive';
+import { PermissionService } from '../../../services/permission/permission.service';
 
 @Component({
   selector: 'app-dich-vu-y-te',
   standalone: true,
-  imports: [CommonModule, MatPaginator, NotificationComponent, ReactiveFormsModule],
+  imports: [CommonModule, MatPaginator, NotificationComponent, ReactiveFormsModule, HasPermissionDirective],
   templateUrl: './dich-vu-y-te.component.html',
-  styleUrl: './dich-vu-y-te.component.css'
+  styleUrls: [
+    './dich-vu-y-te.component.css',
+    '/public/assets/admins/css/styles.css'
+  ]
 })
 export class DichVuYTeComponent {
   data: IDichVuYTe[] = [];
@@ -36,7 +40,8 @@ export class DichVuYTeComponent {
     private dichVuYTeService: DichVuYTeService,
     private fb: FormBuilder,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private permissionService: PermissionService
   ) {
     this.serviceForm = this.fb.group({
       maDichVuYTe: [{ value: '', disabled: true }],
@@ -78,18 +83,23 @@ export class DichVuYTeComponent {
   }
 
   addService(): void {
-    this.editMode = false;
-    this.selectedService = null;
-    this.serviceForm.reset({ chiPhi: 0 });
-    this.showForm = true;
+    if (this.permissionService.hasRole('QuanLy')) {
+      this.editMode = false;
+      this.selectedService = null;
+      this.serviceForm.reset({ chiPhi: 0 });
+      this.showForm = true;
+    }
   }
-
-  editService(service: IDichVuYTe): void {
-    this.editMode = true;
-    this.selectedService = { ...service };
-    this.serviceForm.patchValue(service);
-    this.showForm = true;
+  
+  editService(service: any): void {
+    if (this.permissionService.hasRole('QuanLy')) {
+      this.editMode = true;
+      this.selectedService = { ...service };
+      this.serviceForm.patchValue(service);
+      this.showForm = true;
+    }
   }
+  
 
   saveService(): void {
     if (this.serviceForm.invalid) {
@@ -157,18 +167,18 @@ export class DichVuYTeComponent {
   }
 
   deleteService(id: number): void {
-    if (confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) {
-      this.dichVuYTeService.deleteService(id).subscribe({
-        next: () => {
+    if (this.permissionService.hasRole('QuanLy')) {
+      if (confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) {
+        this.dichVuYTeService.deleteService(id).subscribe({
+          next: () => {
             this.notificationService.showSuccess('Xóa dịch vụ thành công!');
-            setTimeout(() => {
-              window.location.reload();
-            }, 1000);
-        },
-        error: (err: HttpErrorResponse) => {
-          this.handleError(err);
-        }
-      });
+            this.loadServices();
+          },
+          error: (err: HttpErrorResponse) => {
+            this.handleError(err);
+          }
+        });
+      }
     }
   }
 

@@ -31,11 +31,24 @@ namespace HeThongHoTroVaQuanLyPhongKham.Middlewares
                 throw new UnauthorizedException("Bạn không có quyền truy cập vì chưa đăng nhập.");
             }
 
-            // Kiểm tra role (nếu API yêu cầu)
-            var role = context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
-            if (string.IsNullOrEmpty(role))
-            {
+            // Lấy tất cả vai trò của người dùng
+            var userRoles = context.User.Claims
+                .Where(c => c.Type == ClaimTypes.Role)
+                .Select(c => c.Value)
+                .ToList();
+
+            if (userRoles == null || !userRoles.Any())
                 throw new ForbiddenException("Bạn không có quyền truy cập trang này vì tài khoản chưa có vai trò.");
+
+            // Lấy danh sách vai trò yêu cầu từ endpoint
+            var requiredRolesAttribute = endpoint?.Metadata.GetMetadata<AuthorizeAttribute>();
+            if (requiredRolesAttribute?.Roles != null)
+            {
+                var requiredRoles = requiredRolesAttribute.Roles.Split(',').Select(r => r.Trim()).ToList();
+
+                bool hasRequiredRole = userRoles.Any(userRole => requiredRoles.Contains(userRole));
+                if (!hasRequiredRole)
+                    throw new ForbiddenException("Bạn không có quyền truy cập trang này vì vai trò không phù hợp với yêu cầu.");
             }
 
             await _next(context);
