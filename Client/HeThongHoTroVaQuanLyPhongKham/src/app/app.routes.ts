@@ -5,6 +5,10 @@ import { DichVuComponent } from './users/components/dich-vu/dich-vu.component';
 import { LichHenComponent } from './users/components/lich-hen/lich-hen.component';
 import { DangNhapComponent } from './users/components/dang-nhap/dang-nhap.component';
 import { UserLayoutComponent } from './users/components/user-layout.component';
+import { AdminLayoutComponent } from './admins/components/admin-layout/admin-layout.component';
+import { PhongKhamComponent } from './admins/components/phong-kham/phong-kham.component';
+import { DichVuYTeComponent } from './admins/components/dich-vu-y-te/dich-vu-y-te.component';
+import { adminAuthGuard } from './guards/adminAuthGuard';
 
 export const routes: Routes = [
   { 
@@ -20,12 +24,14 @@ export const routes: Routes = [
   },
 
   //Admins
-  // { 
-  //   path: 'admin', 
-  //   component: AdminLayoutComponent,
-  //   // canActivate: [authRoleGuard],
-  //   children: [
-  //     { path: 'phong-kham', component: PhongkhamComponent }
-  //   ]
-  // }
+  { 
+    path: 'admin', 
+    component: AdminLayoutComponent,
+    canActivate: [adminAuthGuard],
+    children: [
+      // { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'phong-kham', component: PhongKhamComponent },
+      { path: 'dich-vu-y-te', component: DichVuYTeComponent}
+    ]
+  }
 ];

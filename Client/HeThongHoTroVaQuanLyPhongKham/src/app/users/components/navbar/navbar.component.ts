@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { AuthService } from '../../../services/Auth/AuthService';
+import { LoginStore } from '../../../store/LoginStore';
 
 @Component({
   selector: 'app-navbar',
@@ -20,11 +21,15 @@ import { AuthService } from '../../../services/Auth/AuthService';
 export class NavbarComponent {
   constructor(
     public authService: AuthService,
-    private router: Router
+    private router: Router,
+    private loginStore: LoginStore
   ) { }
 
   logout(): void {
     this.authService.removeToken();
+    this.loginStore.setAuthenticated(false);
+    this.loginStore.setRole('');
+    console.log('Login successful:', this.authService.getToken());
     this.router.navigate(['/dang-nhap']);
   }
 }

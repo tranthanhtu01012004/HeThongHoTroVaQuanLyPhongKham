@@ -1,6 +1,6 @@
 import { HttpErrorResponse } from "@angular/common/http";
-import { IErrorHandler } from "./IErrorHandler";
 import { Injectable } from "@angular/core";
+import { IErrorHandler } from "./IErrorHandler";
 
 @Injectable(
     { providedIn: 'root' }

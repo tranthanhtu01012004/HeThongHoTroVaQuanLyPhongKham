@@ -5,7 +5,7 @@ import { LoginStore } from '../../../store/LoginStore';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ILoginInformation } from '../../../interfaces/Auth/ILoginInformation';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { NotificationComponent } from '../notification/notification.component';
 import { ILogin } from '../../../interfaces/login/ILogin';
 import { ApiResponse } from '../../../commons/ApiResponse';
@@ -41,7 +41,8 @@ export class DangNhapComponent {
     private loginStore: LoginStore,
     private router: Router,
     private authService: AuthService,
-    public errorNotificationService: ErrorNotificationService
+    public errorNotificationService: ErrorNotificationService,
+    private route: ActivatedRoute
   ) {
     this.loginForm = this.fb.group({
       tenDangNhap: ['', Validators.required],
@@ -70,12 +71,34 @@ export class DangNhapComponent {
     if (response.status && response.data) {
       // Set token
       this.authService.setToken(response.data.token);
-      console.log('Token set thành công cho localStorage:', response.data.token);
+      console.log('Token và role đã được lưu vào localStorage:', response.data);
 
+      
+      // Cập nhật trạng thái đăng nhập trong LoginStore
       this.loginStore.setAuthenticated(true);
+
+      const role = this.authService.getRoleFromToken();
+      if (role)
+        this.loginStore.setRole(role);
+      else {
+        console.warn('Không tìm thấy role trong token');
+        this.errorNotificationService.handleCustomError('Không thể xác định vai trò của người dùng.');
+        return;
+      }
+
       this.errorNotificationService.clearNotifications();
       console.log('Login successful:', response);
-      this.router.navigate(['/dich-vu']);
+
+      const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+      if (returnUrl) {
+        this.router.navigateByUrl(returnUrl);
+      } else {
+        if (role !== 'BenhNhan') {
+          this.router.navigate(['/admin/dashboard']);
+        } else {
+          this.router.navigate(['/dich-vu-y-te']);
+        }
+      }
     } else {
       this.errorMessages = [response.message || 'Đăng nhập thất bại'];
       this.showNotification = true;
