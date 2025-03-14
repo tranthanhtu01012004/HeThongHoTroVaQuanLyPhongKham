@@ -86,11 +86,11 @@ builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 // Tai lieu tham khao: https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-9.0
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngularApp", builder =>
+    options.AddPolicy("AllowAll", builder =>
     {
-        builder.WithOrigins("http://localhost:4200")
-               .AllowAnyHeader()
-               .AllowAnyMethod();
+        builder.AllowAnyOrigin()
+               .AllowAnyMethod()
+               .AllowAnyHeader();
     });
 });
 
@@ -125,7 +125,7 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 // Enable CORS
-app.UseCors("AllowAngularApp");
+app.UseCors("AllowAll");
 
 app.UseAuthentication(); // Xác thực JWT 
 

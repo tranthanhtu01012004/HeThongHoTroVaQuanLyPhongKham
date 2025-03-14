@@ -6,51 +6,71 @@ import { ErrorHandlerService } from "./ErrorHandlerService";
     providedIn: 'root'
   })
 export class ErrorNotificationService {
-showNotification: boolean = false;
-errorMessages: string[] = [];
+  showNotification: boolean = false;
+  messages: string[] = [];
+  messageType: 'error' | 'success' | 'info' = 'error';
+  private timeoutId: any = null; // Lưu trữ ID của setTimeout
 
-constructor(private errorHandler: ErrorHandlerService) { }
+  constructor(private errorHandler: ErrorHandlerService) {}
 
-/**
-   * Xử lý lỗi HTTP và hiển thị thông báo
-   * @param error Đối tượng HttpErrorResponse từ Angular HttpClient
-*/
-public handleError(error: HttpErrorResponse): void {
-    this.errorMessages = this.errorHandler.handleError(error) || ['Đã xảy ra lỗi không xác định.'];
+  public showError(messages: string | string[]): void {
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
+    const errorMessages = Array.isArray(messages) ? messages : [messages];
+    this.messages = errorMessages.filter(msg => msg && msg.trim() !== '');
+    this.messageType = 'error';
     this.showNotification = true;
   }
 
-/**
-   * Hiển thị thông báo lỗi khi form không hợp lệ
-*/
-public showFormValidationErrors(): void {
-    this.errorMessages = ['Vui lòng điền đầy đủ thông tin'];
+  public showSuccess(messages: string | string[]): void {
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
+    const successMessages = Array.isArray(messages) ? messages : [messages];
+    this.messages = successMessages.filter(msg => msg && msg.trim() !== '');
+    this.messageType = 'success';
+    this.showNotification = true;
+
+    // Tự động đóng sau 3 giây
+    this.timeoutId = setTimeout(() => {
+      this.closeNotification();
+    }, 3000);
+  }
+
+  public showInfo(messages: string | string[]): void {
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
+    const infoMessages = Array.isArray(messages) ? messages : [messages];
+    this.messages = infoMessages.filter(msg => msg && msg.trim() !== '');
+    this.messageType = 'info';
     this.showNotification = true;
   }
 
-/**
-   * Hiển thị thông báo lỗi tùy chỉnh
-   * @param messages Mảng thông báo lỗi hoặc chuỗi đơn
-*/
-public handleCustomError(messages: string | string[]): void {
-// Chuyển thành mảng nếu là chuỗi đơn
-const errorMessages = Array.isArray(messages) ? messages : [messages];
-this.errorMessages = errorMessages.filter(msg => msg && msg.trim() !== '');
-this.showNotification = true;
-}
+  public handleError(error: HttpErrorResponse): void {
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
+    this.messages = this.errorHandler.handleError(error) || ['Đã xảy ra lỗi không xác định.'];
+    this.messageType = 'error';
+    this.showNotification = true;
+  }
 
-/**
-    * Xóa tất cả thông báo và ẩn thông báo
-*/
-public clearNotifications(): void {
+  public showFormValidationErrors(): void {
+    this.clearTimeoutIfExists(); // Xóa timeout cũ nếu có
+    this.messages = ['Vui lòng điền đầy đủ thông tin'];
+    this.messageType = 'error';
+    this.showNotification = true;
+  }
+
+  public clearNotifications(): void {
     this.showNotification = false;
-    this.errorMessages = [];
-}
+    this.messages = [];
+    this.messageType = 'error';
+    this.clearTimeoutIfExists();
+  }
 
-/**
-    * Đóng thông báo (gọi clearNotifications)
- */
-public closeNotification(): void {
+  public closeNotification(): void {
     this.clearNotifications();
-}
+  }
+
+  private clearTimeoutIfExists(): void {
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
+  }
 }

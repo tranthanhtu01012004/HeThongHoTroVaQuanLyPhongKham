@@ -16,8 +16,7 @@ export class UnauthorizedComponent {
   }
 
   goBack(): void {
-    // Điều hướng về trang trước hoặc trang mặc định
-    this.router.navigate([this.returnUrl]);
+    this.router.navigate(['/']);
   }
 
   goToHome(): void {

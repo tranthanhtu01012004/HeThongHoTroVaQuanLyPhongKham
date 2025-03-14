@@ -34,7 +34,7 @@ export const adminAuthGuard: CanActivateFn = (route, state) => {
     if (normalizedRole && normalizedAllowedRoles.includes(normalizedRole)) {
       return true;
     } else {
-      const returnUrl = state.url; // Lấy URL hiện tại từ state
+      const returnUrl = state.url;
       if (returnUrl && returnUrl.startsWith('/admin')) {
         router.navigate(['/unauthorized'], {
           queryParams: { returnUrl },
@@ -44,7 +44,7 @@ export const adminAuthGuard: CanActivateFn = (route, state) => {
         if (role?.toLowerCase() !== 'benhnhan') {
           router.navigate(['/admin/dashboard']);
         } else {
-          router.navigate(['/dich-vu-y-te']);
+          router.navigate(['/dich-vu']);
         }
       }
       return false;

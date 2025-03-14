@@ -9,6 +9,7 @@ import { AdminLayoutComponent } from './admins/components/admin-layout/admin-lay
 import { PhongKhamComponent } from './admins/components/phong-kham/phong-kham.component';
 import { DichVuYTeComponent } from './admins/components/dich-vu-y-te/dich-vu-y-te.component';
 import { adminAuthGuard } from './guards/adminAuthGuard';
+import { UnauthorizedComponent } from './users/components/unauthorized/unauthorized.component';
 
 export const routes: Routes = [
   { 
@@ -19,7 +20,8 @@ export const routes: Routes = [
       { path: 'gioi-thieu', component: GioiThieuComponent },
       { path: 'dich-vu', component: DichVuComponent },
       { path: 'lich-hen', component: LichHenComponent },
-      { path: 'dang-nhap', component: DangNhapComponent }
+      { path: 'dang-nhap', component: DangNhapComponent },
+      { path: 'unauthorized', component: UnauthorizedComponent}
     ]
   },
 
