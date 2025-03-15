@@ -33,15 +33,12 @@ GO
 -- Bảng NhanVien
 CREATE TABLE tbl_nhan_vien (
     maNhanVien      INT             NOT NULL    IDENTITY(1,1),
-    maTaiKhoan      INT             NULL,
+    maTaiKhoan      INT             NOT NULL,
     ten             NVARCHAR(100)   NOT NULL,
     soDienThoai     VARCHAR(15)     NOT NULL,
-    email           VARCHAR(100)    NULL,
 	caLamViec       NVARCHAR(50)    NULL,
     chuyenMon       NVARCHAR(100)   NOT NULL,
     CONSTRAINT pk_tbl_nhan_vien PRIMARY KEY (maNhanVien),
-    CONSTRAINT uq_tbl_nhan_vien_soDienThoai UNIQUE (soDienThoai),
-    CONSTRAINT uq_tbl_nhan_vien_email UNIQUE (email),
     CONSTRAINT ck_tbl_nhan_vien_soDienThoai CHECK (LEN(soDienThoai) >= 10),
 	CONSTRAINT uq_tbl_nhan_vien_taikhoan UNIQUE (maTaiKhoan)
 );
@@ -90,7 +87,6 @@ CREATE TABLE tbl_benh_nhan (
     diaChi				NVARCHAR(1000)  NULL,
     soDienThoai			VARCHAR(15)		NULL,
     CONSTRAINT pk_tbl_benh_nhan PRIMARY KEY (maBenhNhan),
-    CONSTRAINT uq_tbl_benh_nhan_soDienThoai UNIQUE (soDienThoai),
     CONSTRAINT ck_tbl_benh_nhan_tuoi CHECK (tuoi >= 0),
     CONSTRAINT ck_tbl_benh_nhan_gioiTinh CHECK (gioiTinh IN (0, 1)),
 	CONSTRAINT uq_tbl_benh_nhan_taikhoan UNIQUE (maTaiKhoan)
@@ -216,7 +212,7 @@ GO
 -- Khóa ngoại cho tbl_nhan_vien
 ALTER TABLE tbl_nhan_vien
 	ADD CONSTRAINT fk_tbl_nhan_vien_tai_khoan FOREIGN KEY (maTaiKhoan) REFERENCES tbl_tai_khoan (maTaiKhoan)
-		ON DELETE SET NULL
+		ON DELETE CASCADE
 			ON UPDATE CASCADE;
 GO
 
@@ -371,19 +367,19 @@ INSERT INTO tbl_tai_khoan (maVaiTro, tenDangNhap, matKhau) VALUES
 GO
 
 -- Chèn dữ liệu vào tbl_nhan_vien
-INSERT INTO tbl_nhan_vien (maTaiKhoan, ten, soDienThoai, email, caLamViec, chuyenMon) VALUES
-    (1, N'Lê Thị D', '0934567890', 'lethid@gmail.com', N'Toàn thời gian', N'Quản lý'),            -- QuanLy
-    (2, N'Nguyễn Văn A', '0901234567', 'nguyenvana@gmail.com', N'Sáng', N'Nội khoa'),             -- BacSi
-    (3, N'Đỗ Thị I', '0989012345', 'dothii@gmail.com', N'Chiều', N'Chuyên khoa mắt'),             -- BacSi
-    (4, N'Ngô Văn J', '0990123456', 'ngovanj@gmail.com', N'Sáng', N'Chuyên khoa tim'),            -- BacSi
-    (5, N'Vũ Thị K', '0902345678', 'vuthik@gmail.com', N'Chiều', N'Chuyên khoa nhi'),             -- BacSi
-    (6, N'Trần Thị B', '0912345678', 'tranthib@gmail.com', N'Chiều', N'Hỗ trợ y tế'),             -- YTa
-    (7, N'Phạm Văn C', '0923456789', 'phamvanc@gmail.com', N'Toàn thời gian', N'Lễ tân'),         -- LeTan
-    (8, N'Hoàng Văn E', '0945678901', 'hoangvane@gmail.com', N'Sáng', N'Xét nghiệm'),             -- KyThuatVienXetNghiem
-    (9, N'Phan Thị F', '0956789012', 'phanthif@gmail.com', N'Chiều', N'Dược học'),                -- DuocSi
-    (10, N'Trương Thị H', '0978901234', 'truongthih@gmail.com', N'Sáng', N'Kế toán'),             -- KeToan
-    (11, N'Bùi Thị M', '0924567890', 'buithim@gmail.com', N'Sáng', N'Trợ lý y tế'),               -- TroLyBacSy
-    (12, N'Nguyễn Thị O', '0946789012', 'nguyenthio@gmail.com', N'Toàn thời gian', N'Hành chính'); -- NhanVienHanhChinh
+INSERT INTO tbl_nhan_vien (maTaiKhoan, ten, soDienThoai, caLamViec, chuyenMon) VALUES
+    (1, N'Lê Thị D', '0934567890', N'Toàn thời gian', N'Quản lý'),            -- QuanLy
+    (2, N'Nguyễn Văn A', '0901234567', N'Sáng', N'Nội khoa'),             -- BacSi
+    (3, N'Đỗ Thị I', '0989012345', N'Chiều', N'Chuyên khoa mắt'),             -- BacSi
+    (4, N'Ngô Văn J', '0990123456', N'Sáng', N'Chuyên khoa tim'),            -- BacSi
+    (5, N'Vũ Thị K', '0902345678', N'Chiều', N'Chuyên khoa nhi'),             -- BacSi
+    (6, N'Trần Thị B', '0912345678', N'Chiều', N'Hỗ trợ y tế'),             -- YTa
+    (7, N'Phạm Văn C', '0923456789', N'Toàn thời gian', N'Lễ tân'),         -- LeTan
+    (8, N'Hoàng Văn E', '0945678901', N'Sáng', N'Xét nghiệm'),             -- KyThuatVienXetNghiem
+    (9, N'Phan Thị F', '0956789012', N'Chiều', N'Dược học'),                -- DuocSi
+    (10, N'Trương Thị H', '0978901234', N'Sáng', N'Kế toán'),             -- KeToan
+    (11, N'Bùi Thị M', '0924567890', N'Sáng', N'Trợ lý y tế'),               -- TroLyBacSy
+    (12, N'Nguyễn Thị O', '0946789012', N'Toàn thời gian', N'Hành chính'); -- NhanVienHanhChinh
 GO
 
 -- Chèn dữ liệu vào tbl_phong_kham

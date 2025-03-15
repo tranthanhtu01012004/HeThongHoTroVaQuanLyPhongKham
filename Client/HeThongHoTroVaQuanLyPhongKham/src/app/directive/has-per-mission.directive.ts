@@ -1,4 +1,4 @@
-import { Directive, Input, ElementRef, Renderer2 } from '@angular/core';
+import { Directive, Input, ElementRef, Renderer2, HostListener } from '@angular/core';
 import { PermissionService } from '../services/permission/permission.service';
 
 @Directive({
@@ -21,16 +21,31 @@ export class HasPermissionDirective {
 
   private updateView(): void {
     const hasPermission = this.permissionService.hasAnyRole(this.permissions);
-    const button = this.el.nativeElement.tagName === 'BUTTON' 
-      ? this.el.nativeElement 
-      : this.el.nativeElement.querySelector('button');
+    const element = this.el.nativeElement;
 
     if (hasPermission) {
-      this.renderer.removeAttribute(button, 'disabled');
-      this.renderer.removeClass(button, 'locked');
+      // Mở khóa
+      this.renderer.removeClass(element, 'locked');
+      this.renderer.removeStyle(element, 'opacity');
+      this.renderer.removeStyle(element, 'cursor');
+      if (element.tagName === 'BUTTON') {
+        this.renderer.removeAttribute(element, 'disabled');
+      }
     } else {
-      this.renderer.setAttribute(button, 'disabled', 'true');
-      this.renderer.addClass(button, 'locked');
+      // Khóa
+      this.renderer.addClass(element, 'locked');
+      this.renderer.setStyle(element, 'opacity', '0.6');
+      this.renderer.setStyle(element, 'cursor', 'not-allowed');
+      if (element.tagName === 'BUTTON') {
+        this.renderer.setAttribute(element, 'disabled', 'true');
+      }
+    }
+  }
+
+  @HostListener('click', ['$event'])
+  onClick(event: Event): void {
+    if (!this.permissionService.hasAnyRole(this.permissions) && this.el.nativeElement.tagName === 'A') {
+      event.preventDefault(); // Ngăn điều hướng cho <a>
     }
   }
 }

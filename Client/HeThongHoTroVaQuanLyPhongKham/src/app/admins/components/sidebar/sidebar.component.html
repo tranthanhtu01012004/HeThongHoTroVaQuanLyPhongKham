@@ -1,37 +1,47 @@
 <div class="sidebar">
-  <ul class="sidebar--items">
-        <li>
-            <a>
-                <span class="icon icon-1"><i class="ri-layout-grid-line"></i></span>
-                <span class="sidebar--item">Bạn đang truy cập với vai trò: <span style="color: red;">{{ role }}</span> </span>
-            </a>
-        </li>
-        <li>
-            <a href="#">
-                <span class="icon icon-1"><i class="ri-layout-grid-line"></i></span>
-                <span class="sidebar--item">Dashboard</span>
-            </a>
-        </li>
-        <li>
-            <a routerLink="/admin/phong-kham" routerLinkActive="active">
-                <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
-                <span class="sidebar--item">Phòng khám</span>
-            </a>
-        </li>
-        <li>
-            <a routerLink="/admin/dich-vu-y-te" routerLinkActive="active">
-                <span class="icon icon-3"><i class="ri-stethoscope-line"></i></span>
-                <span class="sidebar--item" style="white-space: nowrap;">Dịch vụ y tế</span>
-            </a>
-        </li>
-    
-  </ul>
-  <ul class="sidebar--bottom-items">
+    <ul class="sidebar--items">
       <li>
-          <a href="#">
-              <span class="icon icon-8"><i class="ri-logout-box-r-line"></i></span>
-              <span class="sidebar--item" (click)="logout()">Logout</span>
-          </a>
+        <a class="no-hover">
+          <span class="sidebar--item cus">
+            Bạn đang truy cập với vai trò: <span style="color: red;">{{ role }}</span>
+          </span>
+        </a>
       </li>
-  </ul>
-</div>
+      <li>
+        <a routerLink="/admin/dashboard" routerLinkActive="active">
+          <span class="icon icon-1"><i class="ri-layout-grid-line"></i></span>
+          <span class="sidebar--item">Dashboard</span>
+        </a>
+      </li>
+      <li>
+        <a routerLink="/admin/dich-vu-y-te" routerLinkActive="active">
+          <span class="icon icon-3"><i class="ri-stethoscope-line"></i></span>
+          <span class="sidebar--item" style="white-space: nowrap;">Dịch vụ y tế</span>
+        </a>
+      </li>
+      <li class="permission-check">
+        <a [routerLink]="hasPermission('QuanLy') ? '/admin/phong-kham' : null" 
+           routerLinkActive="active" 
+           [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
+          <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
+          <span class="sidebar--item"><span class="lock-icon"></span>Phòng khám</span>
+        </a>
+      </li>
+      <li class="permission-check">
+        <a [routerLink]="hasPermission('QuanLy') ? '/admin/nhan-vien' : null" 
+           routerLinkActive="active" 
+           [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
+          <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
+          <span class="sidebar--item"><span class="lock-icon"></span>Nhân viên</span>
+        </a>
+      </li>
+    </ul>
+    <ul class="sidebar--bottom-items">
+      <li>
+        <a href="#" (click)="logout()">
+          <span class="icon icon-8"><i class="ri-logout-box-r-line"></i></span>
+          <span class="sidebar--item">Logout</span>
+        </a>
+      </li>
+    </ul>
+  </div>

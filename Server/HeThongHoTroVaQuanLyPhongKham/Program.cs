@@ -78,6 +78,7 @@ builder.Services.AddScoped<IService<DonThuocDTO>, DonThuocService>();
 builder.Services.AddScoped<IService<VaiTroDTO>, VaiTroService>();
 builder.Services.AddScoped<IService<KetQuaXetNghiemDTO>, KetQuaXetNghiemService>();
 builder.Services.AddScoped<IService<KetQuaDieuTriDTO>, KetQuaDieuTriService>();
+builder.Services.AddScoped<IVaiTroService, VaiTroService>();
 
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();

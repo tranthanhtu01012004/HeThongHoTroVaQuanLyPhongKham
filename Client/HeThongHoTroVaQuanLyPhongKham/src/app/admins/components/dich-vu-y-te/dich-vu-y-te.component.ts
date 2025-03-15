@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
 import { IDichVuYTe } from '../../../interfaces/dich-vu-y-te/IDichVuYTe';
 import { DichVuYTeService } from '../../../services/dich-vu-y-te/dich-vu-yte.service';
 import { MatPaginator, PageEvent } from '@angular/material/paginator';
@@ -19,8 +19,10 @@ import { PermissionService } from '../../../services/permission/permission.servi
   templateUrl: './dich-vu-y-te.component.html',
   styleUrls: [
     './dich-vu-y-te.component.css',
-    '/public/assets/admins/css/styles.css'
-  ]
+    '/public/assets/admins/css/styles.css',
+    '/public/assets/admins/css/custom.css'
+  ],
+  encapsulation: ViewEncapsulation.None
 })
 export class DichVuYTeComponent {
   data: IDichVuYTe[] = [];
@@ -100,6 +102,21 @@ export class DichVuYTeComponent {
     }
   }
   
+  deleteService(id: number): void {
+    if (this.permissionService.hasRole('QuanLy')) {
+      if (confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) {
+        this.dichVuYTeService.deleteService(id).subscribe({
+          next: () => {
+            this.notificationService.showSuccess('Xóa dịch vụ thành công!');
+            this.loadServices();
+          },
+          error: (err: HttpErrorResponse) => {
+            this.handleError(err);
+          }
+        });
+      }
+    }
+  }
 
   saveService(): void {
     if (this.serviceForm.invalid) {
@@ -160,25 +177,9 @@ export class DichVuYTeComponent {
           }
         },
         error: (err: HttpErrorResponse) => {
-          this.handleError(err); // Lỗi từ server sẽ được xử lý ở đây
+          this.handleError(err);
         }
       });
-    }
-  }
-
-  deleteService(id: number): void {
-    if (this.permissionService.hasRole('QuanLy')) {
-      if (confirm('Bạn có chắc chắn muốn xóa dịch vụ này?')) {
-        this.dichVuYTeService.deleteService(id).subscribe({
-          next: () => {
-            this.notificationService.showSuccess('Xóa dịch vụ thành công!');
-            this.loadServices();
-          },
-          error: (err: HttpErrorResponse) => {
-            this.handleError(err);
-          }
-        });
-      }
     }
   }
 

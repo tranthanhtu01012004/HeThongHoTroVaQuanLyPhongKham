@@ -6,5 +6,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     public interface ITaiKhoanService : IService<TaiKhoanDTO>
     {
         Task<TaiKhoanDTO> UpdateAsync(TaiKhoanUpdateDTO dto);
+        Task<TaiKhoanDTO> AddNhanVienAsync(TaiKhoanDTO dto);
     }
 }

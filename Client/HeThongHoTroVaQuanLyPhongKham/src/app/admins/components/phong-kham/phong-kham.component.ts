@@ -9,15 +9,17 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { NotificationComponent } from "../../../users/components/notification/notification.component";
+import { HasPermissionDirective } from '../../../directive/has-per-mission.directive';
 
 @Component({
   selector: 'app-phong-kham',
   standalone: true,
-  imports: [CommonModule, MatPaginator, ReactiveFormsModule, NotificationComponent],
+  imports: [CommonModule, MatPaginator, ReactiveFormsModule, NotificationComponent, HasPermissionDirective],
   templateUrl: './phong-kham.component.html',
   styleUrls: [
     './phong-kham.component.css',
-    '/public/assets/admins/css/styles.css'
+    '/public/assets/admins/css/styles.css',
+    '/public/assets/admins/css/custom.css'
   ],
   encapsulation: ViewEncapsulation.None
 })

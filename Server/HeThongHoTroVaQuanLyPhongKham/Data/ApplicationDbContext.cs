@@ -61,8 +61,6 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("tbl_benh_nhan");
 
-            entity.HasIndex(e => e.SoDienThoai, "uq_tbl_benh_nhan_soDienThoai").IsUnique();
-
             entity.HasIndex(e => e.MaTaiKhoan, "uq_tbl_benh_nhan_taikhoan").IsUnique();
 
             entity.Property(e => e.MaBenhNhan).HasColumnName("maBenhNhan");
@@ -295,10 +293,6 @@ public partial class ApplicationDbContext : DbContext
 
             entity.ToTable("tbl_nhan_vien");
 
-            entity.HasIndex(e => e.Email, "uq_tbl_nhan_vien_email").IsUnique();
-
-            entity.HasIndex(e => e.SoDienThoai, "uq_tbl_nhan_vien_soDienThoai").IsUnique();
-
             entity.HasIndex(e => e.MaTaiKhoan, "uq_tbl_nhan_vien_taikhoan").IsUnique();
 
             entity.Property(e => e.MaNhanVien).HasColumnName("maNhanVien");
@@ -308,10 +302,6 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.ChuyenMon)
                 .HasMaxLength(100)
                 .HasColumnName("chuyenMon");
-            entity.Property(e => e.Email)
-                .HasMaxLength(100)
-                .IsUnicode(false)
-                .HasColumnName("email");
             entity.Property(e => e.MaTaiKhoan).HasColumnName("maTaiKhoan");
             entity.Property(e => e.SoDienThoai)
                 .HasMaxLength(15)
@@ -323,7 +313,6 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.TblNhanVien)
                 .HasForeignKey<TblNhanVien>(d => d.MaTaiKhoan)
-                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tbl_nhan_vien_tai_khoan");
         });
 

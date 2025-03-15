@@ -1,0 +1,114 @@
+<style>
+    .form-group {
+        margin: 10px 0;
+    }
+    button {
+        margin: 0 10px;
+    }
+</style>
+<app-notification></app-notification>
+<h2 class="section--title mt-2">Quản Lý Nhân Viên</h2>
+<div class="recent--patients">
+  <div class="title" [hasPermission]="'QuanLy'">
+    <button class="add" (click)="addNhanVien()">
+      <span class="lock-icon"></span>
+      Thêm nhân viên mới
+    </button>
+</div>
+<div *ngIf="showForm" class="form-container">
+  <h3>{{ editMode ? 'Chỉnh sửa viên mới' : 'Thêm nhân viên' }}</h3>
+  <form [formGroup]="nhanVienForm" (ngSubmit)="saveNhanVien()">
+    <div class="form-group" hidden>
+      <label>Mã nhân viên</label>
+      <input formControlName="maNhanVien" class="form-control" readonly />
+    </div>
+    <div class="form-group">
+      <label>Tên đăng nhập</label>
+      <input formControlName="tenDangNhap" class="form-control" type="text" />
+    </div>
+    <div class="form-group">
+      <label>Mật khẩu</label>
+      <input formControlName="matKhau" class="form-control" type="text"  />
+    </div>
+    <div class="form-group">
+      <label>Tên nhân viên</label>
+      <input formControlName="ten" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>Số điện thoại</label>
+      <input formControlName="soDienThoai" class="form-control" type="text" />
+    </div>
+    <div class="form-group">
+        <label>Ca làm việc</label>
+        <select formControlName="caLamViec" class="form-control">
+          <option value="">Chọn ca làm việc</option>
+          <option value="Sáng">Sáng</option>
+          <option value="Chiều">Chiều</option>
+          <option value="Toàn thời gian">Toàn thời gian</option>
+        </select>
+      </div>
+    <div class="form-group">
+      <label>Chuyên môn</label>
+      <input formControlName="chuyenMon" class="form-control" />
+    </div>
+    <div class="form-group">
+      <label>Vai trò của tài khoản</label>
+      <select formControlName="maVaiTro" class="form-control">
+        <option value="">Chọn vai trò</option>
+        <option *ngFor="let vaiTro of vaiTroList" [value]="vaiTro.maVaiTro">
+          <span style="color: red;">{{ vaiTro.ten }}</span>
+        </option>
+      </select>
+    </div>
+    <div class="form-group">
+      <button type="submit" class="btn btn-success">Lưu</button>
+      <button type="button" (click)="cancelForm()" class="btn btn-secondary">Hủy</button>
+    </div>
+  </form>
+</div>
+<div [hasPermission]="'QuanLy'">
+  <div class="table table-striped">
+      <table>
+        <thead>
+          <tr>
+            <th>Mã nhân viên</th>
+            <th>Tên</th>
+            <th>Số điện thoại</th>
+            <th>Ca làm việc</th>
+            <th>Chuyên môn</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of data">
+            <td>{{ item.maNhanVien }}</td>
+            <td>{{ item.ten }}</td>
+            <td>{{ item.soDienThoai }}</td>
+            <td>{{ item.caLamViec }}</td>
+            <td>{{ item.chuyenMon }}</td>
+            <td>
+              <button [hasPermission]="'QuanLy'" (click)="editNhanVien(item)" class="btn btn-warning" style="margin-right: 10px;">
+                <span class="lock-icon"></span>
+                Sửa
+              </button>
+              <button [hasPermission]="'QuanLy'" (click)="deleteNhanVien(item.maNhanVien)" class="btn btn-danger" style="margin-left: 10px;">
+                <span class="lock-icon"></span>
+                Xóa
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+  </div>
+</div>
+<div class="mt-5" *ngIf="data.length > 0">
+<mat-paginator
+    [length]="totalItems"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[3, 6, 9]"
+    [pageIndex]="pageIndex"
+    (page)="onPageChange($event)"
+    showFirstLastButtons>
+</mat-paginator>
+</div>
+</div>
