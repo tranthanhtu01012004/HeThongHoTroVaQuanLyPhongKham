@@ -1,23 +1,66 @@
-    <!-- Appointment Start -->
-    <div class="container-fluid py-5">
-        <div class="container">
-            <div class="row gx-5">
-                <div class="col-lg-6 mb-5 mb-lg-0">
-                    <div class="mb-4">
-                        <h5 class="d-inline-block text-primary text-uppercase border-bottom border-5">Appointment</h5>
-                        <h1 class="display-4">Make An Appointment For Your Family</h1>
-                    </div>
-                    <p class="mb-5">Eirmod sed tempor lorem ut dolores. Aliquyam sit sadipscing kasd ipsum. Dolor ea et dolore et at sea ea at dolor, justo ipsum duo rebum sea invidunt voluptua. Eos vero eos vero ea et dolore eirmod et. Dolores diam duo invidunt lorem. Elitr ut dolores magna sit. Sea dolore sanctus sed et. Takimata takimata sanctus sed.</p>
-                    <a class="btn btn-primary rounded-pill py-3 px-5 me-3" href="">Find Doctor</a>
-                    <a class="btn btn-outline-primary rounded-pill py-3 px-5" href="">Read More</a>
-                </div>
-                <div class="col-lg-6">
-                    <div class="bg-light text-center rounded p-5">
-                        <h1 class="mb-4">Đặt lịch</h1>
-                        <form></form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Appointment End -->
+<style>
+  label {
+    color: black;
+  }
+
+  .form-group1 { 
+    margin: 15px 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+  }
+
+  .form-group {
+    margin: 15px 0;
+  }
+
+  button { margin: 5px; }
+
+  .form-container2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    margin-top: 50px;
+  }
+
+  .form-container {
+    width: 25%;
+    background-color: #88ccd5;
+    padding: 50px;
+    border-radius: 20px;
+  }
+</style>
+
+<app-notification></app-notification>
+<div class="form-container2">
+  <div class="form-container">
+    <h2 class="text-center text-danger">Đặt Lịch Hẹn</h2>
+    <form [formGroup]="lichHenForm" (ngSubmit)="datLichHen()">
+      <div class="form-group">
+        <label>Dịch vụ y tế</label>
+        <select formControlName="MaDichVuYTe" class="form-control">
+          <option value="">Chọn dịch vụ</option>
+          <option *ngFor="let dv of danhSachDichVu" [value]="dv.maDichVuYTe">{{ dv.ten }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ngày hẹn</label>
+        <input 
+          type="datetime-local" 
+          formControlName="NgayHen" 
+          class="form-control" 
+          [min]="minDateTime" 
+          [max]="maxDateTime"
+        />
+      </div>
+      <div class="form-group1">
+        <button type="submit" class="btn btn-success" [disabled]="lichHenForm.invalid">Đặt lịch</button>
+        <button type="button" class="btn btn-secondary" (click)="lichHenForm.reset()">Hủy</button>
+      </div>
+    </form>
+  </div>
+</div>

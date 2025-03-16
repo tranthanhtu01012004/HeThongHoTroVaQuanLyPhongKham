@@ -36,7 +36,7 @@ export const routes: Routes = [
       // { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'phong-kham', component: PhongKhamComponent },
       { path: 'dich-vu-y-te', component: DichVuYTeComponent },
-      { path: 'nhan-vien', component: NhanVienComponent }
+      { path: 'nhan-vien', component: NhanVienComponent },
     ]
   }
 ];

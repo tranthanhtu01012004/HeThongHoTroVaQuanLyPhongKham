@@ -6,5 +6,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     public interface IJwtService
     {
         string GenerateToken(TblTaiKhoan taiKhoan);
+        int? GetMaTaiKhoan();
+        string? GetCurrentRole();
     }
 }

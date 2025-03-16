@@ -255,10 +255,12 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.MaNhanVienNavigation).WithMany(p => p.TblLichHens)
                 .HasForeignKey(d => d.MaNhanVien)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tbl_lich_hen_nhan_vien");
 
             entity.HasOne(d => d.MaPhongKhamNavigation).WithMany(p => p.TblLichHens)
                 .HasForeignKey(d => d.MaPhongKham)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("fk_tbl_lich_hen_phong_kham");
         });
 

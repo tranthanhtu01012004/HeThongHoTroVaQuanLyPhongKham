@@ -35,6 +35,14 @@
           <span class="sidebar--item"><span class="lock-icon"></span>Nhân viên</span>
         </a>
       </li>
+      <li class="permission-check">
+        <a [routerLink]="hasPermission('QuanLy') ? '/admin/tai-khoan' : null" 
+           routerLinkActive="active" 
+           [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
+          <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
+          <span class="sidebar--item"><span class="lock-icon"></span>Tài khoản</span>
+        </a>
+      </li>
     </ul>
     <ul class="sidebar--bottom-items">
       <li>

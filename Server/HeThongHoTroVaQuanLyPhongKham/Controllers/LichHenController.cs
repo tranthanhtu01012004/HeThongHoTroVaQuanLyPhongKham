@@ -44,7 +44,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpPatch("{id:int}/status")]
-        [Authorize(Roles = "QuanLy,BacSi,LeTan,NhanVienHanhChinh")]
+        [Authorize(Roles = "BacSi")]
         public async Task<IActionResult> UpdateTrangThai([FromRoute] int id, [FromBody] LichHenUpdateDTO dto)
         {
             try
@@ -85,8 +85,33 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
+        [HttpPost("patient")]
+        [Authorize(Roles = "BenhNhan")]
+        public async Task<IActionResult> CreateForPatient([FromBody] LichHenCreateDTO dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                var createdLichHen = await _lichHenService.AddForPatientAsync(dto);
+                return CreatedAtAction(
+                    nameof(GetById),
+                    new { id = createdLichHen.MaLichHen },
+                    ApiResponse<LichHenDTO>.Success(createdLichHen, "Bệnh nhân đặt lịch hẹn thành công."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<LichHenDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<LichHenDTO>.Fail(ex.Message));
+            }
+        }
+
         [HttpPost]
-        [Authorize(Roles = "BenhNhan,LeTan,NhanVienHanhChinh,QuanLy,BacSi")]
+        [Authorize(Roles = "LeTan,NhanVienHanhChinh,QuanLy,BacSi")]
         public async Task<IActionResult> Create([FromBody] LichHenDTO dto)
         {
             try

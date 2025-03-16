@@ -4,14 +4,13 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ApiResponse } from '../../commons/ApiResponse';
 import { ILichHenUpdate } from '../../interfaces/lich-hen/ILichHenUpdate';
-import { environment } from '../../environments/environment';
 import { ILichHen } from '../../interfaces/lich-hen/ILichHen';
 
 @Injectable({
   providedIn: 'root'
 })
 export class LichHenService extends BaseApiService {
-  private apiUrl = `${environment.apiBaseUrl}/api/admin/appointments`;
+  private endpoint = '/admin/appointments';
 
   constructor(http: HttpClient) {
     super(http);
@@ -33,31 +32,35 @@ export class LichHenService extends BaseApiService {
       params = params.set('maPhong', maPhong.toString());
     }
 
-    return this.http.get<ApiResponse<ILichHen[]>>(this.apiUrl, { params });
+    return this.http.get<ApiResponse<ILichHen[]>>(`${this.apiBaseUrl}${this.endpoint}`, { params }); // Sửa this.apiUrl thành this.apiBaseUrl
   }
 
   // Lấy lịch hẹn theo ID
   getById(id: number): Observable<ApiResponse<ILichHen>> {
-    return this.http.get<ApiResponse<ILichHen>>(`${this.apiUrl}/${id}`);
+    return this.http.get<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}`);
   }
 
   // Thêm lịch hẹn mới
   add(lichHen: ILichHen): Observable<ApiResponse<ILichHen>> {
-    return this.http.post<ApiResponse<ILichHen>>(this.apiUrl, lichHen);
+    return this.http.post<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}`, lichHen);
+  }
+
+  createForPatient(lichHen: any): Observable<ApiResponse<any>> {
+    return this.http.post<ApiResponse<any>>(`${this.apiBaseUrl}${this.endpoint}/patient`, lichHen);
   }
 
   // Cập nhật lịch hẹn
   update(id: number, lichHen: ILichHen): Observable<ApiResponse<ILichHen>> {
-    return this.http.put<ApiResponse<ILichHen>>(`${this.apiUrl}/${id}`, lichHen);
+    return this.http.put<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}`, lichHen);
   }
 
   // Cập nhật trạng thái lịch hẹn
   updateTrangThai(id: number, updateDto: ILichHenUpdate): Observable<ApiResponse<ILichHen>> {
-    return this.http.patch<ApiResponse<ILichHen>>(`${this.apiUrl}/${id}/status`, updateDto);
+    return this.http.patch<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}/status`, updateDto);
   }
 
   // Xóa lịch hẹn
   delete(id: number): Observable<ApiResponse<void>> {
-    return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
+    return this.http.delete<ApiResponse<void>>(`${this.apiBaseUrl}${this.endpoint}/${id}`);
   }
 }

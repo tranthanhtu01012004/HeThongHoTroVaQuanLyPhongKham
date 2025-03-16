@@ -68,13 +68,12 @@ GO
 CREATE TABLE tbl_lich_hen (
     maLichHen       INT             NOT NULL IDENTITY(1,1),
     maBenhNhan      INT             NOT NULL,
-    maNhanVien      INT             NOT NULL,
+    maNhanVien      INT             NULL,
     maDichVuYTe     INT             NOT NULL,
-    maPhongKham     INT             NOT NULL,
+    maPhongKham     INT             NULL,
     ngayHen         DATETIME        NOT NULL,
     trangThai       NVARCHAR(50)    NOT NULL,
     CONSTRAINT pk_tbl_lich_hen PRIMARY KEY (maLichHen),
-	CONSTRAINT ck_tbl_lich_hen_ngayHen CHECK (ngayHen >= GETDATE()) -- Ngày hẹn phải sau hoặc bằng hiện tại
 );
 GO
 

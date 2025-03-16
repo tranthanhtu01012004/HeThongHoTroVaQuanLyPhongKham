@@ -9,11 +9,11 @@ public partial class TblLichHen
 
     public int MaBenhNhan { get; set; }
 
-    public int MaNhanVien { get; set; }
+    public int? MaNhanVien { get; set; }
 
     public int MaDichVuYte { get; set; }
 
-    public int MaPhongKham { get; set; }
+    public int? MaPhongKham { get; set; }
 
     public DateTime NgayHen { get; set; }
 
@@ -23,9 +23,9 @@ public partial class TblLichHen
 
     public virtual TblDichVuYTe MaDichVuYteNavigation { get; set; } = null!;
 
-    public virtual TblNhanVien MaNhanVienNavigation { get; set; } = null!;
+    public virtual TblNhanVien? MaNhanVienNavigation { get; set; }
 
-    public virtual TblPhongKham MaPhongKhamNavigation { get; set; } = null!;
+    public virtual TblPhongKham? MaPhongKhamNavigation { get; set; }
 
     public virtual ICollection<TblHoaDon> TblHoaDons { get; set; } = new List<TblHoaDon>();
 }
