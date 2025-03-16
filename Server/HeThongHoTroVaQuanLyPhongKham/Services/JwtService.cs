@@ -10,10 +10,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     public class JwtService : IJwtService
     {
         private readonly IConfiguration _configuration;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public JwtService(IConfiguration configuration)
+        public JwtService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _configuration = configuration;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public string GenerateToken(TblTaiKhoan taiKhoan)
@@ -40,5 +42,16 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
+        public int? GetMaTaiKhoan()
+        {
+            var maTaiKhoanClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(maTaiKhoanClaim) || !int.TryParse(maTaiKhoanClaim, out int maTaiKhoan))
+                return null;
+
+            return maTaiKhoan;
+        }
+
+        public string? GetCurrentRole() => _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.Role)?.Value;
     }
 }

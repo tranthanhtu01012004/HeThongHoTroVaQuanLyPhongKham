@@ -56,6 +56,7 @@ builder.Services.AddScoped<ITaiKhoanRepository, TaiKhoanRepository>();
 // Service
 builder.Services.AddScoped<ITaiKhoanService, TaiKhoanService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IService<NhanVienDTO>, NhanVienService>();
 builder.Services.AddScoped<IService<PhongKhamDTO>, PhongKhamService>();
