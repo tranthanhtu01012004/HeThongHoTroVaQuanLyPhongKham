@@ -60,7 +60,7 @@ CREATE TABLE tbl_phong_kham_nhan_vien (
     maPhongKham			INT             NOT NULL,
     maNhanVien			INT             NOT NULL,
     vaiTro				NVARCHAR(50)    NOT NULL,
-    CONSTRAINT pk_tbl_phong_kham_nhan_vien PRIMARY KEY (maPhongKhamNhanVien, maPhongKham, maNhanVien)
+    CONSTRAINT pk_tbl_phong_kham_nhan_vien PRIMARY KEY (maPhongKhamNhanVien)
 );
 GO
 
