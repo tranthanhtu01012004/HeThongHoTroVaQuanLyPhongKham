@@ -6,7 +6,7 @@ using HeThongHoTroVaQuanLyPhongKham.Repositories;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
-    public class PhongKhamService : BaseService, IService<PhongKhamDTO>
+    public class PhongKhamService : BaseService, IPhongKhamService
     {
         private readonly IRepository<TblPhongKham> _phongKhamRepository;
         private readonly IMapper<PhongKhamDTO, TblPhongKham> _phongKhamMapping;
@@ -39,6 +39,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             var phongKhams = await _phongKhamRepository.FindAllAsync(page, pageSize, pageSkip, "MaPhongKham");
             var dtoList = phongKhams.Select(t => _phongKhamMapping.MapEntityToDto(t));
             return (dtoList, totalItems, totalPages);
+        }
+
+        public async Task<IEnumerable<PhongKhamDTO>> GetAllAsync()
+        {
+            var phongKhams = await _phongKhamRepository.FindAllAsync("MaPhongKham");
+            return phongKhams.Select(t => _phongKhamMapping.MapEntityToDto(t));
         }
 
         public async Task<PhongKhamDTO> GetByIdAsync(int id)

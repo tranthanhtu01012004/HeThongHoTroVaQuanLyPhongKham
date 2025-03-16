@@ -12,6 +12,10 @@ import { NotificationComponent } from '../../../users/components/notification/no
 import { HasPermissionDirective } from '../../../directive/has-per-mission.directive';
 import { IVaiTro } from '../../../interfaces/vai-tro/IVaiTro';
 import { VaiTroService } from '../../../services/vai-tro/vai-tro.service';
+import { PhongKhamNhanVienService } from '../../../services/phong-kham-nhan-vien/phong-kham-nhan-vien.service';
+import { IPhongKhamNhanVien } from '../../../interfaces/phong-kham-nhan-vien/IPhongKhamNhanVien';
+import { IPhongKham } from '../../../interfaces/phong-kham/IPhongKham';
+import { PhongKhamService } from '../../../services/phong-kham/phong-kham.service';
 
 @Component({
   selector: 'app-nhan-vien',
@@ -26,174 +30,307 @@ import { VaiTroService } from '../../../services/vai-tro/vai-tro.service';
     encapsulation: ViewEncapsulation.None
 })
 export class NhanVienComponent {
-  data: INhanVien[] = []
-  vaiTroList: IVaiTro[] = [];
-  totalItems: number = 0;
-  pageSize: number = 3;
-  pageIndex: number = 0;
+  // Danh sách các dữ liệu chính
+  danhSachNhanVien: INhanVien[] = [];
+  danhSachPhongKham: IPhongKham[] = [];
+  danhSachVaiTro: IVaiTro[] = [];
+  danhSachPhanCong: IPhongKhamNhanVien[] = [];
 
-  showForm: boolean = false;
-  editMode: boolean = false;
-  selectedNhanVien: INhanVien | null = null;
-  nhanVienForm: FormGroup;
+  // Danh sách nhân viên đã và chưa phân công
+  danhSachNhanVienDaPhanCong: INhanVien[] = [];
+  danhSachNhanVienChuaPhanCong: INhanVien[] = [];
 
-  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  // Phân trang cho nhân viên đã phân công
+  soLuongNhanVienDaPhanCong: number = 0;
+  soLuongMoiTrangDaPhanCong: number = 3;
+  trangHienTaiDaPhanCong: number = 0;
+
+  // Phân trang cho nhân viên chưa phân công
+  soLuongNhanVienChuaPhanCong: number = 0;
+  soLuongMoiTrangChuaPhanCong: number = 3;
+  trangHienTaiChuaPhanCong: number = 0;
+
+  // Trạng thái form và nhân viên
+  hienThiFormNhanVien: boolean = false;
+  cheDoChinhSuaNhanVien: boolean = false;
+  nhanVienDangChon: INhanVien | null = null;
+  formThongTinNhanVien: FormGroup;
+
+  // Trạng thái form phân công
+  hienThiFormPhanCong: boolean = false;
+  formPhanCongNhanVien: FormGroup;
+  nhanVienDangPhanCong: INhanVien | null = null;
+
+  @ViewChild(MatPaginator) paginatorDaPhanCong!: MatPaginator;
+  @ViewChild('unassignedPaginator') paginatorChuaPhanCong!: MatPaginator;
 
   constructor(
     private nhanVienService: NhanVienService,
-    private fb: FormBuilder,
-    private notificationService: NotificationService,
-    private vaiTroService: VaiTroService
+    private phongKhamNhanVienService: PhongKhamNhanVienService,
+    private phongKhamService: PhongKhamService,
+    private vaiTroService: VaiTroService,
+    private formBuilder: FormBuilder,
+    private thongBaoService: NotificationService,
+    private router: Router
   ) {
-    this.nhanVienForm = this.fb.group({
+    this.formThongTinNhanVien = this.formBuilder.group({
       maNhanVien: [{ value: 0, disabled: true }],
       ten: ['', Validators.required],
       soDienThoai: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
-      Email: ['', [Validators.email]],
       caLamViec: ['', Validators.required],
       chuyenMon: ['', Validators.required],
-      tenDangNhap: ['', Validators.required],
-      matKhau: ['', Validators.required],
-      maVaiTro: ['', Validators.required]
+      tenDangNhap: [''],
+      matKhau: [''],
+      maVaiTro: ['']
+    });
+
+    this.formPhanCongNhanVien = this.formBuilder.group({
+      maPhongKham: ['', [Validators.required, Validators.min(1)]],
+      vaiTro: ['', [Validators.required]]
     });
   }
 
-  ngOnInit(): void {
-    this.loadNhanViens();
-    this.loadVaiTros();
+  ngOnInit() {
+    this.taiDanhSachNhanVien();
+    this.taiDanhSachPhongKham();
+    this.taiDanhSachVaiTro();
+    this.taiDanhSachPhanCong();
   }
 
-  loadVaiTros(): void {
-    this.vaiTroService.getAllServices().subscribe({
-      next: (response: any) => {
-        if (response.status && response.data) {
-          console.log(response.data);
-          // Lọc bỏ vai trò "QuanLy"
-          this.vaiTroList = response.data.filter((vaiTro: IVaiTro) => vaiTro.ten !== 'QuanLy');
-          console.log('vaiTroList after filtering:', this.vaiTroList); // Kiểm tra dữ liệu sau khi lọc
-        } else {
-          this.notificationService.showError('Không tải được danh sách vai trò.');
-        }
-      },
-      error: (err: HttpErrorResponse) => {
-        this.handleError(err);
-      }
-    });
-  }
-  
-  loadNhanViens(): void {
-    const page = this.pageIndex + 1;
-    this.nhanVienService.getAllServices(page, this.pageSize).subscribe({
+  // Tải dữ liệu từ server
+  taiDanhSachNhanVien() {
+    this.nhanVienService.getAllServices(1, 1000).subscribe({
       next: (response: ApiResponse<INhanVien[]>) => {
         if (response.status && response.data) {
-          this.data = response.data;
-          this.totalItems = response.totalItems || response.data.length;
+          this.danhSachNhanVien = response.data;
+          this.phanChiaDuLieuNhanVien();
         } else {
-          this.notificationService.showError(response.message || 'Không tải được danh sách nhân viên.');
+          this.thongBaoService.showError(response.message || 'Không tải được danh sách nhân viên.');
         }
       },
-      error: (err: HttpErrorResponse) => {
-        this.handleError(err);
-      }
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
     });
   }
 
-  onPageChange(event: PageEvent): void {
-    this.pageIndex = event.pageIndex;
-    this.pageSize = event.pageSize;
-    this.loadNhanViens();
+  taiDanhSachPhongKham() {
+    this.phongKhamService.getAllServicesNotPaginator().subscribe({
+      next: (response: ApiResponse<IPhongKham[]>) => {
+        if (response.status && response.data) {
+          this.danhSachPhongKham = response.data;
+        } else {
+          this.thongBaoService.showError('Không tải được danh sách phòng khám.');
+        }
+      },
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+    });
   }
 
-  addNhanVien(): void {
-    this.editMode = false;
-    this.selectedNhanVien = null;
-    this.nhanVienForm.reset({ maNhanVien: 0 });
-    this.nhanVienForm.reset({ maNhanVien: 0, caLamViec: '' });
-    this.showForm = true;
+  taiDanhSachVaiTro() {
+    this.vaiTroService.getAllServices().subscribe({
+      next: (response: ApiResponse<IVaiTro[]>) => {
+        if (response.status && response.data) {
+          this.danhSachVaiTro = response.data.filter(vaiTro => vaiTro.ten !== 'QuanLy');
+        } else {
+          this.thongBaoService.showError('Không tải được danh sách vai trò.');
+        }
+      },
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+    });
   }
 
-  editNhanVien(nhanVien: INhanVien): void {
-    this.editMode = true;
-    this.selectedNhanVien = { ...nhanVien };
-    this.nhanVienForm.patchValue(nhanVien);
-    this.showForm = true;
+  taiDanhSachPhanCong() {
+    this.phongKhamNhanVienService.getAllServices(1, 1000).subscribe({
+      next: (response: ApiResponse<IPhongKhamNhanVien[]>) => {
+        if (response.status && response.data) {
+          this.danhSachPhanCong = response.data;
+          this.phanChiaDuLieuNhanVien();
+        } else {
+          this.thongBaoService.showError('Không tải được danh sách phân công.');
+        }
+      },
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+    });
   }
 
-  saveNhanVien(): void {
-    const formValue = this.nhanVienForm.value;
-    const nhanVien: INhanVien = {
-      maNhanVien: this.editMode ? this.selectedNhanVien?.maNhanVien || 0 : 0,
-      ten: formValue.ten,
-      soDienThoai: formValue.soDienThoai,
-      caLamViec: formValue.caLamViec || undefined,
-      chuyenMon: formValue.chuyenMon,
-      tenDangNhap: formValue.tenDangNhap,
-      matKhau: formValue.matKhau,
-      maVaiTro: Number(formValue.maVaiTro)
-    };
+  // Phân chia dữ liệu nhân viên
+  phanChiaDuLieuNhanVien() {
+    const danhSachMaDaPhanCong = new Set(this.danhSachPhanCong.map(a => a.maNhanVien));
+    this.danhSachNhanVienDaPhanCong = this.danhSachNhanVien.filter(item => danhSachMaDaPhanCong.has(item.maNhanVien));
+    this.danhSachNhanVienChuaPhanCong = this.danhSachNhanVien.filter(item => !danhSachMaDaPhanCong.has(item.maNhanVien));
+    this.soLuongNhanVienDaPhanCong = this.danhSachNhanVienDaPhanCong.length;
+    this.soLuongNhanVienChuaPhanCong = this.danhSachNhanVienChuaPhanCong.length;
+  }
 
-    if (this.editMode && this.selectedNhanVien?.maNhanVien) {
-      this.nhanVienService.updateService(this.selectedNhanVien.maNhanVien, nhanVien).subscribe({
+  // Xử lý phân trang
+  xuLyThayDoiTrangDaPhanCong(event: PageEvent) {
+    this.trangHienTaiDaPhanCong = event.pageIndex;
+    this.soLuongMoiTrangDaPhanCong = event.pageSize;
+  }
+
+  xuLyThayDoiTrangChuaPhanCong(event: PageEvent) {
+    this.trangHienTaiChuaPhanCong = event.pageIndex;
+    this.soLuongMoiTrangChuaPhanCong = event.pageSize;
+  }
+
+  // Quản lý form nhân viên
+  themNhanVienMoi() {
+    this.cheDoChinhSuaNhanVien = false;
+    this.nhanVienDangChon = null;
+    this.formThongTinNhanVien.reset({ maNhanVien: 0, caLamViec: '' });
+    this.hienThiFormNhanVien = true;
+  }
+
+  chinhSuaNhanVien(nhanVien: INhanVien) {
+    this.cheDoChinhSuaNhanVien = true;
+    this.nhanVienDangChon = { ...nhanVien };
+    this.formThongTinNhanVien.patchValue({
+      maNhanVien: nhanVien.maNhanVien,
+      ten: nhanVien.ten,
+      soDienThoai: nhanVien.soDienThoai,
+      caLamViec: nhanVien.caLamViec,
+      chuyenMon: nhanVien.chuyenMon,
+      maVaiTro: nhanVien.maVaiTro,
+      maTaiKhoan: nhanVien.maTaiKhoan || 0
+    });
+    this.hienThiFormNhanVien = true;
+  }
+
+  luuThongTinNhanVien() {
+    const giaTriForm = this.formThongTinNhanVien.value;
+  
+    if (this.cheDoChinhSuaNhanVien && this.nhanVienDangChon?.maNhanVien) {
+      // Khi chỉnh sửa: Không gửi tenDangNhap và matKhau
+      const nhanVien: INhanVien = {
+        maNhanVien: this.nhanVienDangChon.maNhanVien, // Đảm bảo maNhanVien luôn có giá trị
+        ten: giaTriForm.ten,
+        soDienThoai: giaTriForm.soDienThoai,
+        caLamViec: giaTriForm.caLamViec || undefined,
+        chuyenMon: giaTriForm.chuyenMon,
+        tenDangNhap: this.nhanVienDangChon.tenDangNhap,
+        matKhau: this.nhanVienDangChon.matKhau,
+        maVaiTro: Number(giaTriForm.maVaiTro),
+        maTaiKhoan: this.nhanVienDangChon.maTaiKhoan || 0
+      };
+  
+      this.nhanVienService.updateService(this.nhanVienDangChon.maNhanVien, nhanVien).subscribe({
         next: (response: ApiResponse<INhanVien>) => {
           if (response.status) {
-            this.notificationService.showSuccess('Cập nhật nhân viên thành công!');
-            this.resetForm();
-            this.loadNhanViens();
+            this.thongBaoService.showSuccess('Cập nhật nhân viên thành công!');
+            this.datLaiFormNhanVien();
+            this.taiDanhSachNhanVien();
           } else {
-            this.notificationService.showError(response.message || 'Cập nhật thất bại.');
+            this.thongBaoService.showError(response.message || 'Cập nhật thất bại.');
           }
         },
-        error: (err: HttpErrorResponse) => {
-          this.handleError(err);
-        }
+        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
       });
     } else {
+      // Khi thêm mới: Gửi đầy đủ các trường
+      const nhanVien: INhanVien = {
+        maNhanVien: 0,
+        ten: giaTriForm.ten,
+        soDienThoai: giaTriForm.soDienThoai,
+        caLamViec: giaTriForm.caLamViec || undefined,
+        chuyenMon: giaTriForm.chuyenMon,
+        tenDangNhap: giaTriForm.tenDangNhap,
+        matKhau: giaTriForm.matKhau || null,
+        maVaiTro: Number(giaTriForm.maVaiTro),
+        maTaiKhoan: 0
+      };
+  
       this.nhanVienService.createService(nhanVien).subscribe({
         next: (response: ApiResponse<INhanVien>) => {
           if (response.status) {
-            this.notificationService.showSuccess('Thêm nhân viên thành công!');
-            this.resetForm();
-            this.loadNhanViens();
+            this.thongBaoService.showSuccess('Thêm nhân viên thành công!');
+            this.datLaiFormNhanVien();
+            this.taiDanhSachNhanVien();
           } else {
-            this.notificationService.showError(response.message || 'Thêm thất bại.');
+            this.thongBaoService.showError(response.message || 'Thêm thất bại.');
           }
         },
-        error: (err: HttpErrorResponse) => {
-          this.handleError(err);
-        }
+        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
       });
     }
   }
 
-  deleteNhanVien(id: number): void {
+  xoaNhanVien(maNhanVien: number) {
     if (confirm('Bạn có chắc chắn muốn xóa nhân viên này?')) {
-      this.nhanVienService.deleteService(id).subscribe({
+      this.nhanVienService.deleteService(maNhanVien).subscribe({
         next: () => {
-          this.notificationService.showSuccess('Xóa nhân viên thành công!');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          this.thongBaoService.showSuccess('Xóa nhân viên thành công!');
+          this.taiDanhSachNhanVien();
         },
-        error: (err: HttpErrorResponse) => {
-          this.handleError(err);
-        }
+        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
       });
     }
   }
 
-  cancelForm(): void {
-    this.resetForm();
+  // Quản lý form phân công
+  phanCongNhanVien(nhanVien: INhanVien) {
+    this.nhanVienDangPhanCong = nhanVien;
+    this.hienThiFormPhanCong = true;
+    this.formPhanCongNhanVien.reset();
   }
 
-  resetForm(): void {
-    this.showForm = false;
-    this.editMode = false;
-    this.selectedNhanVien = null;
-    this.nhanVienForm.reset({ maNhanVien: 0 });
-    this.nhanVienForm.reset({ maNhanVien: 0, caLamViec: '' })
+  luuPhanCongNhanVien() {
+
+    const giaTriForm = this.formPhanCongNhanVien.value;
+    const thongTinPhanCong: IPhongKhamNhanVien = {
+      maPhongKhamNhanVien: 0,
+      maPhongKham: Number(giaTriForm.maPhongKham),
+      maNhanVien: this.nhanVienDangPhanCong?.maNhanVien || 0,
+      vaiTro: giaTriForm.vaiTro
+    };
+
+    this.phongKhamNhanVienService.createService(thongTinPhanCong).subscribe({
+      next: (response: ApiResponse<IPhongKhamNhanVien>) => {
+        if (response.status) {
+          this.thongBaoService.showSuccess('Phân công nhân viên thành công!');
+          this.huyFormPhanCong();
+          this.taiDanhSachPhanCong();
+          this.taiDanhSachNhanVien();
+        } else {
+          this.thongBaoService.showError(response.message || 'Phân công thất bại.');
+        }
+      },
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+    });
   }
 
-  handleError(err: HttpErrorResponse): void {
-    this.notificationService.handleError(err);
+  huyFormPhanCong() {
+    this.hienThiFormPhanCong = false;
+    this.nhanVienDangPhanCong = null;
+    this.formPhanCongNhanVien.reset();
+  }
+
+  huyFormNhanVien() {
+    this.datLaiFormNhanVien();
+  }
+
+  datLaiFormNhanVien() {
+    this.hienThiFormNhanVien = false;
+    this.cheDoChinhSuaNhanVien = false;
+    this.nhanVienDangChon = null;
+    this.formThongTinNhanVien.reset({ maNhanVien: 0, caLamViec: '' });
+  }
+
+  // Lấy thông tin phòng khám và vai trò
+  layPhongKhamCuaNhanVien(maNhanVien: number): string {
+    const phanCong = this.danhSachPhanCong.find(a => a.maNhanVien === maNhanVien);
+    if (phanCong) {
+      const phongKham = this.danhSachPhongKham.find(p => p.maPhongKham === phanCong.maPhongKham);
+      return phongKham ? phongKham.loai : 'Không tìm thấy phòng';
+    }
+    return 'Chưa được phân công';
+  }
+
+  layTenVaiTro(maVaiTro: number): string {
+    const vaiTro = this.danhSachVaiTro.find(vt => vt.maVaiTro === maVaiTro);
+    return vaiTro ? vaiTro.ten : 'Không tìm thấy vai trò';
+  }
+
+  // Xử lý lỗi
+  xuLyLoi(err: HttpErrorResponse) {
+    this.thongBaoService.handleError(err);
   }
 }

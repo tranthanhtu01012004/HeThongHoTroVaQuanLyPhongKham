@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 @Injectable({
   providedIn: 'root'
 })
-export class VaiTroService extends BaseApiService{
+export class VaiTroService extends BaseApiService {
 
     private endpoint = '/admin/roles';
     
@@ -18,7 +18,11 @@ export class VaiTroService extends BaseApiService{
     getAllServices(): Observable<ApiResponse<IVaiTro[]>> {
       return this.http.get<ApiResponse<IVaiTro[]>>(`${this.apiBaseUrl}${this.endpoint}`);
     }
-  
+
+    GetById(id: number): Observable<ApiResponse<IVaiTro>> {
+      return this.http.get<ApiResponse<IVaiTro>>(`${this.apiBaseUrl}${this.endpoint}/${id}`);
+    }
+
     createService(service: IVaiTro): Observable<ApiResponse<IVaiTro>> {
       return this.http.post<ApiResponse<IVaiTro>>(`${this.apiBaseUrl}${this.endpoint}`, service);
     }

@@ -16,9 +16,13 @@ export class PhongKhamService extends BaseApiService {
       super(http);
     }
     getAllServices(page: number = 1, pageSize: number = 10): Observable<ApiResponse<IPhongKham[]>> {
-      return this.http.get<ApiResponse<IPhongKham[]>>(`${this.apiBaseUrl}${this.endpoint}?page=${page}&pageSize=${pageSize}`);
+      return this.http.get<ApiResponse<IPhongKham[]>>(`${this.apiBaseUrl}${this.endpoint}/paginated/?page=${page}&pageSize=${pageSize}`);
     }
-  
+
+    getAllServicesNotPaginator(): Observable<ApiResponse<IPhongKham[]>> {
+      return this.http.get<ApiResponse<IPhongKham[]>>(`${this.apiBaseUrl}${this.endpoint}`);
+    }
+
     getServices(page: number = 1, pageSize: number = 10): Observable<ApiResponse<IPhongKham[]>> {
       return this.http.get<ApiResponse<IPhongKham[]>>(`${this.apiBaseUrl}${this.endpoint}?page=${page}&pageSize=${pageSize}`);
     }

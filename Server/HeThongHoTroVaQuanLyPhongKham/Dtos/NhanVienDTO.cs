@@ -29,15 +29,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [RegularExpression(@"^[a-zA-ZÀ-ỹ\s]+$", ErrorMessage = "Chuyên môn chỉ được chứa chữ cái và khoảng trắng")]
         public string ChuyenMon { get; set; } = null!;
 
-        [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
         [StringLength(50, MinimumLength = 3, ErrorMessage = "Tên đăng nhập phải từ 3 đến 50 ký tự")]
         [RegularExpression(@"^[a-zA-Z0-9_]+$", ErrorMessage = "Tên đăng nhập chỉ được chứa chữ cái, số và dấu gạch dưới")]
-        public string TenDangNhap { get; set; } = null!;
+        public string? TenDangNhap { get; set; }
 
-        [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
         [StringLength(100, MinimumLength = 6, ErrorMessage = "Mật khẩu phải từ 6 đến 100 ký tự")]
         [RegularExpression(@"^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{6,}$", ErrorMessage = "Mật khẩu phải chứa ít nhất một chữ cái và một số")]
-        public string MatKhau { get; set; } = null!;
+        public string? MatKhau { get; set; }
 
         [Required(ErrorMessage = "Mã vai trò là bắt buộc")]
         [Range(1, int.MaxValue, ErrorMessage = "Mã vai trò phải là số dương")]

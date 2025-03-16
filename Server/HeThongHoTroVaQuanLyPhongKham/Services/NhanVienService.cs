@@ -4,6 +4,7 @@ using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class NhanVienService : BaseService, IService<NhanVienDTO>
@@ -11,12 +12,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IRepository<TblNhanVien> _nhanVienRepository;
         private readonly IMapper<NhanVienDTO, TblNhanVien> _nhanVienMapping;
         private readonly ITaiKhoanService _taiKhoanService;
+        private readonly IRepository<TblTaiKhoan> _taiKhoanRepository;
 
-        public NhanVienService(IRepository<TblNhanVien> nhanVienRepository, IMapper<NhanVienDTO, TblNhanVien> nhanVienMapping, ITaiKhoanService taiKhoanService)
+        public NhanVienService(IRepository<TblNhanVien> nhanVienRepository, IMapper<NhanVienDTO, TblNhanVien> nhanVienMapping, ITaiKhoanService taiKhoanService, IRepository<TblTaiKhoan> taiKhoanRepository)
         {
             _nhanVienRepository = nhanVienRepository;
             _nhanVienMapping = nhanVienMapping;
             _taiKhoanService = taiKhoanService;
+            _taiKhoanRepository = taiKhoanRepository;
         }
 
         public async Task<NhanVienDTO> AddAsync(NhanVienDTO dto)
@@ -43,9 +46,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task DeleteAsync(int id)
         {
-            await _nhanVienRepository.DeleteAsync(
-                _nhanVienMapping.MapDtoToEntity(
-                    await GetByIdAsync(id)));
+            var taiKhoan = await _taiKhoanRepository.GetQueryable()
+                .Include(tk => tk.TblNhanVien)
+                .FirstOrDefaultAsync(tk => tk.TblNhanVien.MaNhanVien == id);
+
+            if (taiKhoan is null)
+                throw new NotFoundException("Tài khoản không tồn tại.");
+
+            await _taiKhoanRepository.DeleteAsync(taiKhoan);
+
+            // da su dung Cascade
+            //await _nhanVienRepository.DeleteAsync(
+            //    _nhanVienMapping.MapDtoToEntity(
+            //        await GetByIdAsync(id)));
         }
 
         public async Task<(IEnumerable<NhanVienDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
@@ -71,6 +84,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         {
             var nhanVienUpdate = _nhanVienMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaNhanVien));
+            var taiKhoanDTO = new TaiKhoanUpdateDTO
+            {
+                MaTaiKhoan = (int)dto.MaTaiKhoan,
+                MaVaiTro = dto.MaVaiTro
+            };
+
+            var taiKhoan = await _taiKhoanService.UpdateAsync(taiKhoanDTO);
 
             _nhanVienMapping.MapDtoToEntity(dto, nhanVienUpdate);
 

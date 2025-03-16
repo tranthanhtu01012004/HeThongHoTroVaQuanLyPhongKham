@@ -13,14 +13,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     [Authorize(Roles = "QuanLy")]
     public class PhongKhamController : ControllerBase
     {
-        private readonly IService<PhongKhamDTO> _phongKhamService;
+        private readonly IPhongKhamService _phongKhamService;
 
-        public PhongKhamController(IService<PhongKhamDTO> phongKhamService)
+        public PhongKhamController(IPhongKhamService phongKhamService)
         {
             _phongKhamService = phongKhamService;
         }
 
-        [HttpGet]
+        [HttpGet("paginated")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
@@ -37,6 +37,26 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 return BadRequest(ApiResponse<PhongKhamDTO>.Fail(ex.Message));
             }
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                return Ok(ApiResponse<IEnumerable<PhongKhamDTO>>.Success(
+                    await _phongKhamService.GetAllAsync(), 
+                        $"Đã lấy danh sách phòng khám."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<PhongKhamDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<PhongKhamDTO>.Fail(ex.Message));
+            }
+        }
+
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById([FromRoute] int id)

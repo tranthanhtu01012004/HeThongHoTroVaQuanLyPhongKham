@@ -4,8 +4,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 {
     public class PhongKhamNhanVienDTO
     {
-        [Required(ErrorMessage = "Mã phòng khám nhân viên là bắt buộc")]
-        [Range(1, int.MaxValue, ErrorMessage = "Mã phòng khám nhân viên phải là số dương")]
         public int MaPhongKhamNhanVien { get; set; }
 
         [Required(ErrorMessage = "Mã phòng khám là bắt buộc")]
