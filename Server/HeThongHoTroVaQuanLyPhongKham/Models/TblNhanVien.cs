@@ -7,19 +7,17 @@ public partial class TblNhanVien
 {
     public int MaNhanVien { get; set; }
 
-    public int? MaTaiKhoan { get; set; }
+    public int MaTaiKhoan { get; set; }
 
     public string Ten { get; set; } = null!;
 
     public string SoDienThoai { get; set; } = null!;
 
-    public string? Email { get; set; }
-
     public string? CaLamViec { get; set; }
 
     public string ChuyenMon { get; set; } = null!;
 
-    public virtual TblTaiKhoan? MaTaiKhoanNavigation { get; set; }
+    public virtual TblTaiKhoan MaTaiKhoanNavigation { get; set; } = null!;
 
     public virtual ICollection<TblLichHen> TblLichHens { get; set; } = new List<TblLichHen>();
 

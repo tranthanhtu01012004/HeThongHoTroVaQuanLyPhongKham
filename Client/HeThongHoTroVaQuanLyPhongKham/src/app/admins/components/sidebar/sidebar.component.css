@@ -1,0 +1,37 @@
+.lock-icon {
+    display: none;
+    margin-right: 5px;
+  }
+  
+  .locked .lock-icon {
+    display: inline-block;
+  }
+  
+  .locked .lock-icon::before {
+    content: '\f023'; /* FontAwesome lock icon */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 20px;
+  }
+  
+  button[disabled], a.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  /* Style cho link bị vô hiệu hóa */
+.disabled-link {
+  opacity: 0.5; /* Làm mờ link */
+  cursor: not-allowed; /* Hiển thị con trỏ không cho phép click */
+  pointer-events: none; /* Ngăn hoàn toàn sự kiện click */
+}
+
+/* Đảm bảo lock icon hiển thị khi không có quyền */
+.permission-check .lock-icon {
+  display: inline-block !important; /* Hiển thị icon khóa */
+}
+
+/* Tùy chỉnh giao diện khi hover (không có hiệu ứng nếu bị vô hiệu hóa) */
+.sidebar--items li a:not(.disabled-link):hover {
+  background-color: #f0f0f0;
+  color: #007bff;
+}

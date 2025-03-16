@@ -11,6 +11,7 @@ import { DichVuYTeComponent } from './admins/components/dich-vu-y-te/dich-vu-y-t
 import { adminAuthGuard } from './guards/adminAuthGuard';
 import { UnauthorizedComponent } from './users/components/unauthorized/unauthorized.component';
 import { authGuard } from './guards/authGuards';
+import { NhanVienComponent } from './admins/components/nhan-vien/nhan-vien.component';
 
 export const routes: Routes = [
   { 
@@ -22,7 +23,7 @@ export const routes: Routes = [
       { path: 'dich-vu', component: DichVuComponent },
       { path: 'lich-hen', component: LichHenComponent, canActivate: [authGuard] },
       { path: 'dang-nhap', component: DangNhapComponent },
-      { path: 'unauthorized', component: UnauthorizedComponent}
+      { path: 'unauthorized', component: UnauthorizedComponent }
     ]
   },
 
@@ -34,7 +35,8 @@ export const routes: Routes = [
     children: [
       // { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'phong-kham', component: PhongKhamComponent },
-      { path: 'dich-vu-y-te', component: DichVuYTeComponent}
+      { path: 'dich-vu-y-te', component: DichVuYTeComponent },
+      { path: 'nhan-vien', component: NhanVienComponent }
     ]
   }
 ];

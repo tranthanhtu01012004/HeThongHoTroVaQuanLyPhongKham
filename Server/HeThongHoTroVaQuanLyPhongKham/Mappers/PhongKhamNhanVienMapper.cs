@@ -18,7 +18,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
 
         public void MapDtoToEntity(PhongKhamNhanVienDTO dto, TblPhongKhamNhanVien entity)
         {
-            entity.MaPhongKhamNhanVien = dto.MaPhongKhamNhanVien;
             entity.MaPhongKham = dto.MaPhongKham;
             entity.MaNhanVien = dto.MaNhanVien;
             entity.VaiTro = dto.VaiTro;

@@ -9,15 +9,17 @@ import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { NotificationComponent } from "../../../users/components/notification/notification.component";
+import { HasPermissionDirective } from '../../../directive/has-per-mission.directive';
 
 @Component({
   selector: 'app-phong-kham',
   standalone: true,
-  imports: [CommonModule, MatPaginator, ReactiveFormsModule, NotificationComponent],
+  imports: [CommonModule, MatPaginator, ReactiveFormsModule, NotificationComponent, HasPermissionDirective],
   templateUrl: './phong-kham.component.html',
   styleUrls: [
     './phong-kham.component.css',
-    '/public/assets/admins/css/styles.css'
+    '/public/assets/admins/css/styles.css',
+    '/public/assets/admins/css/custom.css'
   ],
   encapsulation: ViewEncapsulation.None
 })
@@ -93,31 +95,6 @@ export class PhongKhamComponent {
   }
 
   saveService(): void {
-    if (this.serviceForm.invalid) {
-      const loaiControl = this.serviceForm.get('loai');
-      const sucChuaControl = this.serviceForm.get('sucChua');
-
-      if (loaiControl?.errors?.['required']) {
-        this.notificationService.showError('Loại phòng khám là bắt buộc.');
-        return;
-      }
-
-      if (sucChuaControl?.errors) {
-        if (sucChuaControl.errors['required'] || sucChuaControl.value === null || sucChuaControl.value === '') {
-          this.notificationService.showError('Sức chứa là bắt buộc.');
-          return;
-        }
-        if (sucChuaControl.errors['min']) {
-          this.notificationService.showError('Sức chứa phải lớn hơn 0.');
-          return;
-        }
-        if (sucChuaControl.errors['pattern']) {
-          this.notificationService.showError('Sức chứa phải là một số nguyên dương.');
-          return;
-        }
-      }
-    }
-
     const formValue = this.serviceForm.value;
     const maPhongKham = this.serviceForm.get('maPhongKham')?.value || 0;
     const sucChua = formValue.sucChua !== null && formValue.sucChua !== '' ? Number(formValue.sucChua) : 0;
@@ -165,9 +142,7 @@ export class PhongKhamComponent {
       this.phongKhamService.deleteService(id).subscribe({
         next: () => {
           this.notificationService.showSuccess('Xóa phòng khám thành công!');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          this.loadServices();
         },
         error: (err: HttpErrorResponse) => {
           this.handleError(err);

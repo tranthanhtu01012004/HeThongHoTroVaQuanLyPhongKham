@@ -476,6 +476,14 @@ a {
 .table {
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
     border: solid 1px;
+    background-color: antiquewhite;
+}
+
+.td-custom {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
 }
 
 table {
@@ -622,4 +630,14 @@ th {
   .title {
     display: flex;
     justify-content: flex-end;
+  }
+
+  .form-container {
+    padding: 30px;
+    border: solid 2px;
+    margin-bottom: 20px;
+  }
+  h3, h4 {
+    text-align: center;
+    color: red !important;
   }

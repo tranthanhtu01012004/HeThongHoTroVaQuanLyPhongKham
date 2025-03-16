@@ -6,6 +6,7 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services.HashPassword;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Common;
+using System.Security.Claims;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
     public class TaiKhoanService : BaseService, ITaiKhoanService
@@ -15,16 +16,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IPasswordHasher _passwordHasher;
         private readonly IService<VaiTroDTO> _vaiTroService;
         private readonly IService<BenhNhanDTO> _benhNhanService;
-        private readonly IMapper<BenhNhanDTO, TblBenhNhan> _benhNhanMapping;
 
-        public TaiKhoanService(IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepository, IPasswordHasher passwordHasher, IService<VaiTroDTO> vaiTroService, IService<BenhNhanDTO> benhNhanService, IMapper<BenhNhanDTO, TblBenhNhan> benhNhanMapping)
+        public TaiKhoanService(IMapper<TaiKhoanDTO, TblTaiKhoan> taiKhoanMapping, ITaiKhoanRepository taiKhoanRepository, IPasswordHasher passwordHasher, IService<VaiTroDTO> vaiTroService, IService<BenhNhanDTO> benhNhanService)
         {
             _taiKhoanMapping = taiKhoanMapping;
             _taiKhoanRepository = taiKhoanRepository;
             _passwordHasher = passwordHasher;
             _vaiTroService = vaiTroService;
             _benhNhanService = benhNhanService;
-            _benhNhanMapping = benhNhanMapping;
         }
 
         public async Task<TaiKhoanDTO> AddAsync(TaiKhoanDTO dto)
@@ -53,11 +52,28 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             return _taiKhoanMapping.MapEntityToDto(taiKhoan);
         }
 
+        public async Task<TaiKhoanDTO> AddNhanVienAsync(TaiKhoanDTO dto)
+        {
+            var taiKhoanExisting = await _taiKhoanRepository.FindByNameAsync(dto.TenDangNhap);
+            if (taiKhoanExisting != null &&
+                string.Equals(taiKhoanExisting.TenDangNhap, dto.TenDangNhap, StringComparison.OrdinalIgnoreCase))
+                throw new DuplicateEntityException($"Tài khoản với tên đăng nhập [{dto.TenDangNhap}] đã tồn tại.");
+
+            var taiKhoanEntity = _taiKhoanMapping.MapDtoToEntity(dto);
+
+            taiKhoanEntity.MatKhau = _passwordHasher.HashPassword(dto.MatKhau);
+
+            return _taiKhoanMapping.MapEntityToDto(
+                await _taiKhoanRepository.CreateAsync(taiKhoanEntity));
+        }
+
         public async Task DeleteAsync(int id)
         {
-            await _taiKhoanRepository.DeleteAsync(
-                _taiKhoanMapping.MapDtoToEntity(
-                    await GetByIdAsync(id)));
+            var taiKhoan = await _taiKhoanRepository.FindByIdAsync(id);
+            if (taiKhoan.TenDangNhap.ToLower().Equals("admin"))
+                throw new NotFoundException("Không thể xóa tài khoản quản trị viên.");
+
+            await _taiKhoanRepository.DeleteAsync(taiKhoan);
         }
 
         public async Task<(IEnumerable<TaiKhoanDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)

@@ -20,15 +20,15 @@
     <form [formGroup]="serviceForm" (ngSubmit)="saveService()">
       <div class="form-group" hidden>
         <label>Mã dịch vụ</label>
-        <input formControlName="maDichVuYTe" readonly>
+        <input formControlName="maDichVuYTe" class="form-control" readonly>
       </div>
       <div class="form-group">
         <label>Tên dịch vụ</label>
-        <input formControlName="ten">
+        <input formControlName="ten" class="form-control"/>
       </div>
       <div class="form-group">
         <label>Chi phí (VND)</label>
-        <input type="number" formControlName="chiPhi">
+        <input type="number" formControlName="chiPhi" class="form-control"/>
       </div>
       <div class="form-group">
         <button type="submit" class="btn btn-success">Lưu</button>
@@ -36,7 +36,6 @@
       </div>
     </form>
   </div>
-
 <div class="table table-striped">
       <table>
           <thead>
@@ -52,7 +51,7 @@
               <td>{{ dichVu.maDichVuYTe }}</td>
               <td>{{ dichVu.ten }}</td>
               <td>{{ dichVu.chiPhi | currency:'VND':'symbol':'1.0-0' }}</td>
-              <td>
+              <td class="td-custom">
                 <button [hasPermission]="'QuanLy'" (click)="editService(dichVu)" class="btn btn-warning" style="margin-right: 10px;">
                   <span class="lock-icon"></span>
                   Sửa

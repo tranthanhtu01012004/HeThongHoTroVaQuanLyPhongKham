@@ -6,7 +6,7 @@ using HeThongHoTroVaQuanLyPhongKham.Repositories;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
-    public class VaiTroService : BaseService, IService<VaiTroDTO>
+    public class VaiTroService : BaseService, IVaiTroService
     {
         private readonly IRepository<TblVaiTro> _vaiTroRepository;
         private readonly IMapper<VaiTroDTO, TblVaiTro> _vaiTroMapping;
@@ -39,6 +39,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             var vaiTros = await _vaiTroRepository.FindAllAsync(page, pageSize, pageSkip, "MaVaiTro");
             var dtoList = vaiTros.Select(t => _vaiTroMapping.MapEntityToDto(t));
             return (dtoList, totalItems, totalPages);
+        }
+
+        public async Task<IEnumerable<VaiTroDTO>> GetAllAsync()
+        {
+            var vaiTros = await _vaiTroRepository.FindAllAsync("MaVaiTro");
+            return vaiTros.Select(t => _vaiTroMapping.MapEntityToDto(t));
         }
 
         public async Task<VaiTroDTO> GetByIdAsync(int id)
