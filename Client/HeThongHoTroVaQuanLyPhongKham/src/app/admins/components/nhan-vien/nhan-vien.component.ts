@@ -259,6 +259,7 @@ export class NhanVienComponent {
         next: () => {
           this.thongBaoService.showSuccess('Xóa nhân viên thành công!');
           this.taiDanhSachNhanVien();
+          this.taiDanhSachPhanCong();
         },
         error: (err: HttpErrorResponse) => this.xuLyLoi(err)
       });
@@ -270,10 +271,18 @@ export class NhanVienComponent {
     this.nhanVienDangPhanCong = nhanVien;
     this.hienThiFormPhanCong = true;
     this.formPhanCongNhanVien.reset();
+
+    // Nếu nhân viên đã có phân công, điền dữ liệu hiện tại vào form
+    const phanCongHienTai = this.danhSachPhanCong.find(pc => pc.maNhanVien === nhanVien.maNhanVien);
+    if (phanCongHienTai) {
+      this.formPhanCongNhanVien.patchValue({
+        maPhongKham: phanCongHienTai.maPhongKham,
+        vaiTro: phanCongHienTai.vaiTro
+      });
+    }
   }
 
   luuPhanCongNhanVien() {
-
     const giaTriForm = this.formPhanCongNhanVien.value;
     const thongTinPhanCong: IPhongKhamNhanVien = {
       maPhongKhamNhanVien: 0,
@@ -282,19 +291,41 @@ export class NhanVienComponent {
       vaiTro: giaTriForm.vaiTro
     };
 
-    this.phongKhamNhanVienService.createService(thongTinPhanCong).subscribe({
-      next: (response: ApiResponse<IPhongKhamNhanVien>) => {
-        if (response.status) {
-          this.thongBaoService.showSuccess('Phân công nhân viên thành công!');
-          this.huyFormPhanCong();
-          this.taiDanhSachPhanCong();
-          this.taiDanhSachNhanVien();
-        } else {
-          this.thongBaoService.showError(response.message || 'Phân công thất bại.');
-        }
-      },
-      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
-    });
+    // Kiểm tra xem nhân viên đã có phân công chưa
+    const phanCongHienTai = this.danhSachPhanCong.find(pc => pc.maNhanVien === thongTinPhanCong.maNhanVien);
+
+    if (phanCongHienTai) {
+      // Nếu đã có phân công, thực hiện update
+      thongTinPhanCong.maPhongKhamNhanVien = phanCongHienTai.maPhongKhamNhanVien;
+      this.phongKhamNhanVienService.updateService(phanCongHienTai.maPhongKhamNhanVien, thongTinPhanCong).subscribe({
+        next: (response: ApiResponse<IPhongKhamNhanVien>) => {
+          if (response.status) {
+            this.thongBaoService.showSuccess('Cập nhật phân công thành công!');
+            this.huyFormPhanCong();
+            this.taiDanhSachPhanCong();
+            this.taiDanhSachNhanVien();
+          } else {
+            this.thongBaoService.showError(response.message || 'Cập nhật phân công thất bại.');
+          }
+        },
+        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+      });
+    } else {
+      // Nếu chưa có phân công, thực hiện create
+      this.phongKhamNhanVienService.createService(thongTinPhanCong).subscribe({
+        next: (response: ApiResponse<IPhongKhamNhanVien>) => {
+          if (response.status) {
+            this.thongBaoService.showSuccess('Phân công nhân viên thành công!');
+            this.huyFormPhanCong();
+            this.taiDanhSachPhanCong();
+            this.taiDanhSachNhanVien();
+          } else {
+            this.thongBaoService.showError(response.message || 'Phân công thất bại.');
+          }
+        },
+        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+      });
+    }
   }
 
   huyFormPhanCong() {
@@ -324,9 +355,9 @@ export class NhanVienComponent {
     return 'Chưa được phân công';
   }
 
-  layTenVaiTro(maVaiTro: number): string {
-    const vaiTro = this.danhSachVaiTro.find(vt => vt.maVaiTro === maVaiTro);
-    return vaiTro ? vaiTro.ten : 'Không tìm thấy vai trò';
+  layVaiTroPhanCong(maNhanVien: number): string {
+    const phanCong = this.danhSachPhanCong.find(pc => pc.maNhanVien === maNhanVien);
+    return phanCong ? phanCong.vaiTro : 'Chưa phân công';
   }
 
   // Xử lý lỗi

@@ -16,6 +16,7 @@
             int pageSkip, string keyPropertyName
         );
         Task<T> FindByIdWithQueryAsync(IQueryable<T> query, int id, string keyPropertyName);
-        Task<int> CountAsync(); 
+        Task<int> CountAsync();
+        Task<T> FindByIdForUpdateAsync(int id, string keyPropertyName);
     }
 }

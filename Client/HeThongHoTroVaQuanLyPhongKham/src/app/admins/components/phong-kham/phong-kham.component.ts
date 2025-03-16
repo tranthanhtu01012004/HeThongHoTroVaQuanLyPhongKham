@@ -95,31 +95,6 @@ export class PhongKhamComponent {
   }
 
   saveService(): void {
-    if (this.serviceForm.invalid) {
-      const loaiControl = this.serviceForm.get('loai');
-      const sucChuaControl = this.serviceForm.get('sucChua');
-
-      if (loaiControl?.errors?.['required']) {
-        this.notificationService.showError('Loại phòng khám là bắt buộc.');
-        return;
-      }
-
-      if (sucChuaControl?.errors) {
-        if (sucChuaControl.errors['required'] || sucChuaControl.value === null || sucChuaControl.value === '') {
-          this.notificationService.showError('Sức chứa là bắt buộc.');
-          return;
-        }
-        if (sucChuaControl.errors['min']) {
-          this.notificationService.showError('Sức chứa phải lớn hơn 0.');
-          return;
-        }
-        if (sucChuaControl.errors['pattern']) {
-          this.notificationService.showError('Sức chứa phải là một số nguyên dương.');
-          return;
-        }
-      }
-    }
-
     const formValue = this.serviceForm.value;
     const maPhongKham = this.serviceForm.get('maPhongKham')?.value || 0;
     const sucChua = formValue.sucChua !== null && formValue.sucChua !== '' ? Number(formValue.sucChua) : 0;
@@ -167,9 +142,7 @@ export class PhongKhamComponent {
       this.phongKhamService.deleteService(id).subscribe({
         next: () => {
           this.notificationService.showSuccess('Xóa phòng khám thành công!');
-          setTimeout(() => {
-            window.location.reload();
-          }, 1000);
+          this.loadServices();
         },
         error: (err: HttpErrorResponse) => {
           this.handleError(err);

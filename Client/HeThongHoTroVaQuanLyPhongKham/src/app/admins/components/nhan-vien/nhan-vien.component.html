@@ -118,8 +118,8 @@
             <td>{{ item.caLamViec }}</td>
             <td>{{ item.chuyenMon }}</td>
             <td>{{ layPhongKhamCuaNhanVien(item.maNhanVien) }}</td>
-            <td>{{ layTenVaiTro(item.maVaiTro) }}</td>
-            <td>
+            <td>{{ layVaiTroPhanCong(item.maNhanVien) }}</td>
+            <td class="td-custom">
               <button [hasPermission]="'QuanLy'" (click)="phanCongNhanVien(item)" class="btn btn-primary" style="margin-right: 10px;">
                 <span class="lock-icon"></span>
                 Phân công lại
@@ -176,8 +176,8 @@
             <td>{{ item.caLamViec }}</td>
             <td>{{ item.chuyenMon }}</td>
             <td>{{ layPhongKhamCuaNhanVien(item.maNhanVien) }}</td>
-            <td>{{ layTenVaiTro(item.maVaiTro) }}</td>
-            <td>
+            <td>{{ layVaiTroPhanCong(item.maNhanVien) }}</td>
+            <td class="td-custom">
               <button [hasPermission]="'QuanLy'" (click)="phanCongNhanVien(item)" class="btn btn-primary" style="margin-right: 10px;">
                 <span class="lock-icon"></span>
                 Phân công

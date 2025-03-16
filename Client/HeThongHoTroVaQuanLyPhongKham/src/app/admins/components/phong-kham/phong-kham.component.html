@@ -52,7 +52,7 @@
                   <td>{{ item.maPhongKham }}</td>
                   <td>{{ item.loai }}</td>
                   <td>{{ item.sucChua }}</td>
-                  <td>
+                  <td class="td-custom">
                     <button [hasPermission]="'QuanLy'" (click)="editService(item)" class="btn btn-warning" style="margin-right: 10px;">
                       <span class="lock-icon"></span>
                       Sửa

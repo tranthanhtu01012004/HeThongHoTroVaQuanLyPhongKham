@@ -69,9 +69,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task DeleteAsync(int id)
         {
-            await _taiKhoanRepository.DeleteAsync(
-                _taiKhoanMapping.MapDtoToEntity(
-                    await GetByIdAsync(id)));
+            var taiKhoan = await _taiKhoanRepository.FindByIdAsync(id);
+            if (taiKhoan.TenDangNhap.ToLower().Equals("admin"))
+                throw new NotFoundException("Không thể xóa tài khoản quản trị viên.");
+
+            await _taiKhoanRepository.DeleteAsync(taiKhoan);
         }
 
         public async Task<(IEnumerable<TaiKhoanDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)

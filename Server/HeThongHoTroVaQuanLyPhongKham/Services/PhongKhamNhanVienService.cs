@@ -59,8 +59,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task<PhongKhamNhanVienDTO> UpdateAsync(PhongKhamNhanVienDTO dto)
         {
-            var phongKhamNhanVienUpdate = _phongKhamNhanVienMapping.MapDtoToEntity(
-                await GetByIdAsync(dto.MaPhongKhamNhanVien));
+            var phongKhamNhanVienUpdate = await _phongKhamNhanVienRepository.FindByIdForUpdateAsync(dto.MaPhongKhamNhanVien, "MaPhongKhamNhanVien");
+            if (phongKhamNhanVienUpdate is null)
+                throw new Exception($"Không tìm thấy phân công với MaPhongKhamNhanVien = {dto.MaPhongKhamNhanVien}");
 
             await _nhanVienService.GetByIdAsync(dto.MaNhanVien);
             await _phongKhamService.GetByIdAsync(dto.MaPhongKham);

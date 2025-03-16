@@ -51,7 +51,7 @@
               <td>{{ dichVu.maDichVuYTe }}</td>
               <td>{{ dichVu.ten }}</td>
               <td>{{ dichVu.chiPhi | currency:'VND':'symbol':'1.0-0' }}</td>
-              <td>
+              <td class="td-custom">
                 <button [hasPermission]="'QuanLy'" (click)="editService(dichVu)" class="btn btn-warning" style="margin-right: 10px;">
                   <span class="lock-icon"></span>
                   Sửa

@@ -99,5 +99,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Repositories
         {
             return await _context.Set<T>().CountAsync();
         }
+
+        public async Task<T> FindByIdForUpdateAsync(int id, string keyPropertyName)
+        {
+            var entity = await _context.Set<T>()
+                .FirstOrDefaultAsync(e => EF.Property<int>(e, keyPropertyName) == id);
+            _logger.LogInformation($"Đã tìm thấy {typeof(T).Name} với ID {id}.");
+            return entity;
+        }
     }
 }
