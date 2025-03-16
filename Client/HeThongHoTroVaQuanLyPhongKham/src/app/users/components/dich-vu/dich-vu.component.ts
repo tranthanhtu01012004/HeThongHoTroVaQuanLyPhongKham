@@ -4,6 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { IDichVuYTe } from '../../../interfaces/dich-vu-y-te/IDichVuYTe';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dich-vu',
@@ -25,7 +26,7 @@ export class DichVuComponent implements OnInit {
   pageSize: number = 3;
   pageIndex: number = 0;
 
-  constructor(private dichVuYTeService: DichVuYTeService) {}
+  constructor(private dichVuYTeService: DichVuYTeService, private router: Router) {}
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
@@ -54,4 +55,9 @@ export class DichVuComponent implements OnInit {
     this.pageSize = event.pageSize;
     this.loadServices(); // Tải lại dữ liệu khi đổi trang
   }
+
+  datLich(dichVu: IDichVuYTe): void {
+    this.router.navigate(['/lich-hen'], { queryParams: { maDichVuYTe: dichVu.maDichVuYTe } });
+  }
+
 }

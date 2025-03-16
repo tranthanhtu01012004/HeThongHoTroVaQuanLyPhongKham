@@ -1,32 +1,24 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { LichHenService } from '../../../services/lich-hen/lich-hen.service';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { MatTableModule } from '@angular/material/table';
-import { MatPaginatorModule } from '@angular/material/paginator';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { MatSelectModule } from '@angular/material/select';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute, Router } from '@angular/router';
-import { ILichHen } from '../../../interfaces/lich-hen/ILichHen';
+import { ActivatedRoute } from '@angular/router';
+import { IDichVuYTe } from '../../../interfaces/dich-vu-y-te/IDichVuYTe';
+import { DichVuYTeService } from '../../../services/dich-vu-y-te/dich-vu-yte.service';
+import { NotificationService } from '../../../services/handle-error/NotificationService';
+import { HttpErrorResponse } from '@angular/common/http';
+import { NotificationComponent } from "../notification/notification.component";
+import { CommonModule } from '@angular/common';
+import { LichHenCreateDTO } from '../../../interfaces/LichHenCreateDTO';
+import { DateFormatterService } from '../../../services/DateFormatterService';
 
 @Component({
   selector: 'app-lich-hen',
   standalone: true,
   imports: [
-    MatTableModule,
-    MatPaginatorModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatSelectModule,
-    ReactiveFormsModule
+    CommonModule,
+    ReactiveFormsModule,
+    NotificationComponent
   ],
   templateUrl: './lich-hen.component.html',
   styleUrls: [
@@ -40,83 +32,80 @@ import { ILichHen } from '../../../interfaces/lich-hen/ILichHen';
 })
 export class LichHenComponent implements OnInit {
   lichHenForm: FormGroup;
-  isEditMode: boolean = false;
-  maLichHen: number | null = null;
+  danhSachDichVu: IDichVuYTe[] = [];
+  minDateTime: string;
+  maxDateTime: string;
 
   constructor(
     private fb: FormBuilder,
     private lichHenService: LichHenService,
+    private dichVuYTeService: DichVuYTeService,
+    private notificationService: NotificationService,
     private route: ActivatedRoute,
-    public router: Router
+    private dateFormatter: DateFormatterService
   ) {
     this.lichHenForm = this.fb.group({
-      maBenhNhan: ['', [Validators.required, Validators.min(1)]],
-      maNhanVien: ['', [Validators.required, Validators.min(1)]],
-      maDichVuYTe: ['', [Validators.required, Validators.min(1)]],
-      maPhongKham: ['', [Validators.required, Validators.min(1)]],
-      ngayHen: ['', [Validators.required]],
-      trangThai: ['', [Validators.required, Validators.pattern('^(Chờ xác nhận|Đã xác nhận|Đã hoàn thành|Hủy)$')]]
+      MaDichVuYTe: ['', [Validators.required, Validators.min(1)]],
+      NgayHen: ['', Validators.required],
     });
+
+    const now = new Date();
+    this.minDateTime = this.dateFormatter.formatToISOString(now).slice(0, 16);
+
+    const maxDate = new Date(now);
+    maxDate.setMonth(maxDate.getMonth() + 1); // Thêm 1 tháng
+    this.maxDateTime = this.dateFormatter.formatToISOString(maxDate).slice(0, 16)
   }
 
   ngOnInit(): void {
-    this.maLichHen = +this.route.snapshot.paramMap.get('id')!;
-    if (this.maLichHen) {
-      this.isEditMode = true;
-      this.loadLichHen();
-    }
-  }
-
-  loadLichHen(): void {
-    this.lichHenService.getById(this.maLichHen!).subscribe({
-      next: (response: ApiResponse<ILichHen>) => {
-        if (response.status && response.data) {
-          this.lichHenForm.patchValue(response.data);
-        } else {
-          alert(response.message || 'Không tìm thấy lịch hẹn.');
-        }
-      },
-      error: (err) => {
-        console.error('Lỗi khi tải lịch hẹn:', err);
-        alert('Không thể tải lịch hẹn.');
+    this.loadDanhSachDichVu();
+    this.route.queryParams.subscribe(params => {
+      const maDichVuYTe = params['maDichVuYTe'];
+      if (maDichVuYTe) {
+        this.lichHenForm.patchValue({ MaDichVuYTe: maDichVuYTe });
       }
     });
   }
 
-  onSubmit(): void {
-    if (this.lichHenForm.valid) {
-      const lichHen: ILichHen = this.lichHenForm.value;
-      if (this.isEditMode && this.maLichHen) {
-        this.lichHenService.update(this.maLichHen, lichHen).subscribe({
-          next: (response: ApiResponse<ILichHen>) => {
-            if (response.status) {
-              alert('Cập nhật lịch hẹn thành công.');
-              this.router.navigate(['/lich-hen']);
-            } else {
-              alert(response.message || 'Cập nhật thất bại.');
-            }
-          },
-          error: (err) => {
-            console.error('Lỗi khi cập nhật:', err);
-            alert('Không thể cập nhật lịch hẹn.');
-          }
-        });
-      } else {
-        this.lichHenService.add(lichHen).subscribe({
-          next: (response: ApiResponse<ILichHen>) => {
-            if (response.status) {
-              alert('Thêm lịch hẹn thành công.');
-              this.router.navigate(['/lich-hen']);
-            } else {
-              alert(response.message || 'Thêm thất bại.');
-            }
-          },
-          error: (err) => {
-            console.error('Lỗi khi thêm:', err);
-            alert('Không thể thêm lịch hẹn.');
-          }
-        });
-      }
-    }
+  loadDanhSachDichVu(): void {
+    this.dichVuYTeService.getAllServices(1, 1000).subscribe({
+      next: (response: ApiResponse<IDichVuYTe[]>) => {
+        if (response.status && response.data) {
+          this.danhSachDichVu = response.data;
+        } else {
+          this.notificationService.showError('Không tải được danh sách dịch vụ y tế.');
+        }
+      },
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err),
+    });
   }
+
+  datLichHen(): void {
+    if (this.lichHenForm.invalid) {
+      this.notificationService.showError('Vui lòng chọn dịch vụ và ngày hẹn.');
+      return;
+    }
+
+    const lichHen: LichHenCreateDTO = {
+      MaDichVuYTe: Number(this.lichHenForm.get('MaDichVuYTe')?.value),
+      NgayHen: this.dateFormatter.formatToISOString(this.lichHenForm.get('NgayHen')?.value),
+    };
+
+    this.lichHenService.createForPatient(lichHen).subscribe({
+      next: (response: ApiResponse<any>) => {
+        if (response.status) {
+          this.notificationService.showSuccess('Đặt lịch hẹn thành công!');
+          this.lichHenForm.reset();
+        } else {
+          this.notificationService.showError(response.message || 'Đặt lịch hẹn thất bại.');
+        }
+      },
+      error: (err: HttpErrorResponse) => this.notificationService.handleError(err),
+    });
+  }
+
+  xuLyLoi(err: HttpErrorResponse) {
+    this.notificationService.handleError(err);
+  }
+
 }
