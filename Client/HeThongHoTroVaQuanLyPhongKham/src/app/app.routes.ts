@@ -12,6 +12,7 @@ import { adminAuthGuard } from './guards/adminAuthGuard';
 import { UnauthorizedComponent } from './users/components/unauthorized/unauthorized.component';
 import { authGuard } from './guards/authGuards';
 import { NhanVienComponent } from './admins/components/nhan-vien/nhan-vien.component';
+import { QuanLyLichHenComponent } from './admins/components/quan-ly-lich-hen/quan-ly-lich-hen.component';
 
 export const routes: Routes = [
   { 
@@ -37,6 +38,8 @@ export const routes: Routes = [
       { path: 'phong-kham', component: PhongKhamComponent },
       { path: 'dich-vu-y-te', component: DichVuYTeComponent },
       { path: 'nhan-vien', component: NhanVienComponent },
+      { path: 'lich-hen', component: QuanLyLichHenComponent }
+
     ]
   }
 ];

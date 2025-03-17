@@ -1,4 +1,4 @@
 export interface ILichHenUpdate {
-    maLichHen: number;
-    trangThai: string;
-  }
+  MaLichHen: number;
+  TrangThai: string;
+}

@@ -28,7 +28,7 @@ export class HasPermissionDirective {
       this.renderer.removeClass(element, 'locked');
       this.renderer.removeStyle(element, 'opacity');
       this.renderer.removeStyle(element, 'cursor');
-      if (element.tagName === 'BUTTON') {
+      if (element.tagName === 'BUTTON' || element.tagName === 'SELECT') {
         this.renderer.removeAttribute(element, 'disabled');
       }
     } else {
@@ -36,7 +36,7 @@ export class HasPermissionDirective {
       this.renderer.addClass(element, 'locked');
       this.renderer.setStyle(element, 'opacity', '0.6');
       this.renderer.setStyle(element, 'cursor', 'not-allowed');
-      if (element.tagName === 'BUTTON') {
+      if (element.tagName === 'BUTTON' || element.tagName === 'SELECT') {
         this.renderer.setAttribute(element, 'disabled', 'true');
       }
     }

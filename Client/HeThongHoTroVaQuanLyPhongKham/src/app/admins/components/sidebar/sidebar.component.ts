@@ -15,28 +15,29 @@ import { NgClass } from '@angular/common';
   encapsulation: ViewEncapsulation.None
 })
 export class SidebarComponent {
-  role: string | null = null; // Biến để hiển thị vai trò
+  role: string | null = null;
 
   constructor(
-    private authService: AuthService, // Tiêm AuthService
+    private authService: AuthService,
     private router: Router
   ) {
-    this.loadUserRole(); // Tải vai trò khi khởi tạo
+    this.loadUserRole();
   }
 
-  // Tải vai trò người dùng
   private loadUserRole(): void {
     this.role = this.authService.getRoleFromToken() || 'Unknown';
   }
 
-  // Phương thức kiểm tra quyền
-  hasPermission(requiredRole: string): boolean {
+  hasPermission(requiredRoles: string | string[]): boolean {
     const userRole = this.authService.getRoleFromToken();
-    return userRole === requiredRole;
+    if (!userRole) return false;
+
+    const rolesArray = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
+    return rolesArray.includes(userRole);
   }
 
   logout(): void {
-    this.authService.removeToken(); // Xóa token sử dụng AuthService
-    this.router.navigate(['/login']); // Điều hướng về trang login
+    this.authService.removeToken();
+    this.router.navigate(['/login']);
   }
 }

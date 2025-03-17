@@ -35,12 +35,12 @@
           <span class="sidebar--item"><span class="lock-icon"></span>Nhân viên</span>
         </a>
       </li>
-      <li class="permission-check">
-        <a [routerLink]="hasPermission('QuanLy') ? '/admin/tai-khoan' : null" 
-           routerLinkActive="active" 
-           [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
-          <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
-          <span class="sidebar--item"><span class="lock-icon"></span>Tài khoản</span>
+      <li>
+        <a [routerLink]="hasPermission(['QuanLy', 'BacSi', 'YTa', 'LeTan', 'NhanVienHanhChinh']) ? '/admin/lich-hen' : null"
+          [ngClass]="{'disabled-link': !hasPermission(['QuanLy', 'BacSi', 'YTa', 'LeTan', 'NhanVienHanhChinh'])}"
+          routerLinkActive="active">
+          <span class="icon icon-3"><i class="ri-stethoscope-line"></i></span>
+          <span class="sidebar--item" style="white-space: nowrap;">Lịch hẹn</span>
         </a>
       </li>
     </ul>

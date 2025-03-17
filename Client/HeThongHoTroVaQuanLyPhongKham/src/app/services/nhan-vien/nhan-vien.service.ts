@@ -19,6 +19,10 @@ export class NhanVienService extends BaseApiService{
     return this.http.get<ApiResponse<INhanVien[]>>(`${this.apiBaseUrl}${this.endpoint}?page=${page}&pageSize=${pageSize}`);
   }
 
+  getAllServicesNotPaginator(): Observable<ApiResponse<INhanVien[]>> {
+    return this.http.get<ApiResponse<INhanVien[]>>(`${this.apiBaseUrl}${this.endpoint}`);
+  }
+
   getServices(page: number = 1, pageSize: number = 10): Observable<ApiResponse<INhanVien[]>> {
     return this.http.get<ApiResponse<INhanVien[]>>(`${this.apiBaseUrl}${this.endpoint}?page=${page}&pageSize=${pageSize}`);
   }
