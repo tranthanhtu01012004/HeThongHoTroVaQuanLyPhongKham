@@ -4,6 +4,6 @@ export interface ILichHen {
     maNhanVien: number;
     maDichVuYTe: number;
     maPhongKham: number;
-    ngayHen: Date;
+    ngayHen: Date | string;
     trangThai: string;
 }

@@ -125,43 +125,24 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             return _lichHenMapping.MapEntityToDto(lichHen);
         }
 
-        public async Task<LichHenDTO> UpdateAsync(LichHenDTO dto)
+        public async Task<LichHenDTO> UpdateAsync(LichHenForUpdateDTO dto)
         {
             var lichHen = await GetByIdAsync(dto.MaLichHen);
             var lichHenUpdate = _lichHenMapping.MapDtoToEntity(lichHen);
 
-            if (lichHen.MaBenhNhan != dto.MaBenhNhan)
-                throw new InvalidOperationException("Không được phép thay đổi mã bệnh nhân.");
-            if (lichHen.MaDichVuYTe != dto.MaDichVuYTe)
-                throw new InvalidOperationException("Không được phép thay đổi mã dịch vụ y tế.");
-
-            if (dto.MaNhanVien == 0)
-            {
-                lichHenUpdate.MaNhanVien = null;
-                throw new NotFoundException("Nhân viên không tồn tại");
-            }    
-
-            await _nhanVienService.GetByIdAsync((int)dto.MaNhanVien);
+            await _nhanVienService.GetByIdAsync(dto.MaNhanVien);  
             lichHenUpdate.MaNhanVien = dto.MaNhanVien;
 
-
-            if (dto.MaPhongKham == 0)
-            {
-                lichHenUpdate.MaPhongKham = null;
-                throw new NotFoundException("Lịch hẹn không tồn tại");
-            }
-
-            await _phongKhamService.GetByIdAsync((int)dto.MaPhongKham);
+            await _phongKhamService.GetByIdAsync(dto.MaPhongKham);
             lichHenUpdate.MaPhongKham = dto.MaPhongKham;
-
-            if (dto.NgayHen < DateTime.Now)
-                throw new ArgumentException("Ngày hẹn không thể là ngày trong quá khứ.");
-            lichHenUpdate.NgayHen = dto.NgayHen;
-
-            lichHenUpdate.TrangThai = dto.TrangThai;
 
             return _lichHenMapping.MapEntityToDto(
                 await _lichHenRepository.UpdateAsync(lichHenUpdate));
+        }
+
+        public Task<LichHenDTO> UpdateAsync(LichHenDTO dto)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<LichHenDTO> UpdateTrangThaiAsync(LichHenUpdateDTO dto)
@@ -172,10 +153,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 throw new InvalidOperationException("Lịch hẹn đã bị hủy, không thể thay đổi trạng thái.");
 
             if (lichHen.TrangThai.Equals("Đã xác nhận"))
-                throw new InvalidOperationException("Lịch hẹn đã xác nhận, không thể thay đổi trạng thái.");
-            
+                if (dto.TrangThai != "Đã hoàn thành")
+                    throw new InvalidOperationException("Lịch hẹn đã xác nhận, không thể thay đổi trạng thái ngoại trừ trạng thái đã hoàn thành.");
+
+            if (lichHen.TrangThai.Equals("Đã hoàn thành"))
+                throw new UnauthorizedAccessException("Lịch hẹn đã hoàn thành, không thể thay đổi trạng thái.");
+
             var role = _jwtService.GetCurrentRole();
-            if (dto.TrangThai == "Hoàn thành" && role != "BacSi")
+            if (dto.TrangThai.Equals("Đã hoàn thành") && role != "BacSi")
                 throw new UnauthorizedAccessException("Chỉ bác sĩ mới được đánh dấu lịch hẹn là hoàn thành.");
 
             lichHen.TrangThai = dto.TrangThai;

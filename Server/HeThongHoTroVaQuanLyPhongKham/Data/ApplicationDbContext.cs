@@ -104,6 +104,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.Property(e => e.MaDonThuoc).HasColumnName("maDonThuoc");
             entity.Property(e => e.MaHoSoYte).HasColumnName("maHoSoYTe");
+            entity.Property(e => e.MaHoaDon).HasColumnName("maHoaDon");
             entity.Property(e => e.NgayKeDon)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
@@ -112,6 +113,10 @@ public partial class ApplicationDbContext : DbContext
             entity.HasOne(d => d.MaHoSoYteNavigation).WithMany(p => p.TblDonThuocs)
                 .HasForeignKey(d => d.MaHoSoYte)
                 .HasConstraintName("fk_tbl_don_thuoc_ho_so_y_te");
+
+            entity.HasOne(d => d.MaHoaDonNavigation).WithMany(p => p.TblDonThuocs)
+                .HasForeignKey(d => d.MaHoaDon)
+                .HasConstraintName("fk_tbl_don_thuoc_hoa_don");
         });
 
         modelBuilder.Entity<TblDonThuocChiTiet>(entity =>
@@ -131,6 +136,7 @@ public partial class ApplicationDbContext : DbContext
             entity.Property(e => e.LieuLuong).HasMaxLength(50);
             entity.Property(e => e.SoLuong).HasColumnName("soLuong");
             entity.Property(e => e.TanSuat).HasMaxLength(50);
+            entity.Property(e => e.ThanhTien).HasColumnType("decimal(15, 2)");
 
             entity.HasOne(d => d.MaDonThuocNavigation).WithMany(p => p.TblDonThuocChiTiets)
                 .HasForeignKey(d => d.MaDonThuoc)
@@ -186,6 +192,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.MaLichHenNavigation).WithMany(p => p.TblHoaDons)
                 .HasForeignKey(d => d.MaLichHen)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("fk_tbl_hoa_don_lich_hen");
         });
 
@@ -386,6 +393,9 @@ public partial class ApplicationDbContext : DbContext
 
             entity.Property(e => e.MaThuoc).HasColumnName("maThuoc");
             entity.Property(e => e.ChongChiDinh).HasMaxLength(1000);
+            entity.Property(e => e.DonGia)
+                .HasColumnType("decimal(15, 2)")
+                .HasColumnName("donGia");
             entity.Property(e => e.DonVi)
                 .HasMaxLength(20)
                 .HasDefaultValue("viên")

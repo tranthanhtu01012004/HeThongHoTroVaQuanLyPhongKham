@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
-    public class NhanVienService : BaseService, IService<NhanVienDTO>
+    public class NhanVienService : BaseService, INhanVienService
     {
         private readonly IRepository<TblNhanVien> _nhanVienRepository;
         private readonly IMapper<NhanVienDTO, TblNhanVien> _nhanVienMapping;
@@ -69,6 +69,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             var nhanViens = await _nhanVienRepository.FindAllAsync(page, pageSize, pageSkip, "MaNhanVien");
             var dtoList = nhanViens.Select(t => _nhanVienMapping.MapEntityToDto(t));
             return (dtoList, totalItems, totalPages);
+        }
+
+        public async Task<IEnumerable<NhanVienDTO>> GetAllAsync()
+        {
+            var nhanViens = await _nhanVienRepository.FindAllAsync("MaNhanVien");
+            return nhanViens.Select(t => _nhanVienMapping.MapEntityToDto(t));
         }
 
         public async Task<NhanVienDTO> GetByIdAsync(int id)

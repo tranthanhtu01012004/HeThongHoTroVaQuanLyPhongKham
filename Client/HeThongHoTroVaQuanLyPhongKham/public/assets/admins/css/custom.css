@@ -32,3 +32,16 @@
     border-radius: 5px;
     margin: 10px 0;
   }
+
+select.locked {
+  position: relative;
+  padding-right: 25px; 
+}
+
+select {
+  border: solid 1px;
+  padding: 10px;
+  height: 50px;
+  border-radius: 5px;
+  text-align: center;
+}

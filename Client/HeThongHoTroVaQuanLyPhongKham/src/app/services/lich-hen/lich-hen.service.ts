@@ -51,7 +51,7 @@ export class LichHenService extends BaseApiService {
 
   // Cập nhật lịch hẹn
   update(id: number, lichHen: ILichHen): Observable<ApiResponse<ILichHen>> {
-    return this.http.put<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}`, lichHen);
+    return this.http.patch<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}`, lichHen);
   }
 
   // Cập nhật trạng thái lịch hẹn

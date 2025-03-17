@@ -15,7 +15,7 @@
       </li>
       <li>
         <a routerLink="/admin/dich-vu-y-te" routerLinkActive="active">
-          <span class="icon icon-3"><i class="ri-stethoscope-line"></i></span>
+          <span class="icon icon-3"><i class="fa-solid fa-notes-medical"></i></span>
           <span class="sidebar--item" style="white-space: nowrap;">Dịch vụ y tế</span>
         </a>
       </li>
@@ -23,7 +23,7 @@
         <a [routerLink]="hasPermission('QuanLy') ? '/admin/phong-kham' : null" 
            routerLinkActive="active" 
            [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
-          <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
+          <span class="icon icon-2"><i class="fa-solid fa-house-chimney-medical"></i></span>
           <span class="sidebar--item"><span class="lock-icon"></span>Phòng khám</span>
         </a>
       </li>
@@ -31,16 +31,16 @@
         <a [routerLink]="hasPermission('QuanLy') ? '/admin/nhan-vien' : null" 
            routerLinkActive="active" 
            [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
-          <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
+          <span class="icon icon-2"><i class="fa-solid fa-users"></i></span>
           <span class="sidebar--item"><span class="lock-icon"></span>Nhân viên</span>
         </a>
       </li>
-      <li class="permission-check">
-        <a [routerLink]="hasPermission('QuanLy') ? '/admin/tai-khoan' : null" 
-           routerLinkActive="active" 
-           [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
-          <span class="icon icon-2"><i class="ri-hospital-line"></i></span>
-          <span class="sidebar--item"><span class="lock-icon"></span>Tài khoản</span>
+      <li>
+        <a [routerLink]="hasPermission(['QuanLy', 'BacSi', 'YTa', 'LeTan', 'NhanVienHanhChinh']) ? '/admin/lich-hen' : null"
+          [ngClass]="{'disabled-link': !hasPermission(['QuanLy', 'BacSi', 'YTa', 'LeTan', 'NhanVienHanhChinh'])}"
+          routerLinkActive="active">
+          <span class="icon icon-3"><i class="fa-solid fa-calendar-check"></i></span>
+          <span class="sidebar--item" style="white-space: nowrap;">Lịch hẹn</span>
         </a>
       </li>
     </ul>
