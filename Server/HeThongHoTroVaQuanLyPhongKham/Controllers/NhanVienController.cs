@@ -13,9 +13,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     [Authorize(Roles = "QuanLy")]
     public class NhanVienController : ControllerBase
     {
-        private readonly IService<NhanVienDTO> _nhanVienService;
+        private readonly INhanVienService _nhanVienService;
 
-        public NhanVienController(IService<NhanVienDTO> nhanVienService)
+        public NhanVienController(INhanVienService nhanVienService)
         {
             _nhanVienService = nhanVienService;
         }
@@ -28,6 +28,26 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             {
                 var (items, totalItems, totalPages) = await _nhanVienService.GetAllAsync(page, pageSize);
                 return Ok(ApiResponse<IEnumerable<NhanVienDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách nhân viên - trang {page} với {pageSize} bản ghi."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<NhanVienDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpGet("all")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAllNotPaginator()
+        {
+            try
+            {
+                return Ok(ApiResponse<IEnumerable<NhanVienDTO>>.Success(
+                    await _nhanVienService.GetAllAsync(), 
+                    $"Đã lấy danh sách nhân viên"));
             }
             catch (NotFoundException ex)
             {

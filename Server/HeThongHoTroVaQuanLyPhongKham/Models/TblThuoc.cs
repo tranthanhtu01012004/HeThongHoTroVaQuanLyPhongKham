@@ -17,5 +17,7 @@ public partial class TblThuoc
 
     public string? TuongTacThuoc { get; set; }
 
+    public decimal DonGia { get; set; }
+
     public virtual ICollection<TblDonThuocChiTiet> TblDonThuocChiTiets { get; set; } = new List<TblDonThuocChiTiet>();
 }

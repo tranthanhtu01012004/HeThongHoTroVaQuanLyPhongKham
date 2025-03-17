@@ -14,7 +14,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 MoTa = dto.MoTa,
                 DonVi = dto.DonVi,
                 ChongChiDinh = dto.ChongChiDinh,
-                TuongTacThuoc = dto.TuongTacThuoc
+                TuongTacThuoc = dto.TuongTacThuoc,
+                DonGia = dto.DonGia
             };
         }
 
@@ -26,6 +27,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             entity.DonVi = dto.DonVi;
             entity.ChongChiDinh = dto.ChongChiDinh;
             entity.TuongTacThuoc = dto.TuongTacThuoc;
+            entity.DonGia = dto.DonGia;
+
         }
 
         public ThuocDTO MapEntityToDto(TblThuoc entity)
@@ -37,7 +40,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 MoTa = entity.MoTa,
                 DonVi = entity.DonVi,
                 ChongChiDinh = entity.ChongChiDinh,
-                TuongTacThuoc = entity.TuongTacThuoc
+                TuongTacThuoc = entity.TuongTacThuoc,
+                DonGia = entity.DonGia
             };
         }
     }

@@ -32,8 +32,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
         {
             foreach(var chiTiet in dto)
             {
-                await _thuocService.GetByIdAsync(chiTiet.MaThuoc);
+                var thuoc = await _thuocService.GetByIdAsync(chiTiet.MaThuoc);
                 await _donThuocService.GetByIdAsync(chiTiet.MaDonThuoc);
+
+                chiTiet.ThanhTien = thuoc.DonGia * chiTiet.SoLuong;
 
                 await _donThuocChiTietRepository.CreateAsync(
                     _donThuocChiTietMapping.MapDtoToEntity(chiTiet)

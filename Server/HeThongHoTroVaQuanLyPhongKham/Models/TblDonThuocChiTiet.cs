@@ -19,6 +19,8 @@ public partial class TblDonThuocChiTiet
 
     public string? TanSuat { get; set; }
 
+    public decimal ThanhTien { get; set; }
+
     public virtual TblDonThuoc MaDonThuocNavigation { get; set; } = null!;
 
     public virtual TblThuoc MaThuocNavigation { get; set; } = null!;

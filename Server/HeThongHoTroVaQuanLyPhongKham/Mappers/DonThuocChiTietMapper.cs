@@ -15,7 +15,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 SoLuong = dto.SoLuong,
                 CachDung = dto.CachDung,
                 LieuLuong = dto.LieuLuong,
-                TanSuat = dto.TanSuat
+                TanSuat = dto.TanSuat,
+                ThanhTien = dto.ThanhTien
             };
         }
 
@@ -28,6 +29,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             entity.CachDung = dto.CachDung;
             entity.LieuLuong = dto.LieuLuong;
             entity.TanSuat = dto.TanSuat;
+            entity.ThanhTien = dto.ThanhTien;
         }
 
         public DonThuocChiTietDTO MapEntityToDto(TblDonThuocChiTiet entity)
@@ -40,7 +42,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 SoLuong = entity.SoLuong,
                 CachDung = entity.CachDung,
                 LieuLuong = entity.LieuLuong,
-                TanSuat = entity.TanSuat
+                TanSuat = entity.TanSuat,
+                ThanhTien = entity.ThanhTien
             };
         }
     }

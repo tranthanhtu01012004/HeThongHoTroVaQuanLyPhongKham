@@ -16,4 +16,6 @@ public partial class TblHoaDon
     public string TrangThaiThanhToan { get; set; } = null!;
 
     public virtual TblLichHen MaLichHenNavigation { get; set; } = null!;
+
+    public virtual ICollection<TblDonThuoc> TblDonThuocs { get; set; } = new List<TblDonThuoc>();
 }

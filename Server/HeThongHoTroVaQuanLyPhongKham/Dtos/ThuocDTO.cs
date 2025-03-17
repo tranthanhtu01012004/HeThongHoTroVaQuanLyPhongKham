@@ -24,5 +24,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [StringLength(1000, MinimumLength = 1, ErrorMessage = "Tương tác phải từ 1 đến 1000 ký tự")]
         public string? TuongTacThuoc { get; set; }
 
+        [Required(ErrorMessage = "Đơn giá là bắt buộc")]
+        [Range(0, 9999999999.99, ErrorMessage = "Đơn giá phải từ 0 đến 9,999,999,999.99")]
+        public decimal DonGia { get; set; }
+
     }
 }

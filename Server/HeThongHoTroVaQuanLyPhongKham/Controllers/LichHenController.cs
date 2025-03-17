@@ -1,5 +1,4 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
-using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
@@ -135,9 +134,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
-        [HttpPut("{id:int}")]
+        [HttpPatch("{id:int}")]
         [Authorize(Roles = "QuanLy,BacSi,LeTan,NhanVienHanhChinh")]
-        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] LichHenDTO dto)
+        public async Task<IActionResult> Update([FromRoute] int id, [FromBody] LichHenForUpdateDTO dto)
         {
             try
             {

@@ -21,5 +21,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 
         [StringLength(50, MinimumLength = 1, ErrorMessage = "Tần suất phải từ 1 đến 50 ký tự")]
         public string? TanSuat { get; set; }
+
+        public decimal ThanhTien { get; set; }
     }
 }
