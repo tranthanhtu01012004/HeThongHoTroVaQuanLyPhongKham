@@ -56,6 +56,12 @@ export class QuanLyLichHenComponent implements OnInit {
   danhSachDichVu: IDichVuYTe[] = [];
   danhSachNhanVien: INhanVien[] = [];
   trangThaiOptions = ['Chờ xác nhận', 'Đã xác nhận', 'Hủy', 'Đã hoàn thành'];
+  
+   // Danh sách lịch hẹn chưa phân công
+  danhSachChuaPhanCong: ILichHen[] = [];
+  soLuongChuaPhanCong: number = 0;
+  soLuongMoiTrangChuaPhanCong: number = 3;
+  trangHienTaiChuaPhanCong: number = 0;
 
   // Danh sách lịch hẹn theo trạng thái
   danhSachChoXacNhan: ILichHen[] = [];
@@ -156,11 +162,13 @@ export class QuanLyLichHenComponent implements OnInit {
 
   // Phân chia dữ liệu lịch hẹn theo trạng thái
   phanChiaDuLieuLichHen(data: ILichHen[]): void {
-    this.danhSachChoXacNhan = data.filter(lh => lh.trangThai === 'Chờ xác nhận');
-    this.danhSachDaXacNhan = data.filter(lh => lh.trangThai === 'Đã xác nhận');
-    this.danhSachDaHuy = data.filter(lh => lh.trangThai === 'Hủy');
-    this.danhSachDaHoanThanh = data.filter(lh => lh.trangThai === 'Đã hoàn thành');
+    this.danhSachChuaPhanCong = data.filter(lh => lh.maNhanVien === null || lh.maNhanVien === 0);
+    this.danhSachChoXacNhan = data.filter(lh => lh.trangThai === 'Chờ xác nhận' && lh.maNhanVien !== null && lh.maNhanVien !== 0);
+    this.danhSachDaXacNhan = data.filter(lh => lh.trangThai === 'Đã xác nhận' && lh.maNhanVien !== null && lh.maNhanVien !== 0);
+    this.danhSachDaHuy = data.filter(lh => lh.trangThai === 'Hủy' && lh.maNhanVien !== null && lh.maNhanVien !== 0);
+    this.danhSachDaHoanThanh = data.filter(lh => lh.trangThai === 'Đã hoàn thành' && lh.maNhanVien !== null && lh.maNhanVien !== 0);
 
+    this.soLuongChuaPhanCong = this.danhSachChuaPhanCong.length;
     this.soLuongChoXacNhan = this.danhSachChoXacNhan.length;
     this.soLuongDaXacNhan = this.danhSachDaXacNhan.length;
     this.soLuongDaHuy = this.danhSachDaHuy.length;
@@ -168,6 +176,11 @@ export class QuanLyLichHenComponent implements OnInit {
   }
 
   // Xử lý thay đổi trang
+  xuLyThayDoiTrangChuaPhanCong(event: PageEvent): void {
+    this.trangHienTaiChuaPhanCong = event.pageIndex;
+    this.soLuongMoiTrangChuaPhanCong = event.pageSize;
+  }
+
   xuLyThayDoiTrangChoXacNhan(event: PageEvent): void {
     this.trangHienTaiChoXacNhan = event.pageIndex;
     this.soLuongMoiTrangChoXacNhan = event.pageSize;
@@ -214,18 +227,13 @@ export class QuanLyLichHenComponent implements OnInit {
       return;
     }
 
-    const lichHenUpdate: ILichHen = {
-      maLichHen: this.updateForm.value.MaLichHen,
-      maBenhNhan: this.updateForm.value.MaBenhNhan,
-      maDichVuYTe: this.updateForm.value.MaDichVuYTe,
+    const lichHenUpdate: any = {
       maNhanVien: Number(this.updateForm.value.MaNhanVien) || 0,
       maPhongKham: Number(this.updateForm.value.MaPhongKham) || 0,
-      ngayHen: this.updateForm.value.NgayHen,
-      trangThai: this.updateForm.value.TrangThai,
     };
 
     this.lichHenService.update(lichHenUpdate.maLichHen, lichHenUpdate).subscribe({
-      next: (res: ApiResponse<ILichHen>) => {
+      next: (res: ApiResponse<any>) => {
         if (res.status) {
           this.notificationService.showSuccess('Cập nhật thành công!');
           this.loadDanhSachLichHen();
@@ -266,6 +274,12 @@ export class QuanLyLichHenComponent implements OnInit {
 
   getTenPhongKham(maPhongKham: number): string {
     return this.danhSachPhongKham.find(pk => pk.maPhongKham === maPhongKham)?.loai || 'Chưa gán';
+  }
+
+  getTenNhanVien(maNhanVien: number | null): string {
+    if (!maNhanVien) return 'Chưa gán';
+    const nhanVien = this.danhSachNhanVien.find(nv => nv.maNhanVien === maNhanVien);
+    return nhanVien ? nhanVien.ten : 'Không xác định';
   }
 
   xuLyLoi(err: HttpErrorResponse): void {

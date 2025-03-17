@@ -8,28 +8,13 @@
 
 <app-notification></app-notification>
 
-<h2 class="section--title mt-2">Quản Lý Lịch Hẹn</h2>
+<h2 class="section--title mt-2">QUẢN LÝ LỊCH HẸN</h2>
 
 <div class="recent--patients">
   <!-- Form chỉnh sửa -->
   <div *ngIf="isEditing" class="form-container">
     <h3>Chỉnh sửa lịch hẹn</h3>
     <form [formGroup]="updateForm" (ngSubmit)="updateLichHen()">
-      <div class="form-group" hidden>
-        <label>Mã lịch hẹn</label>
-        <input formControlName="MaLichHen" class="form-control" readonly />
-      </div>
-      <div class="form-group">
-        <label>Mã bệnh nhân</label>
-        <input formControlName="MaBenhNhan" class="form-control" readonly />
-      </div>
-      <div class="form-group">
-        <label>Dịch vụ y tế</label>
-        <select formControlName="MaDichVuYTe" class="form-control">
-          <option value="">Chọn dịch vụ</option>
-          <option *ngFor="let dv of danhSachDichVu" [value]="dv.maDichVuYTe">{{ dv.ten }}</option>
-        </select>
-      </div>
       <div class="form-group">
         <label>Nhân viên</label>
         <select formControlName="MaNhanVien" class="form-control">
@@ -45,32 +30,81 @@
         </select>
       </div>
       <div class="form-group">
-        <label>Ngày hẹn</label>
-        <input type="datetime-local" formControlName="NgayHen" class="form-control" [min]="minDateTime" />
-      </div>
-      <div class="form-group">
-        <label>Trạng thái</label>
-        <select formControlName="TrangThai" class="form-control">
-          <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai">{{ trangThai }}</option>
-        </select>
-      </div>
-      <div class="form-group">
         <button type="submit" class="btn btn-success" [disabled]="updateForm.invalid">Lưu</button>
         <button type="button" class="btn btn-secondary" (click)="cancelEdit()">Hủy</button>
       </div>
     </form>
   </div>
-<div class="row">
-  <!-- Bảng Chờ xác nhận -->
-  <div class="col-6">
-    <h4 class="mt-4">Lịch hẹn chờ xác nhận</h4>
+  <!-- Bảng Chưa phân công (chỉ admin thấy) -->
+  <div [hasPermission]="'QuanLy'">
+    <h4 class="mt-4">LỊCH HẸN CHƯA PHÂN CÔNG</h4>
     <div class="table table-striped">
       <table>
         <thead>
           <tr>
             <th>Mã lịch hẹn</th>
             <th>Mã bệnh nhân</th>
-            <th>Mã nhân viên</th>
+            <th>Nhân viên</th>
+            <th>Dịch vụ y tế</th>
+            <th>Phòng khám</th>
+            <th>Ngày hẹn</th>
+            <th>Trạng thái</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lichHen of danhSachChuaPhanCong.slice(trangHienTaiChuaPhanCong * soLuongMoiTrangChuaPhanCong, (trangHienTaiChuaPhanCong + 1) * soLuongMoiTrangChuaPhanCong)">
+            <td>{{ lichHen.maLichHen }}</td>
+            <td>{{ lichHen.maBenhNhan }}</td>
+            <td>{{ getTenNhanVien(lichHen.maNhanVien) }}</td>
+            <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
+            <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
+            <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>
+              <div class="select-container">
+                <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
+                  <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
+                    {{ trangThai }}
+                  </option>
+                </select>
+                <span class="lock-icon"></span>
+              </div>
+            </td>
+            <td class="td-custom">
+              <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
+                <span class="lock-icon"></span>Sửa
+              </button>
+            </td>
+          </tr>
+          <tr *ngIf="danhSachChuaPhanCong.length === 0">
+            <td colspan="8" class="text-center">Không có lịch hẹn nào chưa phân công.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-3" *ngIf="danhSachChuaPhanCong.length > 0">
+      <mat-paginator
+        #paginatorChuaPhanCong
+        [length]="soLuongChuaPhanCong"
+        [pageSize]="soLuongMoiTrangChuaPhanCong"
+        [pageSizeOptions]="[3, 6, 9]"
+        [pageIndex]="trangHienTaiChuaPhanCong"
+        (page)="xuLyThayDoiTrangChuaPhanCong($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  </div>
+<div class="row">
+  <!-- Bảng Chờ xác nhận -->
+  <div class="col-6">
+    <h4 class="mt-4">LỊCH HẸN CHỜ XÁC NHẬN</h4>
+    <div class="table table-striped">
+      <table>
+        <thead>
+          <tr>
+            <th>Mã lịch hẹn</th>
+            <th>Mã bệnh nhân</th>
+            <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
             <th>Ngày hẹn</th>
@@ -82,7 +116,7 @@
           <tr *ngFor="let lichHen of danhSachChoXacNhan.slice(trangHienTaiChoXacNhan * soLuongMoiTrangChoXacNhan, (trangHienTaiChoXacNhan + 1) * soLuongMoiTrangChoXacNhan)">
             <td>{{ lichHen.maLichHen }}</td>
             <td>{{ lichHen.maBenhNhan }}</td>
-            <td>{{ lichHen.maNhanVien || 'Chưa gán' }}</td>
+            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
             <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
@@ -123,26 +157,25 @@
 
   <!-- Bảng Đã xác nhận -->
   <div class="col-6">
-    <h4 class="mt-4">Lịch hẹn đã xác nhận</h4>
+    <h4 class="mt-4">LỊCH HẸN ĐÃ XÁC NHẬN</h4>
     <div class="table table-striped">
       <table>
         <thead>
           <tr>
             <th>Mã lịch hẹn</th>
             <th>Mã bệnh nhân</th>
-            <th>Mã nhân viên</th>
+            <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
             <th>Ngày hẹn</th>
             <th>Trạng thái</th>
-            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachDaXacNhan.slice(trangHienTaiDaXacNhan * soLuongMoiTrangDaXacNhan, (trangHienTaiDaXacNhan + 1) * soLuongMoiTrangDaXacNhan)">
             <td>{{ lichHen.maLichHen }}</td>
             <td>{{ lichHen.maBenhNhan }}</td>
-            <td>{{ lichHen.maNhanVien || 'Chưa gán' }}</td>
+            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
             <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
@@ -155,11 +188,6 @@
                 </select>
                 <span class="lock-icon"></span>
               </div>
-            </td>
-            <td class="td-custom">
-              <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
-                <span class="lock-icon"></span>Sửa
-              </button>
             </td>
           </tr>
           <tr *ngIf="danhSachDaXacNhan.length === 0">
@@ -184,26 +212,25 @@
 <div class="row">
   <!-- Bảng Đã hoàn thành -->
   <div class="col-6">
-    <h4 class="mt-4">Lịch hẹn đã hoàn thành</h4>
+    <h4 class="mt-4">LỊCH HẸN ĐÃ HOÀN THÀNH</h4>
     <div class="table table-striped">
       <table>
         <thead>
           <tr>
             <th>Mã lịch hẹn</th>
             <th>Mã bệnh nhân</th>
-            <th>Mã nhân viên</th>
+            <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
             <th>Ngày hẹn</th>
             <th>Trạng thái</th>
-            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachDaHoanThanh.slice(trangHienTaiDaHoanThanh * soLuongMoiTrangDaHoanThanh, (trangHienTaiDaHoanThanh + 1) * soLuongMoiTrangDaHoanThanh)">
             <td>{{ lichHen.maLichHen }}</td>
             <td>{{ lichHen.maBenhNhan }}</td>
-            <td>{{ lichHen.maNhanVien || 'Chưa gán' }}</td>
+            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
             <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
@@ -216,11 +243,6 @@
                 </select>
                 <span class="lock-icon"></span>
               </div>
-            </td>
-            <td class="td-custom">
-              <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
-                <span class="lock-icon"></span>Sửa
-              </button>
             </td>
           </tr>
           <tr *ngIf="danhSachDaHoanThanh.length === 0">
@@ -244,26 +266,25 @@
 
   <!-- Bảng Đã hủy -->
   <div class="col-6">
-    <h4 class="mt-4">Lịch hẹn đã hủy</h4>
+    <h4 class="mt-4">LỊCH HẸN ĐÃ HỦY</h4>
     <div class="table table-striped">
       <table>
         <thead>
           <tr>
             <th>Mã lịch hẹn</th>
             <th>Mã bệnh nhân</th>
-            <th>Mã nhân viên</th>
+            <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
             <th>Ngày hẹn</th>
             <th>Trạng thái</th>
-            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachDaHuy.slice(trangHienTaiDaHuy * soLuongMoiTrangDaHuy, (trangHienTaiDaHuy + 1) * soLuongMoiTrangDaHuy)">
             <td>{{ lichHen.maLichHen }}</td>
             <td>{{ lichHen.maBenhNhan }}</td>
-            <td>{{ lichHen.maNhanVien || 'Chưa gán' }}</td>
+            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
             <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
@@ -276,11 +297,6 @@
                 </select>
                 <span class="lock-icon"></span>
               </div>
-            </td>
-            <td class="td-custom">
-              <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
-                <span class="lock-icon"></span>Sửa
-              </button>
             </td>
           </tr>
           <tr *ngIf="danhSachDaHuy.length === 0">
