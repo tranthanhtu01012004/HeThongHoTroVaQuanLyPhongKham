@@ -43,6 +43,14 @@
           <span class="sidebar--item" style="white-space: nowrap;">Lịch hẹn</span>
         </a>
       </li>
+      <li>
+        <a [routerLink]="hasPermission(['QuanLy', 'BacSi', 'DuocSi']) ? '/admin/thuoc' : null"
+          [ngClass]="{'disabled-link': !hasPermission(['QuanLy', 'BacSi', 'DuocSi'])}"
+          routerLinkActive="active">
+          <span class="icon icon-3"><i class="fa-solid fa-capsules"></i></span>
+          <span class="sidebar--item" style="white-space: nowrap;">Quản lý thuốc</span>
+        </a>
+      </li>
     </ul>
     <ul class="sidebar--bottom-items">
       <li>

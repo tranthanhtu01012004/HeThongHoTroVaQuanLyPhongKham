@@ -26,7 +26,7 @@
 
 <div class="recent--patients">
   <!-- Form chỉnh sửa -->
-  <div *ngIf="isEditing" class="form-container" style="width: 50%;">
+  <div *ngIf="isEditing" class="form-container">
     <h3>CẬP NHẬT LỊCH HẸN</h3>
     <form [formGroup]="updateForm" (ngSubmit)="updateLichHen()">
       <div class="form-group cus-bn">
@@ -86,7 +86,7 @@
         </tbody>
       </table>
     </div>
-    <div class="mt-3" *ngIf="danhSachChuaPhanCong.length > 0">
+    <div class="mt-2" *ngIf="danhSachChuaPhanCong.length > 0">
       <mat-paginator
         #paginatorChuaPhanCong
         [length]="soLuongChuaPhanCong"
@@ -138,7 +138,7 @@
         </tbody>
       </table>
     </div>
-    <div class="mt-3" *ngIf="danhSachChoXacNhan.length > 0">
+    <div class="mt-2" *ngIf="danhSachChoXacNhan.length > 0">
       <mat-paginator
         #paginatorChoXacNhan
         [length]="soLuongChoXacNhan"
@@ -190,7 +190,7 @@
         </tbody>
       </table>
     </div>
-    <div class="mt-3" *ngIf="danhSachDaXacNhan.length > 0">
+    <div class="mt-2" *ngIf="danhSachDaXacNhan.length > 0">
       <mat-paginator
         #paginatorDaXacNhan
         [length]="soLuongDaXacNhan"
@@ -243,7 +243,7 @@
         </tbody>
       </table>
     </div>
-    <div class="mt-3" *ngIf="danhSachDaHoanThanh.length > 0">
+    <div class="mt-2" *ngIf="danhSachDaHoanThanh.length > 0">
       <mat-paginator
         #paginatorDaHoanThanh
         [length]="soLuongDaHoanThanh"
@@ -301,7 +301,7 @@
         </tbody>
       </table>
     </div>
-    <div class="mt-3" *ngIf="danhSachDaHuy.length > 0">
+    <div class="mt-2" *ngIf="danhSachDaHuy.length > 0">
       <mat-paginator
         #paginatorDaHuy
         [length]="soLuongDaHuy"
