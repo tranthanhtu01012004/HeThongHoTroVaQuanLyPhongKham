@@ -261,6 +261,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.MaDichVuYteNavigation).WithMany(p => p.TblLichHens)
                 .HasForeignKey(d => d.MaDichVuYte)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tbl_lich_hen_dich_vu_y_te");
 
             entity.HasOne(d => d.MaNhanVienNavigation).WithMany(p => p.TblLichHens)

@@ -29,7 +29,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         {
             try
             {
-                var (items, totalItems, totalPages) = await _lichHenService.GetAllAsync(page, pageSize);
+                var (items, totalItems, totalPages) = await _lichHenService.GetAllAsync(page, pageSize, ngayHen, maNhanVien, maPhong);
                 return Ok(ApiResponse<IEnumerable<LichHenDTO>>.Success(items, page, pageSize, totalPages, totalItems, $"Đã lấy danh sách lịch hẹn - trang {page} với {pageSize} bản ghi."));
             }
             catch (NotFoundException ex)
