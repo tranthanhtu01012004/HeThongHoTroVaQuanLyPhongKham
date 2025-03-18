@@ -15,7 +15,8 @@ export class HasPermissionDirective {
   ) {}
 
   @Input() set hasPermission(permissions: string | string[]) {
-    this.permissions = Array.isArray(permissions) ? permissions : [permissions];
+    // Nếu là chuỗi, tách bằng dấu phẩy; nếu là mảng thì giữ nguyên
+    this.permissions = typeof permissions === 'string' ? permissions.split(',').map(p => p.trim()) : permissions;
     this.updateView();
   }
 

@@ -14,8 +14,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [StringLength(500, MinimumLength = 1, ErrorMessage = "Mô tả phải từ 1 đến 500 ký tự")]
         public string MoTa { get; set; } = null!;
 
-        [Required(ErrorMessage = "Đơn vị là bắt buộc")]
-        [StringLength(20, MinimumLength = 1, ErrorMessage = "Đơn vị phải từ 1 đến 20 ký tự")]
+        [Required(ErrorMessage = "Đơn vị là bắt buộc phải chọn")]
         public string DonVi { get; set; } = null!;
 
         [StringLength(1000, MinimumLength = 1, ErrorMessage = "Chống chỉ định phải từ 1 đến 1000 ký tự")]

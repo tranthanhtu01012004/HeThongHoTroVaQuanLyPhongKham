@@ -81,6 +81,7 @@ GO
 CREATE TABLE tbl_benh_nhan (
     maBenhNhan			INT				NOT NULL IDENTITY(1,1),
 	maTaiKhoan			INT				NOT NULL,
+	ten					NVARCHAR(100)	NULL,
     tuoi				INT				NULL,
     gioiTinh			BIT				NULL,
     diaChi				NVARCHAR(1000)  NULL,
@@ -129,6 +130,7 @@ GO
 CREATE TABLE tbl_don_thuoc (
     maDonThuoc      INT             NOT NULL    IDENTITY(1,1),
 	maHoSoYTe		INT				NOT NULL,
+	maHoaDon        INT				NOT NULL,
     ngayKeDon       DATETIME        NOT NULL    DEFAULT GETDATE(),
     CONSTRAINT pk_tbl_don_thuoc PRIMARY KEY (maDonThuoc)
 );
@@ -143,6 +145,7 @@ CREATE TABLE tbl_don_thuoc_chi_tiet (
     cachDung			NVARCHAR(200)   NOT NULL,           -- Cách dùng (liều lượng + tần suất + thời gian)
 	LieuLuong			NVARCHAR(50)    NULL,
     TanSuat				NVARCHAR(50)    NULL,
+    ThanhTien           DECIMAL(15,2)   NOT NULL,
     CONSTRAINT pk_tbl_don_thuoc_chi_tiet PRIMARY KEY (maDonThuocChiTiet, maDonThuoc, maThuoc),
     CONSTRAINT chk_soLuong CHECK (soLuong > 0)
 );
@@ -156,6 +159,7 @@ CREATE TABLE tbl_thuoc (
     donVi           NVARCHAR(20)    NOT NULL    DEFAULT N'viên', -- Đơn vị mặc định của thuốc
 	ChongChiDinh    NVARCHAR(1000)  NULL,
     TuongTacThuoc   NVARCHAR(1000)  NULL,
+    donGia          DECIMAL(15,2)   NOT NULL,
     CONSTRAINT pk_tbl_thuoc PRIMARY KEY (maThuoc)
 );
 GO
@@ -290,14 +294,17 @@ GO
 ALTER TABLE tbl_don_thuoc
 	ADD CONSTRAINT fk_tbl_don_thuoc_ho_so_y_te FOREIGN KEY (maHoSoYTe) REFERENCES tbl_ho_so_y_te (maHoSoYTe)
 		ON DELETE CASCADE
-			ON UPDATE CASCADE;
+			ON UPDATE CASCADE,
+    CONSTRAINT fk_tbl_don_thuoc_hoa_don FOREIGN KEY (maHoaDon) REFERENCES tbl_hoa_don (maHoaDon)
+        ON DELETE CASCADE
+            ON UPDATE CASCADE;
 GO
 
 -- Khóa ngoại cho tbl_hoa_don
 ALTER TABLE tbl_hoa_don
 	ADD CONSTRAINT fk_tbl_hoa_don_lich_hen FOREIGN KEY (maLichHen) REFERENCES tbl_lich_hen (maLichHen)
-		ON DELETE CASCADE
-			ON UPDATE CASCADE;
+		ON DELETE NO ACTION
+			ON UPDATE NO ACTION;
 GO
 
 -- Khóa ngoại cho tbl_lich_su_thay_doi
@@ -436,41 +443,70 @@ INSERT INTO tbl_dich_vu_y_te (ten, chiPhi) VALUES
 GO
 
 -- Chèn dữ liệu vào tbl_benh_nhan
-INSERT INTO tbl_benh_nhan (maTaiKhoan, tuoi, gioiTinh, diaChi, soDienThoai) VALUES
-	(13, 30, 1, N'123 Đường Láng, Hà Nội', '0911111111'),
-    (14, 45, 0, N'45 Lê Lợi, TP.HCM', '0922222222'),
-    (15, 25, 1, N'67 Trần Phú, Đà Nẵng', '0933333333'),
-    (16, 60, 0, N'89 Nguyễn Huệ, Huế', '0944444444'),
-    (17, 10, 1, N'12 Hùng Vương, Nha Trang', '0955555555'),
-    (18, 35, 0, N'34 Điện Biên Phủ, Hà Nội', '0966666666'),
-    (19, 50, 1, N'56 Phạm Ngũ Lão, TP.HCM', '0977777777'),
-    (20, 28, 0, N'78 Lý Thường Kiệt, Đà Nẵng', '0988888888'),
-    (21, 70, 1, N'90 Hai Bà Trưng, Huế', '0999999999'),
-    (22, 15, 0, N'23 Nguyễn Trãi, Nha Trang', '0910000000'),
-    (23, 40, 1, N'45 Lê Đại Hành, Hà Nội', '0921111111'),
-    (24, 55, 0, N'67 Nguyễn Thị Minh Khai, TP.HCM', '0932222222'),
-    (25, 33, 1, N'89 Bùi Thị Xuân, Đà Nẵng', '0943333333'),
-    (26, 22, 0, N'12 Trần Hưng Đạo, Huế', '0954444444'),
-    (27, 65, 1, N'34 Lê Hồng Phong, Nha Trang', '0965555555');
+INSERT INTO tbl_benh_nhan (maTaiKhoan, ten, tuoi, gioiTinh, diaChi, soDienThoai) VALUES
+    (13, N'Nguyễn Văn An', 30, 1, N'123 Đường Láng, Đống Đa, Hà Nội', '0912345678'),
+    (14, N'Trần Thị Bình', 45, 0, N'45 Lê Lợi, Quận 1, TP.HCM', '0923456789'),
+    (15, N'Lê Minh Châu', 25, 1, N'67 Trần Phú, Hải Châu, Đà Nẵng', '0934567890'),
+    (16, N'Phạm Thị Dung', 60, 0, N'89 Nguyễn Huệ, TP Huế, Thừa Thiên Huế', '0945678901'),
+    (17, N'Hoàng Văn Em', 10, 1, N'12 Hùng Vương, Lộc Thọ, Nha Trang', '0956789012'),
+    (18, N'Vũ Thị Hoa', 35, 0, N'34 Điện Biên Phủ, Ba Đình, Hà Nội', '0967890123'),
+    (19, N'Đỗ Văn Hùng', 50, 1, N'56 Phạm Ngũ Lão, Quận 1, TP.HCM', '0978901234'),
+    (20, N'Bùi Thị Kim', 28, 0, N'78 Lý Thường Kiệt, Ngũ Hành Sơn, Đà Nẵng', '0989012345'),
+    (21, N'Ngô Văn Long', 70, 1, N'90 Hai Bà Trưng, TP Huế, Thừa Thiên Huế', '0990123456'),
+    (22, N'Tạ Thị Mai', 15, 0, N'23 Nguyễn Trãi, Phước Tiến, Nha Trang', '0911234567'),
+    (23, N'Phan Văn Nam', 40, 1, N'45 Lê Đại Hành, Hai Bà Trưng, Hà Nội', '0922345678'),
+    (24, N'Lý Thị Oanh', 55, 0, N'67 Nguyễn Thị Minh Khai, Quận 3, TP.HCM', '0933456789'),
+    (25, N'Mai Văn Phong', 33, 1, N'89 Bùi Thị Xuân, Thanh Khê, Đà Nẵng', '0944567890'),
+    (26, N'Đặng Thị Quyên', 22, 0, N'12 Trần Hưng Đạo, Phú Hòa, Huế', '0955678901'),
+    (27, N'Hà Văn Sơn', 65, 1, N'34 Lê Hồng Phong, Vĩnh Nghiêm, Nha Trang', '0966789012');
 GO
 
 -- Chèn dữ liệu vào tbl_lich_hen
 INSERT INTO tbl_lich_hen (maBenhNhan, maNhanVien, maDichVuYTe, maPhongKham, ngayHen, trangThai) VALUES
-    (1, 2, 1, 1, '07-12-2025 08:00', N'Đã xác nhận'),   -- Khám nội khoa
-    (2, 3, 2, 2, '07-12-2025 09:00', N'Chờ xác nhận'),   -- Khám mắt
-    (3, 4, 3, 3, '08-12-2025 10:00', N'Đã xác nhận'),    -- Khám tim mạch
-    (4, 5, 4, 4, '08-12-2025 14:00', N'Đã hoàn thành'),  -- Khám nhi
-    (5, 8, 5, 5, '09-12-2025 08:30', N'Đã xác nhận'),    -- Xét nghiệm máu
-    (6, 2, 6, 7, '09-12-2025 15:00', N'Chờ xác nhận'),   -- Siêu âm
-    (7, 8, 7, 8, '10-12-2025 09:30', N'Đã xác nhận'),    -- X-quang
-    (8, 6, 8, 10, '10-12-2025 13:00', N'Đã hoàn thành'), -- Tiêm chủng
-    (9, 11, 9, 11, '11-12-2025 10:00', N'Đã xác nhận'),  -- Vật lý trị liệu
-    (10, 2, 10, 12, '11-12-2025 14:30', N'Chờ xác nhận'), -- Khám tai mũi họng
-    (11, 3, 11, 13, '12-12-2025 08:00', N'Đã xác nhận'), -- Khám da liễu
-    (12, 2, 12, 14, '12-12-2025 15:00', N'Đã hoàn thành'), -- Khám tổng quát
-    (13, 7, 10, 12, '13-12-2025 09:00', N'Đã xác nhận'),  -- Khám tai mũi họng
-    (14, 2, 12, 14, '13-12-2025 14:00', N'Chờ xác nhận'), -- Khám tổng quát
-    (15, 2, 13, 6, '14-12-2025 10:30', N'Đã xác nhận');   -- Cấp cứu
+    -- Trường hợp 1: Chưa phân công (maNhanVien = NULL), Chờ xác nhận
+    (1, NULL, 1, 1, '07-12-2025 08:00', N'Chờ xác nhận'),   -- Khám nội khoa, chưa phân công bác sĩ
+
+    -- Trường hợp 2: Đã phân công, Chờ xác nhận
+    (2, 3, 2, 2, '07-12-2025 09:00', N'Chờ xác nhận'),      -- Khám mắt, bác sĩ Đỗ Thị I
+
+    -- Trường hợp 3: Đã phân công, Đã xác nhận
+    (3, 4, 3, 3, '08-12-2025 10:00', N'Đã xác nhận'),       -- Khám tim mạch, bác sĩ Ngô Văn J
+
+    -- Trường hợp 4: Đã phân công, Đã hoàn thành
+    (4, 5, 4, 4, '08-12-2025 14:00', N'Đã hoàn thành'),     -- Khám nhi, bác sĩ Vũ Thị K
+
+    -- Trường hợp 5: Đã phân công, Đã hủy
+    (5, 8, 5, 5, '09-12-2025 08:30', N'Đã hủy'),            -- Xét nghiệm máu, kỹ thuật viên Hoàng Văn E
+
+    -- Trường hợp 6: Chưa phân công, Chờ xác nhận
+    (6, NULL, 6, 7, '09-12-2025 15:00', N'Chờ xác nhận'),   -- Siêu âm, chưa phân công
+
+    -- Trường hợp 7: Đã phân công, Đã xác nhận
+    (7, 8, 7, 8, '10-12-2025 09:30', N'Đã xác nhận'),       -- X-quang, kỹ thuật viên Hoàng Văn E
+
+    -- Trường hợp 8: Đã phân công, Đã hoàn thành
+    (8, 6, 8, 10, '10-12-2025 13:00', N'Đã hoàn thành'),    -- Tiêm chủng, y tá Trần Thị B
+
+    -- Trường hợp 9: Đã phân công, Đã hủy
+    (9, 11, 9, 11, '11-12-2025 10:00', N'Đã hủy'),          -- Vật lý trị liệu, trợ lý Bùi Thị M
+
+    -- Trường hợp 10: Chưa phân công, Chờ xác nhận
+    (10, NULL, 10, 12, '11-12-2025 14:30', N'Chờ xác nhận'), -- Khám tai mũi họng, chưa phân công
+
+    -- Trường hợp 11: Đã phân công, Đã xác nhận
+    (11, 3, 11, 13, '12-12-2025 08:00', N'Đã xác nhận'),    -- Khám da liễu, bác sĩ Đỗ Thị I
+
+    -- Trường hợp 12: Đã phân công, Đã hoàn thành
+    (12, 2, 12, 14, '12-12-2025 15:00', N'Đã hoàn thành'),  -- Khám tổng quát, bác sĩ Nguyễn Văn A
+
+    -- Trường hợp 13: Đã phân công, Chờ xác nhận
+    (13, 7, 10, 12, '13-12-2025 09:00', N'Chờ xác nhận'),   -- Khám tai mũi họng, lễ tân Phạm Văn C
+
+    -- Trường hợp 14: Chưa phân công, Đã hủy
+    (14, NULL, 12, 14, '13-12-2025 14:00', N'Đã hủy'),      -- Khám tổng quát, chưa phân công
+
+    -- Trường hợp 15: Đã phân công, Đã xác nhận
+    (15, 2, 13, 6, '14-12-2025 10:30', N'Đã xác nhận');     -- Cấp cứu, bác sĩ Nguyễn Văn A
 GO
 
 -- Chèn dữ liệu vào tbl_ho_so_y_te
@@ -519,63 +555,6 @@ INSERT INTO tbl_ket_qua_xet_nghiem (MaHoSoYTe, TenXetNghiem, KetQua, NgayXetNghi
     (9, N'Xét nghiệm nước tiểu', N'Protein: 2+', '28-12-2025'),
     (10, N'Xét nghiệm máu', N'WBC: 8000/mm3', '20-12-2025');
 GO
-
--- Chèn dữ liệu vào tbl_don_thuoc
-INSERT INTO tbl_don_thuoc (maHoSoYTe, ngayKeDon) VALUES
-    (1, '20-12-2026'), 
-	(2 ,'19-12-2026'), 
-	(3, '18-12-2026'), 
-	(4, '17-12-2026'),
-    (5, '16-12-2026'), 
-	(6, '15-12-2026'), 
-	(7, '14-12-2026'), 
-	(8, '20-12-2026'),
-    (9, '28-12-2026'), 
-	(10, '20-12-2026'), 
-	(11, '20-12-2026'), 
-	(12, '29-12-2026'),
-    (13, '20-12-2026'), 
-	(14, '08-12-2026'), 
-	(15, '20-12-2026');
-GO
-
--- Chèn dữ liệu vào tbl_thuoc
-INSERT INTO tbl_thuoc (ten, moTa, donVi, ChongChiDinh, TuongTacThuoc) VALUES
-    (N'Amoxicillin', N'Kháng sinh điều trị nhiễm khuẩn', N'viên', N'Không dùng cho dị ứng penicillin', N'Không dùng với Methotrexat'),
-    (N'Paracetamol', N'Giảm đau, hạ sốt', N'viên', N'Không dùng cho suy gan', N'Không dùng với rượu'),
-    (N'Amlodipine', N'Hạ huyết áp', N'viên', N'Không dùng cho sốc', N'Không dùng với Simvastatin'),
-    (N'Sắt viên', N'Bổ sung sắt cho thiếu máu', N'viên', N'Không dùng cho bệnh thalassemia', N'Không dùng với kháng sinh'),
-    (N'Omeprazole', N'Giảm axit dạ dày', N'viên', N'Không dùng cho suy gan nặng', N'Không dùng với Clopidogrel'),
-    (N'Hydrocortisone', N'Kem bôi chống viêm', N'tuýp', N'Không dùng cho nhiễm trùng da', N'Không dùng với thuốc khác bôi ngoài da'),
-    (N'Natri Clorid', N'Dung dịch truyền bổ sung nước', N'chai', N'Không dùng cho phù phổi', N'Không dùng với Kali-sparing diuretics'),
-    (N'Aspirin', N'Giảm đau, phòng nhồi máu', N'viên', N'Không dùng cho loét dạ dày', N'Không dùng với Warfarin'),
-    (N'Vitamin C', N'Tăng sức đề kháng', N'viên', N'Không dùng cho sỏi thận', N'Không dùng với Aspirin liều cao'),
-    (N'Cefalexin', N'Kháng sinh phổ rộng', N'viên', N'Không dùng cho dị ứng cephalosporin', N'Không dùng với Probenecid'),
-    (N'Ibuprofen', N'Giảm đau, kháng viêm', N'viên', N'Không dùng cho loét dạ dày hoặc suy thận', N'Không dùng với Aspirin liều cao'),
-    (N'Loratadine', N'Chống dị ứng, giảm ngứa', N'viên', N'Không dùng cho bệnh nhân suy gan nặng', N'Không dùng với Ketoconazole'),
-    (N'Dexamethasone', N'Chống viêm, dị ứng', N'viên', N'Không dùng cho nhiễm trùng toàn thân', N'Không dùng với thuốc chống đông máu'),
-    (N'Atorvastatin', N'Hạ cholesterol máu', N'viên', N'Không dùng cho bệnh gan tiến triển', N'Không dùng với Cyclosporine');
-GO
-
--- Chèn dữ liệu vào tbl_don_thuoc_chi_tiet
-INSERT INTO tbl_don_thuoc_chi_tiet (maDonThuoc, maThuoc, soLuong, cachDung, LieuLuong, TanSuat) VALUES
-    (1, 1, 10, N'Uống 2 viên/ngày, dùng 5 ngày', N'500mg', N'2 lần/ngày'),         -- Amoxicillin
-    (1, 2, 5, N'Uống 1 viên/ngày khi sốt, dùng 5 ngày', N'500mg', N'1 lần/ngày'),  -- Paracetamol
-    (3, 3, 30, N'Uống 1 viên/ngày, dùng 30 ngày', N'5mg', N'1 lần/ngày'),          -- Amlodipine
-    (3, 12, 10, N'Uống 1 viên/ngày khi đau, dùng 10 ngày', N'200mg', N'1 lần/ngày'), -- Ibuprofen
-    (4, 8, 2, N'Truyền 500ml/ngày, dùng 2 ngày', N'500ml', N'1 lần/ngày'),         -- Natri Clorid
-    (5, 4, 15, N'Uống 1 viên/ngày sau ăn, dùng 15 ngày', N'100mg', N'1 lần/ngày'), -- Sắt viên
-    (6, 5, 14, N'Uống 2 viên/ngày trước ăn, dùng 7 ngày', N'20mg', N'2 lần/ngày'), -- Omeprazole
-    (6, 10, 7, N'Uống 1 viên/ngày, dùng 7 ngày', N'500mg', N'1 lần/ngày'),         -- Vitamin C
-    (8, 6, 1, N'Bôi 2 lần/ngày, dùng 10 ngày', N'1%', N'2 lần/ngày'),              -- Hydrocortisone
-    (9, 1, 14, N'Uống 2 viên/ngày, dùng 7 ngày', N'500mg', N'2 lần/ngày'),         -- Amoxicillin
-    (10, 2, 3, N'Uống 1 viên/ngày khi sốt, dùng 3 ngày', N'500mg', N'1 lần/ngày'), -- Paracetamol
-    (11, 11, 14, N'Uống 2 viên/ngày, dùng 7 ngày', N'250mg', N'2 lần/ngày'),       -- Cefalexin
-    (13, 7, 30, N'Uống 1 viên/ngày sau ăn, dùng 30 ngày', N'500mg', N'1 lần/ngày'), -- Metformin
-    (14, 13, 7, N'Uống 1 viên/ngày, dùng 7 ngày', N'10mg', N'1 lần/ngày'),         -- Loratadine
-    (15, 9, 15, N'Uống 1 viên/ngày, dùng 15 ngày', N'100mg', N'1 lần/ngày');       -- Aspirin
-GO
-
 -- Chèn dữ liệu vào tbl_hoa_don
 INSERT INTO tbl_hoa_don (maLichHen, tongTien, ngayThanhToan, trangThaiThanhToan) VALUES
     (1, 150000, '07-12-2025 09:00', N'Đã thanh toán'),    -- Khám nội khoa
@@ -593,6 +572,62 @@ INSERT INTO tbl_hoa_don (maLichHen, tongTien, ngayThanhToan, trangThaiThanhToan)
     (13, 180000, NULL, N'Chưa thanh toán'),                -- Khám tai mũi họng
     (14, 300000, '13-12-2025 15:00', N'Đã thanh toán'),   -- Khám tổng quát
     (15, 400000, '14-12-2025 11:30', N'Đã thanh toán');   -- Cấp cứu
+GO
+
+-- Chèn dữ liệu vào tbl_don_thuoc
+INSERT INTO tbl_don_thuoc (maHoSoYTe, maHoaDon, ngayKeDon) VALUES
+    (1, 1, '20-12-2026'), 
+    (2, 2, '19-12-2026'),
+    (3, 3, '18-12-2026'),
+    (4, 4, '17-12-2026'),
+    (5, 5, '16-12-2026'),
+    (6, 6, '15-12-2026'),
+    (7, 7, '14-12-2026'),
+    (8, 8, '20-12-2026'),
+    (9, 9, '28-12-2026'),
+    (10, 10, '20-12-2026'),
+    (11, 11, '20-12-2026'),
+    (12, 12, '29-12-2026'),
+    (13, 13, '20-12-2026'),
+    (14, 14, '08-12-2026'),
+    (15, 15, '20-12-2026');
+GO
+
+-- Chèn dữ liệu vào tbl_thuoc
+INSERT INTO tbl_thuoc (ten, moTa, donVi, ChongChiDinh, TuongTacThuoc, donGia) VALUES
+    (N'Amoxicillin', N'Kháng sinh điều trị nhiễm khuẩn', N'viên', N'Không dùng cho dị ứng penicillin', N'Không dùng với Methotrexat', 5000),
+    (N'Paracetamol', N'Giảm đau, hạ sốt', N'viên', N'Không dùng cho suy gan', N'Không dùng với rượu', 2000),
+    (N'Amlodipine', N'Hạ huyết áp', N'viên', N'Không dùng cho sốc', N'Không dùng với Simvastatin', 3000),
+    (N'Sắt viên', N'Bổ sung sắt cho thiếu máu', N'viên', N'Không dùng cho bệnh thalassemia', N'Không dùng với kháng sinh', 1500),
+    (N'Omeprazole', N'Giảm axit dạ dày', N'viên', N'Không dùng cho suy gan nặng', N'Không dùng với Clopidogrel', 4000),
+    (N'Hydrocortisone', N'Kem bôi chống viêm', N'tuýp', N'Không dùng cho nhiễm trùng da', N'Không dùng với thuốc khác bôi ngoài da', 25000),
+    (N'Natri Clorid', N'Dung dịch truyền bổ sung nước', N'chai', N'Không dùng cho phù phổi', N'Không dùng với Kali-sparing diuretics', 10000),
+    (N'Aspirin', N'Giảm đau, phòng nhồi máu', N'viên', N'Không dùng cho loét dạ dày', N'Không dùng với Warfarin', 1000),
+    (N'Vitamin C', N'Tăng sức đề kháng', N'viên', N'Không dùng cho sỏi thận', N'Không dùng với Aspirin liều cao', 500),
+    (N'Cefalexin', N'Kháng sinh phổ rộng', N'viên', N'Không dùng cho dị ứng cephalosporin', N'Không dùng với Probenecid', 6000),
+    (N'Ibuprofen', N'Giảm đau, kháng viêm', N'viên', N'Không dùng cho loét dạ dày hoặc suy thận', N'Không dùng với Aspirin liều cao', 3000),
+    (N'Loratadine', N'Chống dị ứng, giảm ngứa', N'viên', N'Không dùng cho bệnh nhân suy gan nặng', N'Không dùng với Ketoconazole', 2500),
+    (N'Dexamethasone', N'Chống viêm, dị ứng', N'viên', N'Không dùng cho nhiễm trùng toàn thân', N'Không dùng với thuốc chống đông máu', 4000),
+    (N'Atorvastatin', N'Hạ cholesterol máu', N'viên', N'Không dùng cho bệnh gan tiến triển', N'Không dùng với Cyclosporine', 7000);
+GO
+
+-- Chèn dữ liệu vào tbl_don_thuoc_chi_tiet
+INSERT INTO tbl_don_thuoc_chi_tiet (maDonThuoc, maThuoc, soLuong, cachDung, LieuLuong, TanSuat, ThanhTien) VALUES
+    (1, 1, 10, N'Uống 2 viên/ngày, dùng 5 ngày', N'500mg', N'2 lần/ngày', 50000.00),         -- Amoxicillin
+    (1, 2, 5, N'Uống 1 viên/ngày khi sốt, dùng 5 ngày', N'500mg', N'1 lần/ngày', 10000.00),  -- Paracetamol
+    (3, 3, 30, N'Uống 1 viên/ngày, dùng 30 ngày', N'5mg', N'1 lần/ngày', 90000.00),          -- Amlodipine
+    (3, 11, 10, N'Uống 1 viên/ngày khi đau, dùng 10 ngày', N'200mg', N'1 lần/ngày', 30000.00), -- Ibuprofen
+    (4, 7, 2, N'Truyền 500ml/ngày, dùng 2 ngày', N'500ml', N'1 lần/ngày', 20000.00),         -- Natri Clorid 
+    (5, 4, 15, N'Uống 1 viên/ngày sau ăn, dùng 15 ngày', N'100mg', N'1 lần/ngày', 22500.00), -- Sắt viên
+    (6, 5, 14, N'Uống 2 viên/ngày trước ăn, dùng 7 ngày', N'20mg', N'2 lần/ngày', 56000.00), -- Omeprazole
+    (6, 9, 7, N'Uống 1 viên/ngày, dùng 7 ngày', N'500mg', N'1 lần/ngày', 3500.00),           -- Vitamin C
+    (8, 6, 1, N'Bôi 2 lần/ngày, dùng 10 ngày', N'1%', N'2 lần/ngày', 25000.00),              -- Hydrocortisone
+    (9, 1, 14, N'Uống 2 viên/ngày, dùng 7 ngày', N'500mg', N'2 lần/ngày', 70000.00),         -- Amoxicillin
+    (10, 2, 3, N'Uống 1 viên/ngày khi sốt, dùng 3 ngày', N'500mg', N'1 lần/ngày', 6000.00),  -- Paracetamol
+    (11, 10, 14, N'Uống 2 viên/ngày, dùng 7 ngày', N'250mg', N'2 lần/ngày', 84000.00),       -- Cefalexin
+    (13, 7, 30, N'Uống 1 viên/ngày sau ăn, dùng 30 ngày', N'500mg', N'1 lần/ngày', 30000.00), -- Natri Clorid
+    (14, 12, 7, N'Uống 1 viên/ngày, dùng 7 ngày', N'10mg', N'1 lần/ngày', 17500.00),         -- Loratadine
+    (15, 8, 15, N'Uống 1 viên/ngày, dùng 15 ngày', N'100mg', N'1 lần/ngày', 15000.00);       -- Aspirin
 GO
 
 -- Chèn dữ liệu vào tbl_lich_su_thay_doi

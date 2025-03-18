@@ -15,6 +15,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 GioiTinh = dto.GioiTinh,
                 DiaChi = dto.DiaChi,
                 SoDienThoai = dto.SoDienThoai,
+                Ten = dto.Ten
             };
         }
 
@@ -26,6 +27,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             entity.DiaChi = dto.DiaChi;
             entity.SoDienThoai = dto.SoDienThoai;
             entity.MaTaiKhoan = dto.MaTaiKhoan;
+            entity.Ten = dto.Ten;
         }
 
         public BenhNhanDTO MapEntityToDto(TblBenhNhan entity)
@@ -38,6 +40,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
                 GioiTinh = entity.GioiTinh,
                 DiaChi = entity.DiaChi,
                 SoDienThoai = entity.SoDienThoai,
+                Ten = entity.Ten
             };
         }
     }

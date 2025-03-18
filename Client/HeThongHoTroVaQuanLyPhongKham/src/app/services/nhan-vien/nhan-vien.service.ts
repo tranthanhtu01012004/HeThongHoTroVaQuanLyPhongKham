@@ -20,7 +20,7 @@ export class NhanVienService extends BaseApiService{
   }
 
   getAllServicesNotPaginator(): Observable<ApiResponse<INhanVien[]>> {
-    return this.http.get<ApiResponse<INhanVien[]>>(`${this.apiBaseUrl}${this.endpoint}`);
+    return this.http.get<ApiResponse<INhanVien[]>>(`${this.apiBaseUrl}${this.endpoint}/all`);
   }
 
   getById(id: number): Observable<ApiResponse<INhanVien>> {

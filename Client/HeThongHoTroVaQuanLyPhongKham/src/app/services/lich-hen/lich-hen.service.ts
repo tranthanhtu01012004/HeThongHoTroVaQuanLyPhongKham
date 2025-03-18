@@ -5,6 +5,7 @@ import { Observable } from 'rxjs';
 import { ApiResponse } from '../../commons/ApiResponse';
 import { ILichHenUpdate } from '../../interfaces/lich-hen/ILichHenUpdate';
 import { ILichHen } from '../../interfaces/lich-hen/ILichHen';
+import { INhanVienLichHen } from '../../interfaces/lich-hen/INhanVienLichHen';
 
 @Injectable({
   providedIn: 'root'
@@ -50,7 +51,7 @@ export class LichHenService extends BaseApiService {
   }
 
   // Cập nhật lịch hẹn
-  update(id: number, lichHen: ILichHen): Observable<ApiResponse<ILichHen>> {
+  update(id: number, lichHen: INhanVienLichHen): Observable<ApiResponse<ILichHen>> {
     return this.http.patch<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}`, lichHen);
   }
 

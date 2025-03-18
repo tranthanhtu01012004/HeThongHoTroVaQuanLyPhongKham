@@ -40,6 +40,16 @@
   <div class="form-container">
     <h2 class="text-center text-danger">Đặt Lịch Hẹn</h2>
     <form [formGroup]="lichHenForm" (ngSubmit)="datLichHen()">
+      <div class="form-group" *ngIf="isTenNull">
+        <label>Họ và tên</label>
+        <input 
+          type="text" 
+          formControlName="Ten" 
+          class="form-control" 
+          placeholder="Nhập tên của bạn" 
+        />
+      </div>
+
       <div class="form-group">
         <label>Dịch vụ y tế</label>
         <select formControlName="MaDichVuYTe" class="form-control">
