@@ -73,6 +73,9 @@ public partial class ApplicationDbContext : DbContext
                 .HasMaxLength(15)
                 .IsUnicode(false)
                 .HasColumnName("soDienThoai");
+            entity.Property(e => e.Ten)
+                .HasMaxLength(100)
+                .HasColumnName("ten");
             entity.Property(e => e.Tuoi).HasColumnName("tuoi");
 
             entity.HasOne(d => d.MaTaiKhoanNavigation).WithOne(p => p.TblBenhNhan)

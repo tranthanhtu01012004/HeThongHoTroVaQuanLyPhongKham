@@ -4,6 +4,20 @@
   .table-striped th, .table-striped td { padding: 10px; text-align: left; }
   .td-custom { display: flex; gap: 10px; }
   h4.mt-4 { font-size: 1.25rem; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+  .cus-bn {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+  }
+  .form-group, .form-container, .form-control {
+    background-color: #fff !important; 
+    color: black;
+  }
+  th {
+    text-align: center !important;
+  }
 </style>
 
 <app-notification></app-notification>
@@ -12,9 +26,12 @@
 
 <div class="recent--patients">
   <!-- Form chỉnh sửa -->
-  <div *ngIf="isEditing" class="form-container">
-    <h3>Chỉnh sửa lịch hẹn</h3>
+  <div *ngIf="isEditing" class="form-container" style="width: 50%;">
+    <h3>CẬP NHẬT LỊCH HẸN</h3>
     <form [formGroup]="updateForm" (ngSubmit)="updateLichHen()">
+      <div class="form-group cus-bn">
+        <h2>{{ tenBenhNhanDangChinhSua }}</h2>
+      </div>
       <div class="form-group">
         <label>Nhân viên</label>
         <select formControlName="MaNhanVien" class="form-control">
@@ -42,34 +59,21 @@
       <table>
         <thead>
           <tr>
-            <th>Mã lịch hẹn</th>
-            <th>Mã bệnh nhân</th>
+            <th>Tên bệnh nhân</th>
             <th>Nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
             <th>Ngày hẹn</th>
-            <th>Trạng thái</th>
             <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachChuaPhanCong.slice(trangHienTaiChuaPhanCong * soLuongMoiTrangChuaPhanCong, (trangHienTaiChuaPhanCong + 1) * soLuongMoiTrangChuaPhanCong)">
-            <td>{{ lichHen.maLichHen }}</td>
-            <td>{{ lichHen.maBenhNhan }}</td>
+            <td>{{ getTenBenhNhan(lichHen.maBenhNhan) }}</td>
             <td>{{ getTenNhanVien(lichHen.maNhanVien) }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
             <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              <div class="select-container">
-                <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
-                  <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
-                    {{ trangThai }}
-                  </option>
-                </select>
-                <span class="lock-icon"></span>
-              </div>
-            </td>
             <td class="td-custom">
               <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
                 <span class="lock-icon"></span>Sửa
@@ -102,20 +106,17 @@
       <table>
         <thead>
           <tr>
-            <th>Mã lịch hẹn</th>
-            <th>Mã bệnh nhân</th>
+            <th>Tên bệnh nhân</th>
             <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
             <th>Ngày hẹn</th>
             <th>Trạng thái</th>
-            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachChoXacNhan.slice(trangHienTaiChoXacNhan * soLuongMoiTrangChoXacNhan, (trangHienTaiChoXacNhan + 1) * soLuongMoiTrangChoXacNhan)">
-            <td>{{ lichHen.maLichHen }}</td>
-            <td>{{ lichHen.maBenhNhan }}</td>
+            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
             <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
@@ -129,11 +130,6 @@
                 </select>
                 <span class="lock-icon"></span>
               </div>
-            </td>
-            <td class="td-custom">
-              <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
-                <span class="lock-icon"></span>Sửa
-              </button>
             </td>
           </tr>
           <tr *ngIf="danhSachChoXacNhan.length === 0">
@@ -162,8 +158,7 @@
       <table>
         <thead>
           <tr>
-            <th>Mã lịch hẹn</th>
-            <th>Mã bệnh nhân</th>
+            <th>Tên bệnh nhân</th>
             <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
@@ -173,8 +168,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachDaXacNhan.slice(trangHienTaiDaXacNhan * soLuongMoiTrangDaXacNhan, (trangHienTaiDaXacNhan + 1) * soLuongMoiTrangDaXacNhan)">
-            <td>{{ lichHen.maLichHen }}</td>
-            <td>{{ lichHen.maBenhNhan }}</td>
+            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
             <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
@@ -217,8 +211,7 @@
       <table>
         <thead>
           <tr>
-            <th>Mã lịch hẹn</th>
-            <th>Mã bệnh nhân</th>
+            <th>Tên bệnh nhân</th>
             <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
@@ -228,8 +221,7 @@
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachDaHoanThanh.slice(trangHienTaiDaHoanThanh * soLuongMoiTrangDaHoanThanh, (trangHienTaiDaHoanThanh + 1) * soLuongMoiTrangDaHoanThanh)">
-            <td>{{ lichHen.maLichHen }}</td>
-            <td>{{ lichHen.maBenhNhan }}</td>
+            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
             <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
@@ -271,19 +263,18 @@
       <table>
         <thead>
           <tr>
-            <th>Mã lịch hẹn</th>
-            <th>Mã bệnh nhân</th>
+            <th>Tên bệnh nhân</th>
             <th>Tên nhân viên</th>
             <th>Dịch vụ y tế</th>
             <th>Phòng khám</th>
             <th>Ngày hẹn</th>
             <th>Trạng thái</th>
+            <th>Hành động</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let lichHen of danhSachDaHuy.slice(trangHienTaiDaHuy * soLuongMoiTrangDaHuy, (trangHienTaiDaHuy + 1) * soLuongMoiTrangDaHuy)">
-            <td>{{ lichHen.maLichHen }}</td>
-            <td>{{ lichHen.maBenhNhan }}</td>
+            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
             <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
             <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
             <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
@@ -297,6 +288,11 @@
                 </select>
                 <span class="lock-icon"></span>
               </div>
+            </td>
+            <td class="td-custom">
+              <button [hasPermission]="'QuanLy'" (click)="deleteLichHen(lichHen.maLichHen)" class="btn btn-danger">
+                <span class="lock-icon"></span>Xóa
+              </button>
             </td>
           </tr>
           <tr *ngIf="danhSachDaHuy.length === 0">

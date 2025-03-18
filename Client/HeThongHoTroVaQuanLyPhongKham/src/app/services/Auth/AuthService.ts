@@ -52,6 +52,26 @@ export class AuthService {
         return null;
     }
 
+    getMaTaiKhoanFromToken(): number | null {
+        const token = this.getToken();
+        if (token) {
+            try {
+                const payload = token.split('.')[1];
+                if (!payload) {
+                    return null;
+                }
+                const decodedPayload = atob(payload);
+                const parsedPayload = JSON.parse(decodedPayload);
+                const maTaiKhoan = parsedPayload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+                return maTaiKhoan ? Number(maTaiKhoan) : null;
+            } catch (error) {
+                console.error('Lỗi khi giải mã maTaiKhoan từ token:', error);
+                return null;
+            }
+        }
+        return null;
+    }
+    
     isAuthenticated(): boolean {
         return !!this.getToken();
     }

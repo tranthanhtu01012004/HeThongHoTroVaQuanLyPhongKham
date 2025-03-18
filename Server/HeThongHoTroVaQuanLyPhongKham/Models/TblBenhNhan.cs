@@ -9,6 +9,8 @@ public partial class TblBenhNhan
 
     public int MaTaiKhoan { get; set; }
 
+    public string? Ten { get; set; }
+
     public int? Tuoi { get; set; }
 
     public bool? GioiTinh { get; set; }

@@ -1,3 +1,4 @@
+import { BenhNhanService } from './../../../services/benh-nhan/benh-nhan.service';
 import { MatPaginator, MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
@@ -24,6 +25,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { INhanVien } from '../../../interfaces/nhan-vien/INhanVien';
 import { ILichHenUpdate } from '../../../interfaces/lich-hen/ILichHenUpdate';
+import { INhanVienLichHen } from '../../../interfaces/lich-hen/INhanVienLichHen';
+import { IBenhNhan } from '../../../interfaces/benh-nhan/IBenhNhan';
 
 @Component({
   selector: 'app-quan-ly-lich-hen',
@@ -55,6 +58,8 @@ export class QuanLyLichHenComponent implements OnInit {
   danhSachPhongKham: IPhongKham[] = [];
   danhSachDichVu: IDichVuYTe[] = [];
   danhSachNhanVien: INhanVien[] = [];
+  danhSachBenhNhan: IBenhNhan[] = [];
+  tenBenhNhanDangChinhSua: string = '';
   trangThaiOptions = ['Chờ xác nhận', 'Đã xác nhận', 'Hủy', 'Đã hoàn thành'];
   
    // Danh sách lịch hẹn chưa phân công
@@ -98,6 +103,7 @@ export class QuanLyLichHenComponent implements OnInit {
     private fb: FormBuilder,
     private lichHenService: LichHenService,
     private phongKhamService: PhongKhamService,
+    private benhNhanService: BenhNhanService,
     private nhanVienService: NhanVienService,
     private dichVuYTeService: DichVuYTeService,
     private notificationService: NotificationService,
@@ -107,10 +113,10 @@ export class QuanLyLichHenComponent implements OnInit {
       MaLichHen: [{ value: '', disabled: true }],
       MaBenhNhan: [{ value: '', disabled: true }],
       MaDichVuYTe: [{ value: '', disabled: true }],
-      MaNhanVien: [''],
-      MaPhongKham: [''],
+      MaNhanVien: ['', Validators.required],
+      MaPhongKham: ['', Validators.required],
       NgayHen: ['', Validators.required],
-      TrangThai: ['', Validators.required],
+      TrangThai: ['', Validators.required], 
     });
     this.minDateTime = this.dateFormatter.formatToISOString(new Date()).slice(0, 16);
   }
@@ -123,6 +129,7 @@ export class QuanLyLichHenComponent implements OnInit {
     this.loadDanhSachPhongKham();
     this.loadDanhSachDichVu();
     this.loadDanhSachNhanVien();
+    this.loadDanhSachBenhNhan();
     this.loadDanhSachLichHen();
   }
 
@@ -143,6 +150,15 @@ export class QuanLyLichHenComponent implements OnInit {
   loadDanhSachNhanVien(): void {
     this.nhanVienService.getAllServicesNotPaginator().subscribe({
       next: (res: ApiResponse<INhanVien[]>) => this.danhSachNhanVien = res.status ? res.data || [] : [],
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err),
+    });
+  }
+
+  loadDanhSachBenhNhan(): void {
+    this.benhNhanService.getAll(1, 1000).subscribe({
+      next: (res: ApiResponse<IBenhNhan[]>) => {
+        this.danhSachBenhNhan = res.status ? res.data || [] : [];
+      },
       error: (err: HttpErrorResponse) => this.xuLyLoi(err),
     });
   }
@@ -204,6 +220,7 @@ export class QuanLyLichHenComponent implements OnInit {
   editLichHen(lichHen: ILichHen): void {
     this.isEditing = true;
     this.selectedLichHen = lichHen;
+    this.tenBenhNhanDangChinhSua = this.getTenBenhNhan(lichHen.maBenhNhan);
     this.updateForm.patchValue({
       MaLichHen: lichHen.maLichHen,
       MaBenhNhan: lichHen.maBenhNhan,
@@ -218,6 +235,7 @@ export class QuanLyLichHenComponent implements OnInit {
   cancelEdit(): void {
     this.isEditing = false;
     this.selectedLichHen = null;
+    this.tenBenhNhanDangChinhSua = '';
     this.updateForm.reset();
   }
 
@@ -227,12 +245,30 @@ export class QuanLyLichHenComponent implements OnInit {
       return;
     }
 
-    const lichHenUpdate: any = {
-      maNhanVien: Number(this.updateForm.value.MaNhanVien) || 0,
-      maPhongKham: Number(this.updateForm.value.MaPhongKham) || 0,
+    const formValue = this.updateForm.value;
+
+    if (!formValue.MaNhanVien || formValue.MaNhanVien <= 0) {
+      this.notificationService.showError('Vui lòng chọn nhân viên.');
+      return;
+    }
+    if (!formValue.MaPhongKham || formValue.MaPhongKham <= 0) {
+      this.notificationService.showError('Vui lòng chọn phòng khám.');
+      return;
+    }
+
+    const maLichHen = this.selectedLichHen?.maLichHen;
+    if (!maLichHen) {
+      this.notificationService.showError('Không tìm thấy mã lịch hẹn để cập nhật.');
+      return;
+    }
+
+    const phanCongNhanVien: INhanVienLichHen = { 
+      MaLichHen: maLichHen,
+      MaNhanVien: formValue.MaNhanVien,
+      MaPhongKham: formValue.MaPhongKham
     };
 
-    this.lichHenService.update(lichHenUpdate.maLichHen, lichHenUpdate).subscribe({
+    this.lichHenService.update(maLichHen, phanCongNhanVien).subscribe({
       next: (res: ApiResponse<any>) => {
         if (res.status) {
           this.notificationService.showSuccess('Cập nhật thành công!');
@@ -250,7 +286,11 @@ export class QuanLyLichHenComponent implements OnInit {
     const select = event.target as HTMLSelectElement;
     if (select) {
       const trangThaiMoi = select.value;
-      const updateData: ILichHenUpdate = { MaLichHen: lichHen.maLichHen, TrangThai: trangThaiMoi };
+      const updateData: ILichHenUpdate = { 
+        MaLichHen: lichHen.maLichHen, 
+        TrangThai: trangThaiMoi 
+      };
+      
       this.lichHenService.updateTrangThai(lichHen.maLichHen, updateData).subscribe({
         next: (res: ApiResponse<ILichHen>) => {
           if (res.status) {
@@ -280,6 +320,24 @@ export class QuanLyLichHenComponent implements OnInit {
     if (!maNhanVien) return 'Chưa gán';
     const nhanVien = this.danhSachNhanVien.find(nv => nv.maNhanVien === maNhanVien);
     return nhanVien ? nhanVien.ten : 'Không xác định';
+  }
+
+  getTenBenhNhan(maBenhNhan: number | null): string {
+    if (!maBenhNhan) return 'Chưa gán';
+    const benhNhan = this.danhSachBenhNhan.find(bn => bn.maBenhNhan === maBenhNhan);
+    return benhNhan && benhNhan.ten ? benhNhan.ten : 'Không xác định';
+  }
+
+  deleteLichHen(maLichHen: number): void {
+    if (confirm('Bạn có chắc chắn muốn xóa lịch hẹn này không?')) {
+      this.lichHenService.delete(maLichHen).subscribe({
+        next: () => {
+            this.notificationService.showSuccess('Xóa lịch hẹn thành công!');
+            this.loadDanhSachLichHen();
+        },
+        error: (err: HttpErrorResponse) => this.xuLyLoi(err),
+      });
+    }
   }
 
   xuLyLoi(err: HttpErrorResponse): void {

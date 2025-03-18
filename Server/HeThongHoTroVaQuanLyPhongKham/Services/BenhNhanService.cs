@@ -1,4 +1,5 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
@@ -8,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
-    public class BenhNhanService : BaseService, IService<BenhNhanDTO>
+    public class BenhNhanService : BaseService, IBenhNhanService
     {
         private readonly IRepository<TblBenhNhan> _benhNhanRepository;
         private readonly IMapper<BenhNhanDTO, TblBenhNhan> _benhNhanMapping;
@@ -59,6 +60,15 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             return (dtoList, totalItems, totalPages);
         }
 
+        public async Task<BenhNhanDTO> getBenhNhanByMaTaiKhoan(int id)
+        {
+            var benhNhan = await _benhNhanRepository.GetQueryable()
+                .FirstOrDefaultAsync(bn => bn.MaTaiKhoan == id);
+            if (benhNhan is null)
+                throw new NotFoundException($"Không tìm thấy bệnh nhân với mã tài khoản {id}");
+            return _benhNhanMapping.MapEntityToDto(benhNhan);
+        }
+
         public async Task<BenhNhanDTO> GetByIdAsync(int id)
         {
             var benhNhan = await _benhNhanRepository.FindByIdAsync(id, "MaBenhNhan");
@@ -74,6 +84,17 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 await GetByIdAsync(dto.MaBenhNhan));
 
             _benhNhanMapping.MapDtoToEntity(dto, benhNhanUpdate);
+
+            return _benhNhanMapping.MapEntityToDto(
+                await _benhNhanRepository.UpdateAsync(benhNhanUpdate));
+        }
+
+        public async Task<BenhNhanDTO> updateForTenAsync(BenhNhanUpdateDTO dto)
+        {
+            var benhNhanUpdate = _benhNhanMapping.MapDtoToEntity(
+                await GetByIdAsync(dto.MaBenhNhan));
+
+            benhNhanUpdate.Ten = dto.Ten;
 
             return _benhNhanMapping.MapEntityToDto(
                 await _benhNhanRepository.UpdateAsync(benhNhanUpdate));

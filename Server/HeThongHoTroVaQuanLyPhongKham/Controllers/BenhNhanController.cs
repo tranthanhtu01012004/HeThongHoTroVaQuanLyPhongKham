@@ -1,5 +1,6 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Common;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +13,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     [ApiController]
     public class BenhNhanController : ControllerBase
     {
-        private readonly IService<BenhNhanDTO> _benhNhanService;
+        private readonly IBenhNhanService _benhNhanService;
 
-        public BenhNhanController(IService<BenhNhanDTO> benhNhanService)
+        public BenhNhanController(IBenhNhanService benhNhanService)
         {
             _benhNhanService = benhNhanService;
         }
@@ -46,6 +47,25 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             {
                 return Ok(ApiResponse<BenhNhanDTO>.Success(
                     await _benhNhanService.GetByIdAsync(id), $"Tìm thấy bệnh nhân với ID [{id}]."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<BenhNhanDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<BenhNhanDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpGet("by-tai-khoan/{id}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> getBenhNhanByMaTaiKhoan([FromRoute] int id)
+        {
+            try
+            {
+                return Ok(ApiResponse<BenhNhanDTO>.Success(
+                    await _benhNhanService.getBenhNhanByMaTaiKhoan(id)));
             }
             catch (NotFoundException ex)
             {
@@ -95,6 +115,30 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 
                 return Ok(ApiResponse<BenhNhanDTO>.Success(
                     await _benhNhanService.UpdateAsync(dto), $"Cập nhật bệnh nhân với ID [{id}] thành công."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<BenhNhanDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<BenhNhanDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpPatch("{id:int}/name")]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateForPatient([FromRoute] int id, [FromBody] BenhNhanUpdateDTO dto)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+                if (id != dto.MaBenhNhan)
+                    return BadRequest("Id không khớp");
+
+                return Ok(ApiResponse<BenhNhanDTO>.Success(
+                    await _benhNhanService.updateForTenAsync(dto), $"Cập nhật bệnh nhân với ID [{id}] thành công."));
             }
             catch (NotFoundException ex)
             {

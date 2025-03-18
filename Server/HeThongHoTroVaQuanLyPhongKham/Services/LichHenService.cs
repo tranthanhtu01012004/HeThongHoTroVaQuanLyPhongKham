@@ -19,8 +19,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IService<DichVuYTeDTO> _dichVuYTeService;
         private readonly IService<PhongKhamDTO> _phongKhamService;
         private readonly IJwtService _jwtService;
+        private readonly IRepository<TblHoaDon> _hoaDonRepository;
 
-        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IService<DichVuYTeDTO> dichVuYTeService, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService)
+        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IService<DichVuYTeDTO> dichVuYTeService, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService, IRepository<TblHoaDon> hoaDonRepository)
         {
             _lichHenRepository = lichHenRepository;
             _lichHenMapping = lichHenMapping;
@@ -29,6 +30,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             _dichVuYTeService = dichVuYTeService;
             _phongKhamService = phongKhamService;
             _jwtService = jwtService;
+            _hoaDonRepository = hoaDonRepository;
         }
 
         public Task<LichHenDTO> AddAsync(LichHenDTO dto)
@@ -80,9 +82,20 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task DeleteAsync(int id)
         {
+            var lichHen = await GetByIdAsync(id);
+            if (lichHen == null)
+            {
+                throw new Exception("Lịch hẹn không tồn tại.");
+            }
+
+            // Xóa tất cả hóa đơn liên quan trước
+            var hoaDons = await _hoaDonRepository.GetQueryable()
+                            .Where(hd => hd.MaLichHen == id)
+                            .ToListAsync();
+            await _hoaDonRepository.DeleteAsync(hoaDons);
+
             await _lichHenRepository.DeleteAsync(
-                _lichHenMapping.MapDtoToEntity(
-                    await GetByIdAsync(id)));
+                _lichHenMapping.MapDtoToEntity(lichHen));
         }
 
         public async Task<(IEnumerable<LichHenDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(

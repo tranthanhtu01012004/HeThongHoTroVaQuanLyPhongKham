@@ -7,6 +7,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         public int MaBenhNhan { get; set; }
         public int MaTaiKhoan { get; set; }
 
+        [StringLength(100, ErrorMessage = "Tên không được vượt quá 100 ký tự")]
+        public string? Ten { get; set; }
+
         [Range(0, 150, ErrorMessage = "Tuổi phải từ 0 đến 150")]
         public int? Tuoi { get; set; }
         public bool? GioiTinh { get; set; }
