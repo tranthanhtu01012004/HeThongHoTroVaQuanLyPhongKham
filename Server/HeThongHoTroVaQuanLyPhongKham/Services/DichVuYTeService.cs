@@ -3,6 +3,8 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
+using HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
@@ -10,11 +12,17 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblDichVuYTe> _dichVuYTeRepository;
         private readonly IMapper<DichVuYTeDTO, TblDichVuYTe> _dichVuYTeMapping;
+        private readonly IRepository<TblHoaDon> _hoaDonRepository;
+        private readonly ILichHenService _lichHenService;
+        private readonly IRepository<TblLichHen> _lichHenRepository;
 
-        public DichVuYTeService(IRepository<TblDichVuYTe> dichVuYTeRepository, IMapper<DichVuYTeDTO, TblDichVuYTe> dichVuYTeMapping)
+        public DichVuYTeService(IRepository<TblDichVuYTe> dichVuYTeRepository, IMapper<DichVuYTeDTO, TblDichVuYTe> dichVuYTeMapping, IRepository<TblHoaDon> hoaDonRepository, ILichHenService lichHenService, IRepository<TblLichHen> lichHenRepository)
         {
             _dichVuYTeRepository = dichVuYTeRepository;
             _dichVuYTeMapping = dichVuYTeMapping;
+            _hoaDonRepository = hoaDonRepository;
+            _lichHenService = lichHenService;
+            _lichHenRepository = lichHenRepository;
         }
 
         public async Task<DichVuYTeDTO> AddAsync(DichVuYTeDTO dto)
@@ -26,6 +34,22 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task DeleteAsync(int id)
         {
+            //var dichVuYTe = await GetByIdAsync(id);
+            //if (dichVuYTe is null)
+            //    throw new Exception("Dịch vụ y tế không tồn tại.");
+            //var lichHens = await _lichHenRepository.GetQueryable()
+            //    .Where(lh => lh.MaDichVuYte == id && lh.TrangThai != "Hủy")
+            //    .ToListAsync();
+
+            //if (lichHens.Any())
+            //{
+            //    foreach (var lichHen in lichHens)
+            //    {
+            //        lichHen.MaDichVuYte = 0;
+            //        await _lichHenRepository.UpdateAsync(lichHen);
+            //    }
+            //}
+
             await _dichVuYTeRepository.DeleteAsync(
                 _dichVuYTeMapping.MapDtoToEntity(
                     await GetByIdAsync(id)));

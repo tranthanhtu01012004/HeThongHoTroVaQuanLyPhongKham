@@ -7,5 +7,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         Task<BenhNhanDTO> updateForTenAsync(BenhNhanUpdateDTO dto);
         Task<BenhNhanDTO> getBenhNhanByMaTaiKhoan(int id);
+        Task<List<BenhNhanDTO>> GetBenhNhanByNameAsync(string name);
     }
 }

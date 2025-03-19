@@ -11,7 +11,7 @@ public partial class TblLichHen
 
     public int? MaNhanVien { get; set; }
 
-    public int MaDichVuYte { get; set; }
+    public int? MaDichVuYte { get; set; }
 
     public int? MaPhongKham { get; set; }
 
@@ -21,7 +21,7 @@ public partial class TblLichHen
 
     public virtual TblBenhNhan MaBenhNhanNavigation { get; set; } = null!;
 
-    public virtual TblDichVuYTe MaDichVuYteNavigation { get; set; } = null!;
+    public virtual TblDichVuYTe? MaDichVuYteNavigation { get; set; }
 
     public virtual TblNhanVien? MaNhanVienNavigation { get; set; }
 

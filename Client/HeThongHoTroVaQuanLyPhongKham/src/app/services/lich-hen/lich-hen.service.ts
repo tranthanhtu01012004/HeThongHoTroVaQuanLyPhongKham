@@ -18,14 +18,14 @@ export class LichHenService extends BaseApiService {
   }
 
   // Lấy danh sách lịch hẹn với phân trang và lọc
-  getAll(page: number, pageSize: number, ngayHen?: Date, maNhanVien?: number, maPhong?: number): Observable<ApiResponse<ILichHen[]>> {
+  getAll(page: number, pageSize: number, ngayHen?: string, maNhanVien?: number, maPhong?: number): Observable<ApiResponse<ILichHen[]>> {
     let params = new HttpParams()
       .set('page', page.toString())
       .set('pageSize', pageSize.toString());
 
-    if (ngayHen) {
-      params = params.set('ngayHen', ngayHen.toISOString());
-    }
+      if (ngayHen) {
+        params = params.set('ngayHen', ngayHen);
+      }
     if (maNhanVien) {
       params = params.set('maNhanVien', maNhanVien.toString());
     }

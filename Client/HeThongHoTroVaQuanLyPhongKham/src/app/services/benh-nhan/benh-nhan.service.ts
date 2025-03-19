@@ -19,6 +19,10 @@ export class BenhNhanService extends BaseApiService {
     return this.http.get<ApiResponse<IBenhNhan>>(`${this.apiBaseUrl}${this.endpoint}/by-tai-khoan/${id}`);
   }
 
+  getBenhNhanByName(name: string): Observable<ApiResponse<IBenhNhan[]>> {
+    return this.http.get<ApiResponse<IBenhNhan[]>>(`${this.apiBaseUrl}${this.endpoint}/by-name?name=${encodeURIComponent(name)}`);
+  }
+  
   updateForTen(id: number, benhNhan: IBenhNhan): Observable<ApiResponse<IBenhNhan>> {
     return this.http.patch<ApiResponse<IBenhNhan>>(`${this.apiBaseUrl}${this.endpoint}/${id}/name`, benhNhan);
   }

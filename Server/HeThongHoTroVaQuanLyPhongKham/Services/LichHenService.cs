@@ -16,18 +16,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         //private readonly IService<BenhNhanDTO> _benhNhanService;
         private readonly IRepository<TblBenhNhan> _benhNhanRepository; // Circular denpendency
         private readonly IService<NhanVienDTO> _nhanVienService;
-        private readonly IService<DichVuYTeDTO> _dichVuYTeService;
+        //private readonly IService<DichVuYTeDTO> _dichVuYTeService;
+        private readonly IRepository<TblDichVuYTe> _dichVuYTeRepository;
         private readonly IService<PhongKhamDTO> _phongKhamService;
         private readonly IJwtService _jwtService;
         private readonly IRepository<TblHoaDon> _hoaDonRepository;
 
-        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IService<DichVuYTeDTO> dichVuYTeService, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService, IRepository<TblHoaDon> hoaDonRepository)
+        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IRepository<TblDichVuYTe> dichVuYTeRepository, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService, IRepository<TblHoaDon> hoaDonRepository)
         {
             _lichHenRepository = lichHenRepository;
             _lichHenMapping = lichHenMapping;
             _benhNhanRepository = benhNhanRepository;
             _nhanVienService = nhanVienService;
-            _dichVuYTeService = dichVuYTeService;
+            _dichVuYTeRepository = dichVuYTeRepository;
             _phongKhamService = phongKhamService;
             _jwtService = jwtService;
             _hoaDonRepository = hoaDonRepository;
@@ -55,7 +56,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task<LichHenDTO> AddForPatientAsync(LichHenCreateDTO dto)
         {
-            await _dichVuYTeService.GetByIdAsync(dto.MaDichVuYTe);
+            var dichVuYTe = await _dichVuYTeRepository.FindByIdAsync(dto.MaDichVuYTe, "MaDichVuYte");
+            if (dichVuYTe is null)
+                throw new NotFoundException($"Dịch vụ y tế với ID [{dto.MaDichVuYTe}] không tồn tại.");
 
             var maTaiKhoan = _jwtService.GetMaTaiKhoan();
             if (maTaiKhoan == null)
@@ -83,12 +86,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         public async Task DeleteAsync(int id)
         {
             var lichHen = await GetByIdAsync(id);
-            if (lichHen == null)
-            {
+            if (lichHen is null)
                 throw new Exception("Lịch hẹn không tồn tại.");
-            }
 
-            // Xóa tất cả hóa đơn liên quan trước
             var hoaDons = await _hoaDonRepository.GetQueryable()
                             .Where(hd => hd.MaLichHen == id)
                             .ToListAsync();

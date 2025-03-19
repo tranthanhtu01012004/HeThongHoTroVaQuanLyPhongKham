@@ -14,9 +14,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
             [Range(1, int.MaxValue, ErrorMessage = "Mã nhân viên phải là số dương")]
             public int? MaNhanVien { get; set; }
 
-            [Required(ErrorMessage = "Mã dịch vụ y tế là bắt buộc")]
             [Range(1, int.MaxValue, ErrorMessage = "Mã dịch vụ y tế phải là số dương")]
-            public int MaDichVuYTe { get; set; }
+            public int? MaDichVuYTe { get; set; }
 
             public int? MaPhongKham { get; set; }
 
