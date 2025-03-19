@@ -17,6 +17,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new TblDonThuoc
             {
                 MaDonThuoc = dto.MaDonThuoc,
+                MaHoaDon = dto.MaHoaDon,
                 MaHoSoYte = dto.MaHoSoYte,
                 NgayKeDon = dto.NgayKeDon,
                 TblDonThuocChiTiets = dto.ChiTietThuocList?
@@ -28,6 +29,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
         public void MapDtoToEntity(DonThuocDTO dto, TblDonThuoc entity)
         {
             entity.MaDonThuoc = dto.MaDonThuoc;
+            entity.MaHoaDon = dto.MaHoaDon;
             entity.MaHoSoYte = dto.MaHoSoYte;
             entity.NgayKeDon = dto.NgayKeDon;
             entity.TblDonThuocChiTiets = dto.ChiTietThuocList?
@@ -40,6 +42,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             return new DonThuocDTO
             {
                 MaDonThuoc = entity.MaDonThuoc,
+                MaHoaDon = entity.MaHoaDon,
                 MaHoSoYte = entity.MaHoSoYte,
                 NgayKeDon = entity.NgayKeDon,
                 ChiTietThuocList = entity.TblDonThuocChiTiets?

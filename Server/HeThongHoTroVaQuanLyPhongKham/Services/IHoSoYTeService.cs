@@ -7,5 +7,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         Task<HoSoYTeDTO> UpdateChuanDoanAsync(HoSoYTeUpdateDTO dto);
         Task<HoSoYTeDTO> UpdatePhuongPhapDieuTriAsync(HoSoYTeUpdateDTO dto);
+        Task<HoSoYTeDetailDto> GetMedicalRecordDetailAsync(int maHoSoYTe);
     }
 }
