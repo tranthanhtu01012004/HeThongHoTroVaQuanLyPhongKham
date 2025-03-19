@@ -1,110 +1,213 @@
-<style>
-    .form-group {
-        margin: 10px 0;
-    }
-    button {
-        margin: 0 10px;
-    }
-  </style>
-  <app-notification></app-notification>
-  <h2 class="section--title mt-2">QUẢN LÝ HỒ SƠ Y TẾ</h2>
-  <div class="recent--patients">
-    <div class="title" [hasPermission]="'QuanLy,BacSi,TroLyBacSy'">
-      <button class="add" (click)="addMedicalRecord()">
-        <span class="lock-icon"></span>
-        Thêm hồ sơ y tế
-      </button>
-    </div>
-  
-    <!-- Form thêm/sửa hồ sơ y tế -->
-    <div *ngIf="showForm" class="form-container">
-        <h3>{{ editMode ? 'Chỉnh sửa hồ sơ y tế' : 'Thêm hồ sơ y tế mới' }}</h3>
-        <form [formGroup]="medicalRecordForm" (ngSubmit)="saveMedicalRecord()">
-          <div class="form-group" hidden>
-            <label>Mã hồ sơ y tế</label>
-            <input formControlName="maHoSoYTe" class="form-control" readonly>
-          </div>
-          <div class="form-group">
-            <label>Tên bệnh nhân</label>
-            <mat-form-field appearance="fill" style="width: 100%;">
-              <input
-                matInput
-                placeholder="Nhập tên bệnh nhân"
-                [matAutocomplete]="auto"
-                formControlName="maBenhNhan">
-                <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayBenhNhan.bind(this)" (optionSelected)="onBenhNhanSelected($event)">
-                  <mat-option *ngFor="let benhNhan of filteredBenhNhan" [value]="benhNhan">
-                    {{ benhNhan.ten }} (Mã bệnh nhân: {{ benhNhan.maBenhNhan }})
-                  </mat-option>
-                  <mat-option *ngIf="filteredBenhNhan.length === 0 && medicalRecordForm.get('maBenhNhan')?.value" disabled>
-                    Không tìm thấy bệnh nhân
-                  </mat-option>
-                </mat-autocomplete>
-            </mat-form-field>
-          </div>
-          <div class="form-group">
-            <label>Chẩn đoán</label>
-            <textarea formControlName="chuanDoan" class="form-control"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Phương pháp điều trị</label>
-            <textarea formControlName="phuongPhapDieuTri" class="form-control"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Lịch sử bệnh</label>
-            <textarea formControlName="lichSuBenh" class="form-control"></textarea>
-          </div>
-          <div class="form-group">
-            <button type="submit" class="btn btn-success">Lưu</button>
-            <button type="button" (click)="cancelForm()" class="btn btn-secondary">Hủy</button>
-          </div>
-        </form>
-      </div>
-  
-    <!-- Bảng danh sách hồ sơ y tế -->
-    <div class="table table-striped">
-      <table>
-        <thead>
-          <tr>
-            <th>Mã hồ sơ y tế</th>
-            <th>Tên bệnh nhân</th>
-            <th>Chẩn đoán</th>
-            <th>Phương pháp điều trị</th>
-            <th>Lịch sử bệnh</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let hoSo of data">
-            <td>{{ hoSo.maHoSoYTe }}</td>
-            <td>{{ getTenBenhNhan(hoSo.maBenhNhan) }}</td>
-            <td>{{ hoSo.chuanDoan }}</td>
-            <td>{{ hoSo.phuongPhapDieuTri }}</td>
-            <td>{{ hoSo.lichSuBenh }}</td>
-            <td class="td-custom">
-              <button [hasPermission]="'QuanLy,BacSi,TroLyBacSy'" (click)="editMedicalRecord(hoSo)" class="btn btn-warning" style="margin-right: 10px;">
-                <span class="lock-icon"></span>
-                Sửa
-              </button>
-              <button [hasPermission]="'QuanLy,BacSi,TroLyBacSy'" (click)="deleteMedicalRecord(hoSo.maHoSoYTe)" class="btn btn-danger" style="margin-left: 10px;">
-                <span class="lock-icon"></span>
-                Xóa
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  
-    <!-- Phân trang -->
-    <div class="mt-2" *ngIf="data.length > 0">
-      <mat-paginator
-        [length]="totalItems"
-        [pageSize]="pageSize"
-        [pageSizeOptions]="[5, 10, 20]"
-        [pageIndex]="pageIndex"
-        (page)="onPageChange($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </div>
+<app-notification></app-notification>
+<h2 class="section--title mt-2">QUẢN LÝ HỒ SƠ Y TẾ</h2>
+<div class="recent--patients">
+  <div class="title" [hasPermission]="'QuanLy,BacSi,TroLyBacSy'">
+    <button class="add" (click)="addMedicalRecord()">
+      <span class="lock-icon"></span>
+      Thêm hồ sơ y tế
+    </button>
   </div>
+
+  <!-- Form thêm/sửa hồ sơ y tế -->
+  <div *ngIf="showForm" class="form-container">
+    <h3>{{ editMode ? 'Chỉnh sửa hồ sơ y tế' : 'Thêm hồ sơ y tế mới' }}</h3>
+    <form [formGroup]="medicalRecordForm" (ngSubmit)="saveMedicalRecord()">
+      <div class="form-group" hidden>
+        <label>Mã hồ sơ y tế</label>
+        <input formControlName="maHoSoYTe" class="form-control" readonly>
+      </div>
+      <div class="form-group">
+        <label>Tên bệnh nhân</label>
+        <mat-form-field appearance="fill" style="width: 100%;">
+          <input
+            matInput
+            placeholder="Nhập tên bệnh nhân"
+            [matAutocomplete]="auto"
+            formControlName="maBenhNhan">
+          <mat-autocomplete #auto="matAutocomplete" [displayWith]="displayBenhNhan.bind(this)" (optionSelected)="onBenhNhanSelected($event)">
+            <mat-option *ngFor="let benhNhan of filteredBenhNhan" [value]="benhNhan">
+              {{ benhNhan.ten }} (Mã bệnh nhân: {{ benhNhan.maBenhNhan }})
+            </mat-option>
+            <mat-option *ngIf="filteredBenhNhan.length === 0 && medicalRecordForm.get('maBenhNhan')?.value" disabled>
+              Không tìm thấy bệnh nhân
+            </mat-option>
+          </mat-autocomplete>
+        </mat-form-field>
+      </div>
+      <div class="form-group">
+        <label>Chẩn đoán</label>
+        <textarea formControlName="chuanDoan" class="form-control"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Phương pháp điều trị</label>
+        <textarea formControlName="phuongPhapDieuTri" class="form-control"></textarea>
+      </div>
+      <div class="form-group">
+        <label>Lịch sử bệnh</label>
+        <textarea formControlName="lichSuBenh" class="form-control"></textarea>
+      </div>
+      <div class="form-group">
+        <button type="submit" class="btn btn-success">Lưu</button>
+        <button type="button" (click)="cancelForm()" class="btn btn-secondary">Hủy</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Hiển thị chi tiết hồ sơ y tế -->
+  <div *ngIf="showDetail && selectedDetail" class="detail-container">
+    <!-- Nút in chi tiết hồ sơ y tế -->
+    <button class="btn btn-outline-primary mt-3 me-2" (click)="printMedicalRecordDetail()"><i class="fa-solid fa-file-pdf"></i> In chi tiết hồ sơ y tế</button>
+    <h3>Hồ sơ y tế #{{ selectedDetail.maHoSoYTe }} - {{ selectedDetail.chuanDoan }}</h3>
+    <p class="text-danger">Bệnh nhân: {{ getTenBenhNhan(selectedDetail.maBenhNhan) }}</p>
+
+    <mat-tab-group mat-align-tabs="start">
+      <!-- Tab Triệu chứng -->
+      <mat-tab label="Triệu chứng">
+        <mat-table [dataSource]="selectedDetail.trieuChung" class="mat-elevation-z8">
+          <ng-container matColumnDef="tenTrieuChung">
+            <mat-header-cell *matHeaderCellDef>Tên triệu chứng</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.tenTrieuChung }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="moTa">
+            <mat-header-cell *matHeaderCellDef>Mô tả</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.moTa }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="thoiGianXuatHien">
+            <mat-header-cell *matHeaderCellDef>Thời gian xuất hiện</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.thoiGianXuatHien | date:'dd-MM-yyyy HH:mm' }}</mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="symptomColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: symptomColumns;"></mat-row>
+        </mat-table>
+      </mat-tab>
+
+      <!-- Tab Kết quả xét nghiệm -->
+      <mat-tab label="Kết quả xét nghiệm">
+        <mat-table [dataSource]="selectedDetail.ketQuaXetNghiem" class="mat-elevation-z8">
+          <ng-container matColumnDef="tenXetNghiem">
+            <mat-header-cell *matHeaderCellDef>Tên xét nghiệm</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.tenXetNghiem }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="ketQua">
+            <mat-header-cell *matHeaderCellDef>Kết quả</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.ketQua }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="ngayXetNghiem">
+            <mat-header-cell *matHeaderCellDef>Ngày xét nghiệm</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.ngayXetNghiem | date:'dd-MM-yyyy HH:mm' }}</mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="testColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: testColumns;"></mat-row>
+        </mat-table>
+      </mat-tab>
+
+      <!-- Tab Đơn thuốc -->
+      <mat-tab label="Đơn thuốc">
+        <div *ngFor="let donThuoc of selectedDetail.donThuoc">
+          <p>Ngày kê đơn: <span class="text-danger">{{ donThuoc.ngayKeDon | date:'dd-MM-yyyy HH:mm' }}</span> - Mã hóa đơn: <span class="text-danger">{{ donThuoc.maHoaDon }}</span></p>
+          <mat-table [dataSource]="donThuoc.chiTietThuocList" class="mat-elevation-z8">
+            <ng-container matColumnDef="maThuoc">
+              <mat-header-cell *matHeaderCellDef>Tên thuốc</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ getTenThuoc(element.maThuoc) }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="soLuong">
+              <mat-header-cell *matHeaderCellDef>Số lượng</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ element.soLuong }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="cachDung">
+              <mat-header-cell *matHeaderCellDef>Cách dùng</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ element.cachDung }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="lieuLuong">
+              <mat-header-cell *matHeaderCellDef>Liều lượng</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ element.lieuLuong }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="tanSuat">
+              <mat-header-cell *matHeaderCellDef>Tần suất</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ element.tanSuat }}</mat-cell>
+            </ng-container>
+            <ng-container matColumnDef="thanhTien">
+              <mat-header-cell *matHeaderCellDef>Thành tiền</mat-header-cell>
+              <mat-cell *matCellDef="let element">{{ element.thanhTien | currency:'VND' }}</mat-cell>
+            </ng-container>
+            <mat-header-row *matHeaderRowDef="prescriptionColumns"></mat-header-row>
+            <mat-row *matRowDef="let row; columns: prescriptionColumns;"></mat-row>
+          </mat-table>
+          <button mat-raised-button color="primary" (click)="printPrescription()">In đơn thuốc</button>
+        </div>
+      </mat-tab>
+
+      <!-- Tab Kết quả điều trị -->
+      <mat-tab label="Kết quả điều trị">
+        <mat-table [dataSource]="selectedDetail.ketQuaDieuTri" class="mat-elevation-z8">
+          <ng-container matColumnDef="hieuQua">
+            <mat-header-cell *matHeaderCellDef>Hiệu quả</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.hieuQua }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="tacDungPhu">
+            <mat-header-cell *matHeaderCellDef>Tác dụng phụ</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.tacDungPhu }}</mat-cell>
+          </ng-container>
+          <ng-container matColumnDef="ngayDanhGia">
+            <mat-header-cell *matHeaderCellDef>Ngày đánh giá</mat-header-cell>
+            <mat-cell *matCellDef="let element">{{ element.ngayDanhGia | date:'dd-MM-yyyy HH:mm' }}</mat-cell>
+          </ng-container>
+          <mat-header-row *matHeaderRowDef="resultColumns"></mat-header-row>
+          <mat-row *matRowDef="let row; columns: resultColumns;"></mat-row>
+        </mat-table>
+      </mat-tab>
+    </mat-tab-group>
+    <button mat-raised-button color="secondary" (click)="resetForm()">Quay lại</button>
+  </div>
+
+  <!-- Bảng danh sách hồ sơ y tế -->
+  <div class="table table-striped" *ngIf="!showDetail">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã hồ sơ y tế</th>
+          <th>Tên bệnh nhân</th>
+          <th>Chẩn đoán</th>
+          <th>Phương pháp điều trị</th>
+          <th>Lịch sử bệnh</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let hoSo of data">
+          <td>{{ hoSo.maHoSoYTe }}</td>
+          <td>{{ getTenBenhNhan(hoSo.maBenhNhan) }}</td>
+          <td>{{ hoSo.chuanDoan }}</td>
+          <td>{{ hoSo.phuongPhapDieuTri }}</td>
+          <td>{{ hoSo.lichSuBenh }}</td>
+          <td class="td-custom">
+            <button [hasPermission]="'QuanLy,BacSi,TroLyBacSy'" (click)="viewMedicalRecordDetail(hoSo.maHoSoYTe)" class="btn btn-info" style="margin-right: 10px;">
+              <span class="lock-icon"></span>
+              Xem chi tiết
+            </button>
+            <button [hasPermission]="'QuanLy,BacSi,TroLyBacSy'" (click)="editMedicalRecord(hoSo)" class="btn btn-warning" style="margin-right: 10px;">
+              <span class="lock-icon"></span>
+              Sửa
+            </button>
+            <button [hasPermission]="'QuanLy,BacSi,TroLyBacSy'" (click)="deleteMedicalRecord(hoSo.maHoSoYTe)" class="btn btn-danger">
+              <span class="lock-icon"></span>
+              Xóa
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Phân trang -->
+  <div class="mt-2" *ngIf="data.length > 0 && !showDetail">
+    <mat-paginator
+      [length]="totalItems"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 20]"
+      [pageIndex]="pageIndex"
+      (page)="onPageChange($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
