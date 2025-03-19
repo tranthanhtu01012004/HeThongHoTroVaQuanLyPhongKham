@@ -76,6 +76,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
                 return BadRequest(ApiResponse<BenhNhanDTO>.Fail(ex.Message));
             }
         }
+        [HttpGet("by-name")]
+        [Authorize(Roles = "QuanLy,BacSi,TroLyBacSy")]
+        public async Task<IActionResult> GetBenhNhanByName([FromQuery] string name)
+        {
+            var result = await _benhNhanService.GetBenhNhanByNameAsync(name);
+            return Ok(ApiResponse<List<BenhNhanDTO>>.Success(result));
+        }
+
 
         [HttpPost]
         [Authorize(Roles = "LeTan,NhanVienHanhChinh")]

@@ -69,6 +69,14 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             return _benhNhanMapping.MapEntityToDto(benhNhan);
         }
 
+        public async Task<List<BenhNhanDTO>> GetBenhNhanByNameAsync(string name)
+        {
+            return await _benhNhanRepository.GetQueryable()
+                .Where(bn => bn.Ten.ToLower().Contains(name.ToLower()))
+                .Select(bn => _benhNhanMapping.MapEntityToDto(bn))
+                .ToListAsync();
+        }
+
         public async Task<BenhNhanDTO> GetByIdAsync(int id)
         {
             var benhNhan = await _benhNhanRepository.FindByIdAsync(id, "MaBenhNhan");

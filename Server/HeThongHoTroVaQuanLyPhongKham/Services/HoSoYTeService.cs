@@ -5,6 +5,7 @@ using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
 using HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
@@ -35,6 +36,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             var benhNhan = await _benhNhanRepository.FindByIdAsync(dto.MaBenhNhan, "MaBenhNhan");
             if (benhNhan is null)
                 throw new NotFoundException($"Bệnh nhân với ID [{dto.MaBenhNhan}] không tồn tại.");
+
+            var hsyt = await _hoSoYTeRepository.GetQueryable().FirstOrDefaultAsync(hsyt => hsyt.MaBenhNhan == dto.MaBenhNhan);
+            if (hsyt != null && hsyt.MaBenhNhan == dto.MaBenhNhan)
+                throw new InvalidOperationException("Bệnh nhân này đã có hồ sơ y tế, chỉ có thể cập nhật");
 
             return _hoSoYTeMapping.MapEntityToDto(
                 await _hoSoYTeRepository.CreateAsync(
