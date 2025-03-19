@@ -15,6 +15,7 @@ import { NhanVienComponent } from './admins/components/nhan-vien/nhan-vien.compo
 import { QuanLyLichHenComponent } from './admins/components/quan-ly-lich-hen/quan-ly-lich-hen.component';
 import { ThuocComponent } from './admins/components/thuoc/thuoc.component';
 import { FilterAppointmentsComponent } from './admins/components/appointment-filter/appointment-filter.component';
+import { HoSoYTeComponent } from './admins/components/ho-so-y-te/ho-so-y-te.component';
 
 export const routes: Routes = [
   { 
@@ -42,7 +43,8 @@ export const routes: Routes = [
       { path: 'nhan-vien', component: NhanVienComponent },
       { path: 'lich-hen', component: QuanLyLichHenComponent },
       { path: 'thuoc', component: ThuocComponent },
-      { path: 'loc-lich-hen', component: FilterAppointmentsComponent}
+      { path: 'loc-lich-hen', component: FilterAppointmentsComponent },
+      { path: 'ho-so-y-te', component: HoSoYTeComponent }
 
     ]
   }

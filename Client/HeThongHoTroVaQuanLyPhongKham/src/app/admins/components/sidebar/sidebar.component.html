@@ -51,6 +51,15 @@
           <span class="sidebar--item" style="white-space: nowrap;">Quản lý thuốc</span>
         </a>
       </li>
+
+      <li>
+        <a [routerLink]="hasPermission(['QuanLy','BacSi','YTa','TroLyBacSy','NhanVienHanhChinh']) ? '/admin/ho-so-y-te' : null"
+          [ngClass]="{'disabled-link': !hasPermission(['QuanLy','BacSi','YTa','TroLyBacSy','NhanVienHanhChinh'])}"
+          routerLinkActive="active">
+          <span class="icon icon-3"><i class="fa-solid fa-capsules"></i></span>
+          <span class="sidebar--item" style="white-space: nowrap;">Hồ sơ y tế</span>
+        </a>
+      </li>
     </ul>
     <ul class="sidebar--bottom-items">
       <li>
