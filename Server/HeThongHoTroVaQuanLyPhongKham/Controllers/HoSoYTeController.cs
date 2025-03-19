@@ -38,6 +38,25 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
+        [HttpGet("{id:int}/detail")]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh")]
+        public async Task<IActionResult> GetMedicalRecordDetailAsync(int id)
+        {
+            try
+            {
+                return Ok(ApiResponse<HoSoYTeDetailDto>.Success(
+                    await _hoSoYTeService.GetMedicalRecordDetailAsync(id)));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<string>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<string>.Fail(ex.Message));
+            }
+        }
+
         [HttpGet("{id:int}")]
         [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh,BenhNhan")]
         public async Task<IActionResult> GetById([FromRoute] int id)

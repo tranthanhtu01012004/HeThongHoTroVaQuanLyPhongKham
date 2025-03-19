@@ -4,6 +4,7 @@ import { ApiResponse } from '../../commons/ApiResponse';
 import { IHoSoYTe } from '../../interfaces/ho-so-y-te/IHoSoYTe';
 import { BaseApiService } from '../base-api-service/base-api.service';
 import { HttpClient } from '@angular/common/http';
+import { IHoSoYTeDetail } from '../../interfaces/ho-so-y-te/IHoSoYTeDetail';
 
 @Injectable({
   providedIn: 'root'
@@ -16,6 +17,10 @@ export class HoSoYTeService extends BaseApiService {
       super(http);
     }
 
+
+  getMedicalDetailRecord(id: number): Observable<ApiResponse<IHoSoYTeDetail>> {
+    return this.http.get<ApiResponse<IHoSoYTeDetail>>(`${this.apiBaseUrl}${this.endpoint}/${id}/detail`);
+  }
 
   getAllMedicalRecords(page: number, pageSize: number): Observable<ApiResponse<IHoSoYTe[]>> {
     return this.http.get<ApiResponse<IHoSoYTe[]>>(`${this.apiBaseUrl}${this.endpoint}?page=${page}&pageSize=${pageSize}`);

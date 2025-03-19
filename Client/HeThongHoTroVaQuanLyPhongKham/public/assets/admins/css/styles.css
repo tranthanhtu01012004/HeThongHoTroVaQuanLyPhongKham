@@ -612,7 +612,7 @@ th {
 }
 .table th {
     text-align: center;
-    background: #5073fb;
+    background: #1D2A4D;
     color: #fff;
     border-left: solid 1px;
   }
@@ -657,4 +657,24 @@ th {
   }
   .form-container {
     width: 50%;
+  }
+
+  .form-container, .detail-container {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  #mat-tab-label-0-0:hover {
+    cursor: pointer !important;
+    background-color: #36CEE2 !important;
+  }
+  #mat-tab-label-0-0:active {
+    cursor: pointer !important;
+    background-color: #36CEE2 !important;
+  }
+  .mat-mdc-tab-group-stretch-tabs {
+    border: solid 2px !important;
+    margin-bottom: 20px;
   }

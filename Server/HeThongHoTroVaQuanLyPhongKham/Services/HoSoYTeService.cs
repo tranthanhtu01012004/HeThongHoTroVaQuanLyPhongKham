@@ -19,8 +19,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IDonThuocService _donThuocService;
         private readonly ITrieuChungService _trieuChungService;
         private readonly IKetQuaXetNghiem _ketQuaXetNghiem;
+        private readonly IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> _donThuocChiTietMapping;
+        private readonly IMapper<TrieuChungDTO, TblTrieuChung> _trieuChungMapping;
+        private readonly IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> _ketQuaXetNghiemMapping;
+        private readonly IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> _ketQuaDieuTriMapping;
+        private readonly IMapper<DonThuocDTO, TblDonThuoc> _donThuocMapping;
 
-        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping, IRepository<TblBenhNhan> benhNhanRepository, IKetQuaDieuTriService ketQuaDieuTriService, IDonThuocService donThuocService, ITrieuChungService trieuChungService, IKetQuaXetNghiem ketQuaXetNghiem)
+        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping, IRepository<TblBenhNhan> benhNhanRepository, IKetQuaDieuTriService ketQuaDieuTriService, IDonThuocService donThuocService, ITrieuChungService trieuChungService, IKetQuaXetNghiem ketQuaXetNghiem, IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> donThuocChiTietMapping, IMapper<TrieuChungDTO, TblTrieuChung> trieuChungMapping, IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> ketQuaXetNghiemMapping, IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> ketQuaDieuTriMapping, IMapper<DonThuocDTO, TblDonThuoc> donThuocMapping)
         {
             _hoSoYTeRepository = hoSoYTeRepository;
             _hoSoYTeMapping = hoSoYTeMapping;
@@ -29,6 +34,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             _donThuocService = donThuocService;
             _trieuChungService = trieuChungService;
             _ketQuaXetNghiem = ketQuaXetNghiem;
+            _donThuocChiTietMapping = donThuocChiTietMapping;
+            _trieuChungMapping = trieuChungMapping;
+            _ketQuaXetNghiemMapping = ketQuaXetNghiemMapping;
+            _ketQuaDieuTriMapping = ketQuaDieuTriMapping;
+            _donThuocMapping = donThuocMapping;
         }
 
         public async Task<HoSoYTeDTO> AddAsync(HoSoYTeDTO dto)
@@ -76,6 +86,34 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 throw new NotFoundException($"Hồ sơ y tế với ID [{id}] không tồn tại.");
 
             return _hoSoYTeMapping.MapEntityToDto(hoSoYTe);
+        }
+
+        public async Task<HoSoYTeDetailDto> GetMedicalRecordDetailAsync(int maHoSoYTe)
+        {
+            var hoSoYTe = await _hoSoYTeRepository.GetQueryable()
+                .Include(h => h.TblTrieuChungs)
+                .Include(h => h.TblKetQuaXetNghiems)
+                .Include(h => h.TblDonThuocs)
+                    .ThenInclude(d => d.TblDonThuocChiTiets)
+                    .ThenInclude(dt => dt.MaThuocNavigation)
+                .Include(h => h.TblKetQuaDieuTris)
+                .FirstOrDefaultAsync(h => h.MaHoSoYte == maHoSoYTe);
+
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Hồ sơ y tế với ID [{maHoSoYTe}] không tồn tại.");
+
+            return new HoSoYTeDetailDto
+            {
+                MaHoSoYTe = hoSoYTe.MaHoSoYte,
+                MaBenhNhan = hoSoYTe.MaBenhNhan,
+                ChuanDoan = hoSoYTe.ChuanDoan ?? "Chưa có thông tin chuẩn đoán",
+                PhuongPhapDieuTri = hoSoYTe.PhuongPhapDieuTri ?? "Chưa có thông tin phương pháp điều trị",
+                LichSuBenh = hoSoYTe.LichSuBenh ?? "Không có thông tin lịch sử bệnh",
+                TrieuChung = hoSoYTe.TblTrieuChungs.Select(tc => _trieuChungMapping.MapEntityToDto(tc)).ToList(),
+                KetQuaXetNghiem = hoSoYTe.TblKetQuaXetNghiems.Select(kqxn => _ketQuaXetNghiemMapping.MapEntityToDto(kqxn)).ToList(),
+                DonThuoc = hoSoYTe.TblDonThuocs.Select(dt => _donThuocMapping.MapEntityToDto(dt)).ToList(),
+                KetQuaDieuTri = hoSoYTe.TblKetQuaDieuTris.Select(kqdt => _ketQuaDieuTriMapping.MapEntityToDto(kqdt)).ToList()
+            };
         }
 
         public async Task<HoSoYTeDTO> UpdateAsync(HoSoYTeDTO dto)
