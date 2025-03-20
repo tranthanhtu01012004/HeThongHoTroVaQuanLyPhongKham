@@ -130,7 +130,7 @@ GO
 CREATE TABLE tbl_don_thuoc (
     maDonThuoc      INT             NOT NULL    IDENTITY(1,1),
 	maHoSoYTe		INT				NOT NULL,
-	maHoaDon        INT				NOT NULL,
+	maHoaDon        INT				NULL,
     ngayKeDon       DATETIME        NOT NULL    DEFAULT GETDATE(),
     CONSTRAINT pk_tbl_don_thuoc PRIMARY KEY (maDonThuoc)
 );
@@ -296,7 +296,7 @@ ALTER TABLE tbl_don_thuoc
 		ON DELETE CASCADE
 			ON UPDATE CASCADE,
     CONSTRAINT fk_tbl_don_thuoc_hoa_don FOREIGN KEY (maHoaDon) REFERENCES tbl_hoa_don (maHoaDon)
-        ON DELETE CASCADE
+        ON DELETE SET NULL
             ON UPDATE CASCADE;
 GO
 
