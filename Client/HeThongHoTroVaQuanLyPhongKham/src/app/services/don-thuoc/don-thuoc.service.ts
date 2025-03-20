@@ -19,6 +19,10 @@ export class DonThuocService extends BaseApiService {
     return this.http.get<ApiResponse<IDonThuoc[]>>(`${this.apiBaseUrl}${this.endpoint}?page=${page}&pageSize=${pageSize}`);
   }
 
+  getByMaHoSoYTe(id: number): Observable<ApiResponse<IDonThuoc[]>> {
+    return this.http.get<ApiResponse<IDonThuoc[]>>(`${this.apiBaseUrl}${this.endpoint}/by-ho-so-y-te/${id}`);
+  }
+
   createService(service: IDonThuoc): Observable<ApiResponse<IDonThuoc>> {
     return this.http.post<ApiResponse<IDonThuoc>>(`${this.apiBaseUrl}${this.endpoint}`, service);
   }

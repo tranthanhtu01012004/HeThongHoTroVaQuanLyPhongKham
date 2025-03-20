@@ -21,8 +21,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IService<PhongKhamDTO> _phongKhamService;
         private readonly IJwtService _jwtService;
         private readonly IRepository<TblHoaDon> _hoaDonRepository;
+        private readonly IRepository<TblDonThuoc> _donThuocRepository;
+        private readonly IHoaDonService _hoaDonService;
+        private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository;
 
-        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IRepository<TblDichVuYTe> dichVuYTeRepository, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService, IRepository<TblHoaDon> hoaDonRepository)
+        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IRepository<TblDichVuYTe> dichVuYTeRepository, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService, IRepository<TblHoaDon> hoaDonRepository, IRepository<TblDonThuoc> donThuocRepository, IHoaDonService hoaDonService, IRepository<TblHoSoYTe> hoSoYTeRepository)
         {
             _lichHenRepository = lichHenRepository;
             _lichHenMapping = lichHenMapping;
@@ -32,6 +35,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             _phongKhamService = phongKhamService;
             _jwtService = jwtService;
             _hoaDonRepository = hoaDonRepository;
+            _donThuocRepository = donThuocRepository;
+            _hoaDonService = hoaDonService;
+            _hoSoYTeRepository = hoSoYTeRepository;
         }
 
         public Task<LichHenDTO> AddAsync(LichHenDTO dto)
@@ -165,9 +171,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             if (lichHen.TrangThai == "Hủy")
                 throw new InvalidOperationException("Lịch hẹn đã bị hủy, không thể thay đổi trạng thái.");
 
-            if (lichHen.TrangThai.Equals("Đã xác nhận"))
-                if (dto.TrangThai != "Đã hoàn thành")
-                    throw new InvalidOperationException("Lịch hẹn đã xác nhận, không thể thay đổi trạng thái ngoại trừ trạng thái đã hoàn thành.");
+            if (lichHen.TrangThai.Equals("Đã xác nhận") && dto.TrangThai != "Đã hoàn thành")
+                throw new InvalidOperationException("Lịch hẹn đã xác nhận, chỉ có thể chuyển sang đã hoàn thành.");
 
             if (lichHen.TrangThai.Equals("Đã hoàn thành"))
                 throw new UnauthorizedAccessException("Lịch hẹn đã hoàn thành, không thể thay đổi trạng thái.");
@@ -178,13 +183,65 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
             lichHen.TrangThai = dto.TrangThai;
 
-            return _lichHenMapping.MapEntityToDto(
-                await _lichHenRepository.UpdateAsync(_lichHenMapping.MapDtoToEntity(lichHen)));
+            var updatedLichHen = await _lichHenRepository.UpdateAsync(_lichHenMapping.MapDtoToEntity(lichHen));
+
+            // Tạo hóa đơn và cập nhật đơn thuốc khi lịch hẹn hoàn thành
+            if (dto.TrangThai.Equals("Đã hoàn thành"))
+            {
+                var hoaDonDto = new HoaDonDTO
+                {
+                    MaLichHen = dto.MaLichHen,
+                    TongTien = await CalculateTongTien(dto.MaLichHen),
+                    TrangThaiThanhToan = "Chưa thanh toán",
+                    NgayThanhToan = null
+                };
+                var createdHoaDon = await _hoaDonService.AddAsync(hoaDonDto);
+
+                // Lấy maHoSoYTe từ maBenhNhan của lịch hẹn
+                var maHoSoYTe = await _hoSoYTeRepository.GetQueryable()
+                    .Where(hs => hs.MaBenhNhan == lichHen.MaBenhNhan)
+                    .Select(hs => hs.MaHoSoYte)
+                    .FirstOrDefaultAsync();
+
+                if (maHoSoYTe == 0)
+                    throw new NotFoundException($"Không tìm thấy hồ sơ y tế cho bệnh nhân với mã {lichHen.MaBenhNhan}.");
+
+                // Cập nhật tất cả đơn thuốc liên quan đến maHoSoYTe
+                var donThuocs = await _donThuocRepository.GetQueryable()
+                    .Where(dt => dt.MaHoSoYte == maHoSoYTe && dt.MaHoaDon == null) // Chỉ cập nhật các đơn thuốc chưa có maHoaDon
+                    .ToListAsync();
+
+                if (!donThuocs.Any())
+                    throw new NotFoundException($"Không tìm thấy đơn thuốc nào cho hồ sơ y tế {maHoSoYTe} để cập nhật hóa đơn.");
+
+                foreach (var donThuoc in donThuocs)
+                {
+                    donThuoc.MaHoaDon = createdHoaDon.MaHoaDon;
+                    await _donThuocRepository.UpdateAsync(donThuoc);
+                }
+            }
+
+            return _lichHenMapping.MapEntityToDto(updatedLichHen);
         }
 
         Task<(IEnumerable<LichHenDTO> Items, int TotalItems, int TotalPages)> IService<LichHenDTO>.GetAllAsync(int page, int pageSize)
         {
             throw new NotImplementedException();
         }
+        private async Task<decimal> CalculateTongTien(int maLichHen)
+        {
+            var lichHen = await GetByIdAsync(maLichHen);
+            var dichVuYTe = await _dichVuYTeRepository.FindByIdAsync(lichHen.MaDichVuYTe ?? 0, "MaDichVuYte");
+            var donThuoc = await _donThuocRepository.GetQueryable()
+                .Include(dt => dt.TblDonThuocChiTiets)
+                .FirstOrDefaultAsync(dt => dt.MaHoaDon == maLichHen);
+
+            decimal tongTien = dichVuYTe?.ChiPhi ?? 0;
+            if (donThuoc != null)
+                tongTien += donThuoc.TblDonThuocChiTiets.Sum(ct => ct.ThanhTien);
+
+            return tongTien;
+        }
+
     }
 }

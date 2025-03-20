@@ -150,7 +150,7 @@ export class LichHenComponent implements OnInit {
         if (lichHenResponse.status) {
           this.notificationService.showSuccess('Đặt lịch hẹn thành công!');
           this.lichHenForm.reset();
-          this.router.navigate(['/']);
+          // this.router.navigate(['/']);
         } else {
           this.notificationService.showError(lichHenResponse.message || 'Đặt lịch hẹn thất bại.');
         }

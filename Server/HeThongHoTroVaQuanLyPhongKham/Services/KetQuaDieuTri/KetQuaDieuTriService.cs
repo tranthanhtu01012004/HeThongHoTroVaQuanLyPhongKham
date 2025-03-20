@@ -25,15 +25,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri
 
         public async Task<KetQuaDieuTriDTO> AddAsync(KetQuaDieuTriDTO dto)
         {
-            // Su dung Repo cua HoSoYTe thay vi Service de tranh loi 'circular dependency'
+            // Kiểm tra hồ sơ y tế
             var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(dto.MaHoSoYte, "MaHoSoYte");
             if (hoSoYTe is null)
                 throw new NotFoundException($"Hồ sơ y tế với ID [{dto.MaHoSoYte}] không tồn tại.");
 
-            // tuong tu
+            // Kiểm tra đơn thuốc
             var donThuoc = await _donThuocRepository.FindByIdAsync(dto.MaDonThuoc, "MaDonThuoc");
-            if (hoSoYTe is null)
+            if (donThuoc is null)
                 throw new NotFoundException($"Mã đơn thuốc với ID [{dto.MaDonThuoc}] không tồn tại.");
+
+            // Kiểm tra đơn thuốc có thuộc về hồ sơ y tế không
+            if (donThuoc.MaHoSoYte != dto.MaHoSoYte)
+                throw new InvalidOperationException($"Đơn thuốc với ID [{dto.MaDonThuoc}] không thuộc về hồ sơ y tế [{dto.MaHoSoYte}].");
 
             return _ketQuaDieuTriMapping.MapEntityToDto(
                 await _ketQuaDieuTriRepository.CreateAsync(
@@ -74,15 +78,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.KetQuaDieuTri
 
         public async Task<KetQuaDieuTriDTO> UpdateAsync(KetQuaDieuTriDTO dto)
         {
-            // Su dung Repo cua HoSoYTe thay vi Service de tranh loi 'circular dependency'
+            // Kiểm tra hồ sơ y tế
             var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(dto.MaHoSoYte, "MaHoSoYte");
             if (hoSoYTe is null)
                 throw new NotFoundException($"Hồ sơ y tế với ID [{dto.MaHoSoYte}] không tồn tại.");
 
-            // tuong tu
+            // Kiểm tra đơn thuốc
             var donThuoc = await _donThuocRepository.FindByIdAsync(dto.MaDonThuoc, "MaDonThuoc");
-            if (hoSoYTe is null)
+            if (donThuoc is null)
                 throw new NotFoundException($"Mã đơn thuốc với ID [{dto.MaDonThuoc}] không tồn tại.");
+
+            // Kiểm tra đơn thuốc có thuộc về hồ sơ y tế không
+            if (donThuoc.MaHoSoYte != dto.MaHoSoYte)
+                throw new InvalidOperationException($"Đơn thuốc với ID [{dto.MaDonThuoc}] không thuộc về hồ sơ y tế [{dto.MaHoSoYte}].");
 
             var kqDieuTriUpdate = _ketQuaDieuTriMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaKetQuaDieuTri));

@@ -60,6 +60,26 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
+        [HttpGet("by-ho-so-y-te/{maHoSoYTe}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetByMaHoSoYTe(int maHoSoYTe)
+        {
+            try
+            {
+                return Ok(ApiResponse<IEnumerable<DonThuocDTO>>.Success(
+                    await _donThuocService.GetByMaHoSoYTeAsync(maHoSoYTe), 
+                    $"Tìm thấy đơn thuốc với mã hồ sơ y tế [{maHoSoYTe}]."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<DonThuocDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<DonThuocDTO>.Fail(ex.Message));
+            }
+        }
+
         [HttpPost]
         [Authorize(Roles = "QuanLy,BacSi")]
         public async Task<IActionResult> Create([FromBody] DonThuocDTO dto)

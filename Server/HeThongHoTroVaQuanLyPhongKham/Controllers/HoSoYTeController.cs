@@ -5,6 +5,7 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using HeThongHoTroVaQuanLyPhongKham.Services;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Controllers
 {
@@ -20,7 +21,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh")]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh,KyThuatVienXetNghiem")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
@@ -39,7 +40,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet("{id:int}/detail")]
-        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh")]
+        [Authorize(Roles = "QuanLy,BacSi,YTa,TroLyBacSy,NhanVienHanhChinh,KyThuatVienXetNghiem")]
         public async Task<IActionResult> GetMedicalRecordDetailAsync(int id)
         {
             try

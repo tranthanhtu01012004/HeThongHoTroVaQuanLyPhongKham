@@ -119,6 +119,7 @@ public partial class ApplicationDbContext : DbContext
 
             entity.HasOne(d => d.MaHoaDonNavigation).WithMany(p => p.TblDonThuocs)
                 .HasForeignKey(d => d.MaHoaDon)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("fk_tbl_don_thuoc_hoa_don");
         });
 

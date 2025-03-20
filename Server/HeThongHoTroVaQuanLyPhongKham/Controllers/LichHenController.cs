@@ -13,10 +13,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
     public class LichHenController : ControllerBase
     {
         private readonly ILichHenService _lichHenService;
+        private readonly IHoSoYTeService _hoSoYTeService;
 
-        public LichHenController(ILichHenService lichHenService)
+        public LichHenController(ILichHenService lichHenService, IHoSoYTeService hoSoYTeService)
         {
             _lichHenService = lichHenService;
+            _hoSoYTeService = hoSoYTeService;
         }
 
         [HttpGet]
@@ -34,11 +36,29 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
             catch (NotFoundException ex)
             {
-                return NotFound(ApiResponse<string>.Fail(ex.Message));
+                return NotFound(ApiResponse<LichHenDTO>.Fail(ex.Message));
             }
             catch (Exception ex)
             {
-                return BadRequest(ApiResponse<string>.Fail(ex.Message));
+                return BadRequest(ApiResponse<LichHenDTO>.Fail(ex.Message));
+            }
+        }
+
+        [HttpGet("{id:int}/lich-hen")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetLichHenByMaHoSoYTe(int id)
+        {
+            try
+            {
+                return Ok(ApiResponse<IEnumerable<LichHenDTO>>.Success(await _hoSoYTeService.GetLichHenByMaHoSoYTeAsync(id), $"Đã lấy danh sách lịch hẹn với mã hồ sơ y tế [{id}]."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<LichHenDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<LichHenDTO>.Fail(ex.Message));
             }
         }
 

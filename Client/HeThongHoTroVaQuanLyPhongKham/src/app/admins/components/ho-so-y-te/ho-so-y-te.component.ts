@@ -33,6 +33,7 @@ import { TrieuChungService } from '../../../services/trieu-chung/trieu-chung.ser
 import { KetQuaXetNghiemService } from '../../../services/ket-qua-xet-nghiem/ket-qua-xet-nghiem.service';
 import { DonThuocService } from '../../../services/don-thuoc/don-thuoc.service';
 import { KetQuaDieuTriService } from '../../../services/ket-qua-dieu-tri/ket-qua-dieu-tri.service';
+import { LichHenService } from '../../../services/lich-hen/lich-hen.service';
 
 @Component({
   selector: 'app-ho-so-y-te',
@@ -74,6 +75,9 @@ export class HoSoYTeComponent implements OnInit {
   danhSachThuoc: IThuoc[] = [];
   danhSachThuocLoc: IThuoc[][] = [];
   bangTenThuoc: Map<number, string> = new Map();
+  danhSachDonThuoc: IDonThuoc[] = [];
+  danhSachLichHen: any[] = [];
+  maDichVuYTe: number | null = null;
 
   // Form triệu chứng
   hienFormTrieuChung: boolean = false;
@@ -116,9 +120,10 @@ export class HoSoYTeComponent implements OnInit {
     private ketQuaXetNghiemService: KetQuaXetNghiemService,
     private donThuocService: DonThuocService,
     private ketQuaDieuTriService: KetQuaDieuTriService,
+    private lichHenService: LichHenService
   ) {
     this.formHoSoYTe = this.fb.group({
-      maHoSoYTe: [{ value: '', disabled: true }],
+      maHoSoYTe: [0],
       maBenhNhan: [null, [Validators.required]],
       chuanDoan: [''],
       phuongPhapDieuTri: [''],
@@ -144,7 +149,7 @@ export class HoSoYTeComponent implements OnInit {
     this.formDonThuoc = this.fb.group({
       maDonThuoc: [0],
       maHoSoYTe: [0],
-      maHoaDon: [0, Validators.required],
+      maHoaDon: [null],
       ngayKeDon: ['', Validators.required],
       chiTietThuocList: this.fb.array([])
     });
@@ -152,6 +157,8 @@ export class HoSoYTeComponent implements OnInit {
     this.formKetQuaDieuTri = this.fb.group({
       maKetQuaDieuTri: [0],
       maHoSoYTe: [0],
+      maDonThuoc: [null, Validators.required],
+      maDichVuYTe: [null],
       hieuQua: ['', Validators.required],
       tacDungPhu: [''],
       ngayDanhGia: ['', Validators.required]
@@ -241,6 +248,15 @@ export class HoSoYTeComponent implements OnInit {
     return benhNhan && benhNhan.ten ? benhNhan.ten : 'Không xác định';
   }
 
+  taiDanhSachDonThuoc(maHoSoYTe: number): void {
+    this.donThuocService.getByMaHoSoYTe(maHoSoYTe).subscribe({
+      next: (res: ApiResponse<IDonThuoc[]>) => {
+        this.danhSachDonThuoc = res.status ? (res.data || []) : [];
+      },
+      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+    });
+  }
+  
   onPageChange(suKien: PageEvent): void {
     this.trangHienTai = suKien.pageIndex;
     this.soBanGhiMoiTrang = suKien.pageSize;
@@ -252,14 +268,33 @@ export class HoSoYTeComponent implements OnInit {
       next: (response: ApiResponse<IHoSoYTeDetail>) => {
         if (response.status && response.data) {
           this.chiTietHoSo = response.data;
+  
+          // Loại bỏ chi tiết thuốc trùng lặp trong chiTietThuocList
+          if (this.chiTietHoSo.donThuoc) {
+            this.chiTietHoSo.donThuoc.forEach(donThuoc => {
+              donThuoc.chiTietThuocList = donThuoc.chiTietThuocList.filter(
+                (item, index, self) =>
+                  index === self.findIndex(t =>
+                    t.maThuoc === item.maThuoc &&
+                    t.soLuong === item.soLuong &&
+                    t.cachDung === item.cachDung &&
+                    t.lieuLuong === item.lieuLuong &&
+                    t.tanSuat === item.tanSuat
+                  )
+              );
+            });
+          }
+  
           this.hienChiTiet = true;
           this.hienForm = false;
         } else {
           this.notificationService.showError(response.message || 'Không tải được chi tiết hồ sơ y tế.');
+          this.chiTietHoSo = null;
         }
       },
       error: (err: HttpErrorResponse) => {
         this.xuLyLoi(err);
+        this.chiTietHoSo = null;
       }
     });
   }
@@ -287,14 +322,17 @@ export class HoSoYTeComponent implements OnInit {
   }
 
   luuHoSo(): void {
-    if (this.formHoSoYTe.invalid) {
-      this.notificationService.showError('Vui lòng điền đầy đủ thông tin hồ sơ y tế.');
-      return;
-    }
-
-    const hoSo: IHoSoYTe = this.formHoSoYTe.getRawValue();
-    if (this.dangSua && this.hoSoDangChon?.maHoSoYTe) {
-      this.hoSoYTeService.updateMedicalRecord(this.hoSoDangChon.maHoSoYTe, hoSo).subscribe({
+    const formValue = this.formHoSoYTe.value;
+    const maHoSoYTe = this.formHoSoYTe.get('maHoSoYTe')?.value || 0;
+    const hoSo: IHoSoYTe = {
+      maHoSoYTe: maHoSoYTe,
+      maBenhNhan: formValue.maBenhNhan,
+      chuanDoan: formValue.chuanDoan,
+      phuongPhapDieuTri: formValue.phuongPhapDieuTri,
+      lichSuBenh: formValue.lichSuBenh
+    };
+    if (this.dangSuaTrieuChung) {
+      this.hoSoYTeService.updateMedicalRecord(maHoSoYTe, hoSo).subscribe({
         next: (response: ApiResponse<IHoSoYTe>) => {
           if (response.status) {
             this.notificationService.showSuccess('Cập nhật hồ sơ y tế thành công!');
@@ -606,64 +644,100 @@ export class HoSoYTeComponent implements OnInit {
   }
 
   luuDonThuoc(): void {
-    if (this.formDonThuoc.invalid) {
-      this.notificationService.showError('Vui lòng điền đầy đủ thông tin đơn thuốc.');
-      return;
-    }
-
+    this.formDonThuoc.disable();
     const formValue = this.formDonThuoc.value;
-    const maDonThuoc = this.formTrieuChung.get('maDonThuoc')?.value || 0;
-    const donThuoc: IDonThuoc = {
-      maDonThuoc: maDonThuoc,
-      maHoSoYTe: formValue.maHoSoYTe || 0,
-      maHoaDon: formValue.maHoaDon,
-      ngayKeDon: formValue.ngayKeDon,
-      chiTietThuocList: formValue.chiTietThuocList
-    };
-    if (this.dangSuaDonThuoc && this.donThuocDangChon?.maDonThuoc) {
-      this.donThuocService.updateService(this.donThuocDangChon.maDonThuoc, donThuoc).subscribe({
-        next: (response: ApiResponse<IDonThuoc>) => {
-          if (response.status) {
-            this.notificationService.showSuccess('Cập nhật đơn thuốc thành công!');
-            this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
-            this.huyFormDonThuoc();
-          } else {
-            this.notificationService.showError(response.message || 'Cập nhật thất bại.');
-          }
-        },
-        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
-      });
-    } else {
-      this.donThuocService.createService(donThuoc).subscribe({
-        next: (response: ApiResponse<IDonThuoc>) => {
-          if (response.status) {
-            this.notificationService.showSuccess('Thêm đơn thuốc thành công!');
-            this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
-            this.huyFormDonThuoc();
-          } else {
-            this.notificationService.showError(response.message || 'Thêm thất bại.');
-          }
-        },
-        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
-      });
-    }
-  }
+    const maDonThuoc = this.formDonThuoc.get('maDonThuoc')?.value || 0;
 
-  xoaDonThuoc(donThuoc: IDonThuoc): void {
-    if (donThuoc.maHoaDon) {
+    const chiTietThuocList = formValue.chiTietThuocList as any[];
+    const uniqueChiTietThuocList = chiTietThuocList.filter((item, index, self) =>
+        index === self.findIndex(t =>
+            t.maThuoc === item.maThuoc &&
+            t.soLuong === item.soLuong &&
+            t.cachDung === item.cachDung &&
+            t.lieuLuong === item.lieuLuong &&
+            t.tanSuat === item.tanSuat
+        )
+    );
+
+    if (uniqueChiTietThuocList.length !== chiTietThuocList.length) {
+        this.notificationService.showError('Danh sách chi tiết thuốc có mục trùng lặp. Vui lòng kiểm tra lại.');
+        this.formDonThuoc.enable();
+        return;
+    }
+
+    const donThuocMoi: IDonThuoc = {
+        maDonThuoc: maDonThuoc,
+        maHoSoYTe: formValue.maHoSoYTe || 0,
+        maHoaDon: formValue.maHoaDon || null,
+        ngayKeDon: formValue.ngayKeDon,
+        chiTietThuocList: uniqueChiTietThuocList
+    };
+
+    if (!this.dangSuaDonThuoc && this.chiTietHoSo?.donThuoc) {
+        const donThuocTrungLap = this.chiTietHoSo.donThuoc.find(dt =>
+            dt.ngayKeDon === donThuocMoi.ngayKeDon &&
+            JSON.stringify(dt.chiTietThuocList) === JSON.stringify(donThuocMoi.chiTietThuocList)
+        );
+
+        if (donThuocTrungLap) {
+            this.notificationService.showError('Đơn thuốc này đã tồn tại. Vui lòng kiểm tra lại.');
+            this.formDonThuoc.enable();
+            return;
+        }
+    }
+
+    if (this.dangSuaDonThuoc) {
+        this.donThuocService.updateService(maDonThuoc, donThuocMoi).subscribe({
+            next: (response: ApiResponse<IDonThuoc>) => {
+                if (response.status) {
+                    this.notificationService.showSuccess('Cập nhật đơn thuốc thành công!');
+                    this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
+                    this.huyFormDonThuoc();
+                } else {
+                    this.notificationService.showError(response.message || 'Cập nhật thất bại.');
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                this.xuLyLoi(err);
+                this.formDonThuoc.enable();
+            },
+            complete: () => this.formDonThuoc.enable() // Bật lại form sau khi hoàn tất
+        });
+    } else {
+        this.donThuocService.createService(donThuocMoi).subscribe({
+            next: (response: ApiResponse<IDonThuoc>) => {
+                if (response.status) {
+                    this.notificationService.showSuccess('Thêm đơn thuốc thành công!');
+                    this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
+                    this.huyFormDonThuoc();
+                } else {
+                    this.notificationService.showError(response.message || 'Thêm thất bại.');
+                }
+            },
+            error: (err: HttpErrorResponse) => {
+                this.xuLyLoi(err);
+                this.formDonThuoc.enable();
+            },
+            complete: () => this.formDonThuoc.enable()
+        });
+    }
+}
+
+xoaDonThuoc(donThuoc: IDonThuoc): void {
+  if (donThuoc.maHoaDon) {
       this.notificationService.showError('Không thể xóa đơn thuốc đã có hóa đơn.');
       return;
-    }
-    if (confirm('Bạn có chắc chắn muốn xóa đơn thuốc này?')) {
-      this.donThuocService.deleteService(donThuoc.maDonThuoc!).subscribe({
-        next: () => {
-          this.notificationService.showSuccess('Xóa đơn thuốc thành công!');
-          this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
-        },
-        error: (err: HttpErrorResponse) => this.xuLyLoi(err)
-      });
-    }
   }
+  if (confirm(`Bạn có chắc chắn muốn xóa đơn thuốc với mã ${donThuoc.maDonThuoc}?`)) {
+      this.donThuocService.deleteService(donThuoc.maDonThuoc!).subscribe({
+          next: () => {
+              this.notificationService.showSuccess('Xóa đơn thuốc thành công!');
+              this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
+          },
+          error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+      });
+  }
+}
 
   huyFormDonThuoc(): void {
     this.hienFormDonThuoc = false;
@@ -678,32 +752,69 @@ export class HoSoYTeComponent implements OnInit {
     this.dangSuaKetQuaDieuTri = false;
     this.ketQuaDieuTriDangChon = null;
     this.formKetQuaDieuTri.reset();
-    this.formKetQuaDieuTri.patchValue({ maHoSoYTe: this.chiTietHoSo?.maHoSoYTe });
+  
+    // Kiểm tra chiTietHoSo trước khi gán
+    if (!this.chiTietHoSo || !this.chiTietHoSo.maHoSoYTe) {
+      this.notificationService.showError('Không tìm thấy chi tiết hồ sơ y tế. Vui lòng thử lại.');
+      this.hienFormKetQuaDieuTri = false;
+      return;
+    }
+  
+    this.formKetQuaDieuTri.patchValue({ maHoSoYTe: this.chiTietHoSo.maHoSoYTe });
+  
+    // Lấy danh sách đơn thuốc
+    this.taiDanhSachDonThuoc(this.chiTietHoSo.maHoSoYTe);
+  
     this.hienFormKetQuaDieuTri = true;
   }
 
+  // suaKetQuaDieuTri để lấy danh sách đơn thuốc và gán giá trị maDonThuoc
   suaKetQuaDieuTri(ketQua: IKetQuaDieuTri): void {
     this.dangSuaKetQuaDieuTri = true;
     this.ketQuaDieuTriDangChon = ketQua;
+  
+    // Kiểm tra chiTietHoSo trước khi gán
+    if (!this.chiTietHoSo || !this.chiTietHoSo.maHoSoYTe) {
+      this.notificationService.showError('Không tìm thấy chi tiết hồ sơ y tế. Vui lòng thử lại.');
+      this.hienFormKetQuaDieuTri = false;
+      return;
+    }
+  
     this.formKetQuaDieuTri.patchValue({
       maKetQuaDieuTri: ketQua.maKetQuaDieuTri,
-      maHoSoYTe: this.chiTietHoSo?.maHoSoYTe,
+      maHoSoYTe: this.chiTietHoSo.maHoSoYTe,
+      maDonThuoc: ketQua.maDonThuoc,
       hieuQua: ketQua.hieuQua,
       tacDungPhu: ketQua.tacDungPhu,
       ngayDanhGia: new Date(ketQua.ngayDanhGia).toISOString().slice(0, 16)
     });
+  
+    // Lấy danh sách đơn thuốc
+    this.taiDanhSachDonThuoc(this.chiTietHoSo.maHoSoYTe);
+  
     this.hienFormKetQuaDieuTri = true;
   }
-
+  
   luuKetQuaDieuTri(): void {
-    if (this.formKetQuaDieuTri.invalid) {
-      this.notificationService.showError('Vui lòng điền đầy đủ thông tin kết quả điều trị.');
+    const formValue = this.formKetQuaDieuTri.value;
+    const maHoSoYTe = formValue.maHoSoYTe || this.chiTietHoSo?.maHoSoYTe;
+    if (!maHoSoYTe) {
+      this.notificationService.showError('Không tìm thấy mã hồ sơ y tế. Vui lòng thử lại.');
       return;
     }
-
-    const ketQua: IKetQuaDieuTri = this.formKetQuaDieuTri.value;
-    if (this.dangSuaKetQuaDieuTri && this.ketQuaDieuTriDangChon?.maKetQuaDieuTri) {
-      this.ketQuaDieuTriService.updateService(this.ketQuaDieuTriDangChon.maKetQuaDieuTri, ketQua).subscribe({
+  
+    const maKetQuaDieuTri = this.formKetQuaDieuTri.get('maKetQuaDieuTri')?.value || 0;
+    const ketQua: IKetQuaDieuTri = {
+      maKetQuaDieuTri: maKetQuaDieuTri,
+      maHoSoYTe: maHoSoYTe,
+      maDonThuoc: formValue.maDonThuoc,
+      hieuQua: formValue.hieuQua,
+      tacDungPhu: formValue.tacDungPhu,
+      ngayDanhGia: formValue.ngayDanhGia
+    };
+  
+    if (this.dangSuaKetQuaDieuTri) {
+      this.ketQuaDieuTriService.updateService(maKetQuaDieuTri, ketQua).subscribe({
         next: (response: ApiResponse<IKetQuaDieuTri>) => {
           if (response.status) {
             this.notificationService.showSuccess('Cập nhật kết quả điều trị thành công!');
@@ -801,9 +912,17 @@ export class HoSoYTeComponent implements OnInit {
 
   printPrescription(): void {
     if (!this.chiTietHoSo || !this.chiTietHoSo.donThuoc || this.chiTietHoSo.donThuoc.length === 0) {
-      this.notificationService.showError('Không có đơn thuốc để in.');
-      return;
+        this.notificationService.showError('Không có đơn thuốc để in.');
+        return;
     }
+
+    // Loại bỏ đơn thuốc trùng lặp
+    const uniqueDonThuoc = this.chiTietHoSo.donThuoc.filter((donThuoc, index, self) =>
+        index === self.findIndex(dt =>
+            dt.ngayKeDon === donThuoc.ngayKeDon &&
+            JSON.stringify(dt.chiTietThuocList) === JSON.stringify(donThuoc.chiTietThuocList)
+        )
+    );
 
     const { doc, pageWidth, margin, yPosition: initialY } = this.initializePDF('ĐƠN THUỐC');
     let yPosition = initialY;
@@ -827,35 +946,46 @@ export class HoSoYTeComponent implements OnInit {
     doc.setFont('Roboto', 'normal');
 
     // Vẽ bảng thuốc
-    this.chiTietHoSo.donThuoc.forEach((donThuoc) => {
-      doc.setFontSize(10);
-      doc.text(`Ngày kê đơn: ${new Date(donThuoc.ngayKeDon).toLocaleString('vi-VN')}`, margin, yPosition);
-      yPosition += 6;
+    uniqueDonThuoc.forEach((donThuoc) => {
+        doc.setFontSize(10);
+        doc.text(`Ngày kê đơn: ${new Date(donThuoc.ngayKeDon).toLocaleString('vi-VN')}`, margin, yPosition);
+        yPosition += 6;
 
-      autoTable(doc, {
-        startY: yPosition,
-        head: [['Tên thuốc', 'Số lượng', 'Cách dùng', 'Liều lượng', 'Tần suất', 'Thành tiền']],
-        body: donThuoc.chiTietThuocList.map((thuoc) => [
-          this.getTenThuoc(thuoc.maThuoc),
-          thuoc.soLuong.toString(),
-          thuoc.cachDung,
-          thuoc.lieuLuong,
-          thuoc.tanSuat,
-          thuoc.thanhTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-        ]),
-        styles: { font: 'Roboto', fontSize: 10 },
-        headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
-        margin: { left: margin, right: margin },
-        columnStyles: {
-          0: { cellWidth: 50 },
-          1: { cellWidth: 20 },
-          2: { cellWidth: 30 },
-          3: { cellWidth: 30 },
-          4: { cellWidth: 30 },
-          5: { cellWidth: 30 }
-        }
-      });
-      yPosition = (doc as any).lastAutoTable.finalY + 10;
+        // Loại bỏ chi tiết thuốc trùng lặp
+        const uniqueChiTietThuoc = donThuoc.chiTietThuocList.filter((thuoc, index, self) =>
+            index === self.findIndex(t =>
+                t.maThuoc === thuoc.maThuoc &&
+                t.soLuong === thuoc.soLuong &&
+                t.cachDung === thuoc.cachDung &&
+                t.lieuLuong === thuoc.lieuLuong &&
+                t.tanSuat === thuoc.tanSuat
+            )
+        );
+
+        autoTable(doc, {
+            startY: yPosition,
+            head: [['Tên thuốc', 'Số lượng', 'Cách dùng', 'Liều lượng', 'Tần suất', 'Thành tiền']],
+            body: uniqueChiTietThuoc.map((thuoc) => [
+                this.getTenThuoc(thuoc.maThuoc),
+                thuoc.soLuong.toString(),
+                thuoc.cachDung,
+                thuoc.lieuLuong,
+                thuoc.tanSuat,
+                thuoc.thanhTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+            ]),
+            styles: { font: 'Roboto', fontSize: 10 },
+            headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
+            margin: { left: margin, right: margin },
+            columnStyles: {
+                0: { cellWidth: 50 },
+                1: { cellWidth: 20 },
+                2: { cellWidth: 30 },
+                3: { cellWidth: 30 },
+                4: { cellWidth: 30 },
+                5: { cellWidth: 30 }
+            }
+        });
+        yPosition = (doc as any).lastAutoTable.finalY + 10;
     });
 
     // Ghi chú và chữ ký
@@ -868,7 +998,7 @@ export class HoSoYTeComponent implements OnInit {
     doc.setFont('Roboto', 'normal');
 
     doc.save(`DonThuoc_HoSo_${this.chiTietHoSo.maHoSoYTe}.pdf`);
-  }
+}
 
   printMedicalRecordDetail(): void {
     if (!this.chiTietHoSo) {
