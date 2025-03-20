@@ -1,4 +1,5 @@
 ﻿using HeThongHoTroVaQuanLyPhongKham.Dtos;
+using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.UpdateModels;
 using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
@@ -24,8 +25,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> _ketQuaXetNghiemMapping;
         private readonly IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> _ketQuaDieuTriMapping;
         private readonly IMapper<DonThuocDTO, TblDonThuoc> _donThuocMapping;
+        private readonly IRepository<TblLichHen> _lichHenRepository;
+        private readonly IMapper<LichHenDTO, TblLichHen> _lichHenMapping;
 
-        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping, IRepository<TblBenhNhan> benhNhanRepository, IKetQuaDieuTriService ketQuaDieuTriService, IDonThuocService donThuocService, ITrieuChungService trieuChungService, IKetQuaXetNghiem ketQuaXetNghiem, IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> donThuocChiTietMapping, IMapper<TrieuChungDTO, TblTrieuChung> trieuChungMapping, IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> ketQuaXetNghiemMapping, IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> ketQuaDieuTriMapping, IMapper<DonThuocDTO, TblDonThuoc> donThuocMapping)
+        public HoSoYTeService(IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoSoYTeDTO, TblHoSoYTe> hoSoYTeMapping, IRepository<TblBenhNhan> benhNhanRepository, IKetQuaDieuTriService ketQuaDieuTriService, IDonThuocService donThuocService, ITrieuChungService trieuChungService, IKetQuaXetNghiem ketQuaXetNghiem, IMapper<DonThuocChiTietDTO, TblDonThuocChiTiet> donThuocChiTietMapping, IMapper<TrieuChungDTO, TblTrieuChung> trieuChungMapping, IMapper<KetQuaXetNghiemDTO, TblKetQuaXetNghiem> ketQuaXetNghiemMapping, IMapper<KetQuaDieuTriDTO, TblKetQuaDieuTri> ketQuaDieuTriMapping, IMapper<DonThuocDTO, TblDonThuoc> donThuocMapping, IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping)
         {
             _hoSoYTeRepository = hoSoYTeRepository;
             _hoSoYTeMapping = hoSoYTeMapping;
@@ -39,6 +42,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             _ketQuaXetNghiemMapping = ketQuaXetNghiemMapping;
             _ketQuaDieuTriMapping = ketQuaDieuTriMapping;
             _donThuocMapping = donThuocMapping;
+            _lichHenRepository = lichHenRepository;
+            _lichHenMapping = lichHenMapping;
         }
 
         public async Task<HoSoYTeDTO> AddAsync(HoSoYTeDTO dto)
@@ -86,6 +91,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 throw new NotFoundException($"Hồ sơ y tế với ID [{id}] không tồn tại.");
 
             return _hoSoYTeMapping.MapEntityToDto(hoSoYTe);
+        }
+
+        public async Task<IEnumerable<LichHenDTO>> GetLichHenByMaHoSoYTeAsync(int maHoSoYTe)
+        {
+            var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(maHoSoYTe, "MaHoSoYte");
+            if (hoSoYTe is null)
+                throw new NotFoundException($"Hồ sơ y tế với ID [{maHoSoYTe}] không tồn tại.");
+
+            var lichHens = await _lichHenRepository.GetQueryable()
+                .Where(lh => lh.MaBenhNhan == hoSoYTe.MaBenhNhan)
+                .ToListAsync();
+
+            return lichHens.Select(lh => _lichHenMapping.MapEntityToDto(lh));
         }
 
         public async Task<HoSoYTeDetailDto> GetMedicalRecordDetailAsync(int maHoSoYTe)

@@ -6,8 +6,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
     {
         public int MaKetQuaDieuTri { get; set; }
 
-        [Required(ErrorMessage = "Mã dịch vụ y tế là bắt buộc")]
-        [Range(1, int.MaxValue, ErrorMessage = "Mã dịch vụ y tế phải là số dương")]
+        [Required(ErrorMessage = "Mã hồ sơ y tế là bắt buộc")]
+        [Range(1, int.MaxValue, ErrorMessage = "Mã hồ sơ y tế phải là số dương")]
         public int MaHoSoYte { get; set; }
 
         [Required(ErrorMessage = "Mã đơn thuốc là bắt buộc")]

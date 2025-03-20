@@ -41,6 +41,10 @@ export class LichHenService extends BaseApiService {
     return this.http.get<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}`);
   }
 
+  getLichHenByMaHoSoYTe(id: number): Observable<ApiResponse<any[]>> {
+    return this.http.get<ApiResponse<any[]>>(`${this.apiBaseUrl}${this.endpoint}/${id}/lich-hen`);
+  }
+
   // Thêm lịch hẹn mới
   add(lichHen: ILichHen): Observable<ApiResponse<ILichHen>> {
     return this.http.post<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}`, lichHen);

@@ -9,13 +9,13 @@ public partial class TblDonThuoc
 
     public int MaHoSoYte { get; set; }
 
-    public int MaHoaDon { get; set; }
+    public int? MaHoaDon { get; set; }
 
     public DateTime NgayKeDon { get; set; }
 
     public virtual TblHoSoYTe MaHoSoYteNavigation { get; set; } = null!;
 
-    public virtual TblHoaDon MaHoaDonNavigation { get; set; } = null!;
+    public virtual TblHoaDon? MaHoaDonNavigation { get; set; }
 
     public virtual ICollection<TblDonThuocChiTiet> TblDonThuocChiTiets { get; set; } = new List<TblDonThuocChiTiet>();
 

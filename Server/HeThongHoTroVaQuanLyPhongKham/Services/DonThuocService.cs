@@ -19,22 +19,28 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
         private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository;
         private readonly IThuocService _thuocService;
         private readonly IKetQuaDieuTriService _ketQuaDieuTriService;
+        private readonly IRepository<TblLichHen> _lichHenRepository;
+        private readonly IRepository<TblHoaDon> _hoaDonRepository;
 
-        public DonThuocService(IRepository<TblDonThuoc> donThuocRepository, IMapper<DonThuocDTO, TblDonThuoc> donThuocMapping, IRepository<TblHoSoYTe> hoSoYTeRepository, IThuocService thuocService, IKetQuaDieuTriService ketQuaDieuTriService)
+        public DonThuocService(IRepository<TblDonThuoc> donThuocRepository, IMapper<DonThuocDTO, TblDonThuoc> donThuocMapping, IRepository<TblHoSoYTe> hoSoYTeRepository, IThuocService thuocService, IKetQuaDieuTriService ketQuaDieuTriService, IRepository<TblLichHen> lichHenRepository, IRepository<TblHoaDon> hoaDonRepository)
         {
             _donThuocRepository = donThuocRepository;
             _donThuocMapping = donThuocMapping;
             _hoSoYTeRepository = hoSoYTeRepository;
             _thuocService = thuocService;
             _ketQuaDieuTriService = ketQuaDieuTriService;
+            _lichHenRepository = lichHenRepository;
+            _hoaDonRepository = hoaDonRepository;
         }
 
         public async Task<DonThuocDTO> AddAsync(DonThuocDTO dto)
         {
+            // Kiểm tra hồ sơ y tế
             var hoSoYTe = await _hoSoYTeRepository.FindByIdAsync(dto.MaHoSoYte, "MaHoSoYte");
             if (hoSoYTe is null)
                 throw new NotFoundException($"Hồ sơ y tế với ID [{dto.MaHoSoYte}] không tồn tại.");
 
+            // Kiểm tra danh sách thuốc hợp lệ
             var danhSachThuocHopLe = await _thuocService.GetAllAsync();
             foreach (var chiTiet in dto.ChiTietThuocList)
             {
@@ -42,7 +48,43 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
                     throw new NotFoundException($"Mã thuốc với ID [{chiTiet.MaThuoc}] không tồn tại.");
             }
 
+            // Kiểm tra trùng lặp đơn thuốc
+            // Lấy danh sách đơn thuốc có cùng MaHoSoYte và NgayKeDon
+            var donThuocList = await _donThuocRepository.GetQueryable()
+                .Include(dt => dt.TblDonThuocChiTiets)
+                .Where(dt => dt.MaHoSoYte == dto.MaHoSoYte && dt.NgayKeDon == dto.NgayKeDon)
+                .ToListAsync();
 
+            // So sánh danh sách chi tiết thuốc
+            var existingDonThuoc = donThuocList.FirstOrDefault(dt =>
+                dt.TblDonThuocChiTiets.Count == dto.ChiTietThuocList.Count &&
+                dt.TblDonThuocChiTiets.All(ct =>
+                    dto.ChiTietThuocList.Any(dtoCt =>
+                        dtoCt.MaThuoc == ct.MaThuoc &&
+                        dtoCt.SoLuong == ct.SoLuong &&
+                        dtoCt.CachDung == ct.CachDung &&
+                        dtoCt.LieuLuong == ct.LieuLuong &&
+                        dtoCt.TanSuat == ct.TanSuat)));
+
+            if (existingDonThuoc != null)
+                throw new InvalidOperationException("Đơn thuốc này đã tồn tại trong hệ thống.");
+
+            // Kiểm tra xem có lịch hẹn "Đã hoàn thành" nào liên quan đến maHoSoYTe không
+            var lichHen = await _lichHenRepository.GetQueryable()
+                .Where(lh => lh.MaBenhNhan == hoSoYTe.MaBenhNhan && lh.TrangThai == "Đã hoàn thành")
+                .OrderByDescending(lh => lh.NgayHen)
+                .FirstOrDefaultAsync();
+
+            if (lichHen != null)
+            {
+                var hoaDon = await _hoaDonRepository.GetQueryable()
+                    .Where(hd => hd.MaLichHen == lichHen.MaLichHen)
+                    .FirstOrDefaultAsync();
+                if (hoaDon != null)
+                    dto.MaHoaDon = hoaDon.MaHoaDon;
+            }
+
+            // Thêm đơn thuốc mới
             return _donThuocMapping.MapEntityToDto(
                 await _donThuocRepository.CreateAsync(
                     _donThuocMapping.MapDtoToEntity(dto)));
@@ -103,6 +145,15 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
 
             return _donThuocMapping.MapEntityToDto(
                 await _donThuocRepository.UpdateAsync(donThuocUpdate));
+        }
+        public async Task<IEnumerable<DonThuocDTO>> GetByMaHoSoYTeAsync(int maHoSoYTe)
+        {
+            var query = _donThuocRepository.GetQueryable()
+                .Include(d => d.TblDonThuocChiTiets)
+                .Where(dt => dt.MaHoSoYte == maHoSoYTe);
+
+            var donThuocs = await query.ToListAsync();
+            return donThuocs.Select(dt => _donThuocMapping.MapEntityToDto(dt));
         }
     }
 }

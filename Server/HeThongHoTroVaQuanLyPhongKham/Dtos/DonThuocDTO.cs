@@ -10,7 +10,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
         [Range(1, int.MaxValue, ErrorMessage = "Mã hồ sơ y tế  phải là số dương")]
         public int MaHoSoYte { get; set; }
 
-        public int MaHoaDon { get; set; }
+        public int? MaHoaDon { get; set; }
 
         [Required(ErrorMessage = "Ngày kê đơn là bắt buộc")]
         [DataType(DataType.DateTime, ErrorMessage = "Ngày kê đơn không đúng định dạng")]

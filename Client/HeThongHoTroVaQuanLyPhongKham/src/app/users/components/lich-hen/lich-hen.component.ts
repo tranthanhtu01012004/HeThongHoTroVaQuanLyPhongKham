@@ -3,7 +3,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { ApiResponse } from '../../../commons/ApiResponse';
 import { LichHenService } from '../../../services/lich-hen/lich-hen.service';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Route, Router } from '@angular/router';
 import { IDichVuYTe } from '../../../interfaces/dich-vu-y-te/IDichVuYTe';
 import { DichVuYTeService } from '../../../services/dich-vu-y-te/dich-vu-yte.service';
 import { NotificationService } from '../../../services/handle-error/NotificationService';
@@ -48,7 +48,8 @@ export class LichHenComponent implements OnInit {
     private route: ActivatedRoute,
     private dateFormatter: DateFormatterService,
     private authService: AuthService,
-    private benhNhanService: BenhNhanService
+    private benhNhanService: BenhNhanService,
+    private router: Router
   ) {
     this.lichHenForm = this.fb.group({
       MaDichVuYTe: ['', [Validators.required, Validators.min(1)]],
@@ -149,6 +150,7 @@ export class LichHenComponent implements OnInit {
         if (lichHenResponse.status) {
           this.notificationService.showSuccess('Đặt lịch hẹn thành công!');
           this.lichHenForm.reset();
+          // this.router.navigate(['/']);
         } else {
           this.notificationService.showError(lichHenResponse.message || 'Đặt lịch hẹn thất bại.');
         }

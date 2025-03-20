@@ -12,18 +12,21 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
     {
         private readonly IRepository<TblHoaDon> _hoaDonRepository;
         private readonly IMapper<HoaDonDTO, TblHoaDon> _hoaDonMapping;
-        private readonly ILichHenService _lichHenService;
+        //private readonly ILichHenService _lichHenService;
+        private readonly IRepository<TblLichHen> _lichHenRepository;
 
-        public HoaDonService(IRepository<TblHoaDon> hoaDonRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping, ILichHenService lichHenService)
+        public HoaDonService(IRepository<TblHoaDon> hoaDonRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping, IRepository<TblLichHen> lichHenRepository)
         {
             _hoaDonRepository = hoaDonRepository;
             _hoaDonMapping = hoaDonMapping;
-            _lichHenService = lichHenService;
+            _lichHenRepository = lichHenRepository;
         }
 
         public async Task<HoaDonDTO> AddAsync(HoaDonDTO dto)
         {
-            await _lichHenService.GetByIdAsync(dto.MaLichHen);
+            var lichHen = await _lichHenRepository.FindByIdAsync(dto.MaLichHen, "MaLichHen");
+            if (lichHen is null)
+                throw new NotFoundException("Lịch hẹn không tồn tại");
 
             return _hoaDonMapping.MapEntityToDto(
                 await _hoaDonRepository.CreateAsync(
@@ -62,7 +65,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             var hoaDonUpdate = _hoaDonMapping.MapDtoToEntity(
                 await GetByIdAsync(dto.MaHoaDon));
 
-            await _lichHenService.GetByIdAsync(dto.MaLichHen);
+            //await _lichHenService.GetByIdAsync(dto.MaLichHen);
 
             _hoaDonMapping.MapDtoToEntity(dto, hoaDonUpdate);
 

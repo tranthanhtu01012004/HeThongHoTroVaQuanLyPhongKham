@@ -20,7 +20,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "QuanLy,BacSi,DuocSi")]
+        [Authorize(Roles = "QuanLy,BacSi,DuocSi,KyThuatVienXetNghiem")]
         public async Task<IActionResult> GetAll([FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
             try
