@@ -49,13 +49,11 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
             }
 
             // Kiểm tra trùng lặp đơn thuốc
-            // Lấy danh sách đơn thuốc có cùng MaHoSoYte và NgayKeDon
             var donThuocList = await _donThuocRepository.GetQueryable()
                 .Include(dt => dt.TblDonThuocChiTiets)
                 .Where(dt => dt.MaHoSoYte == dto.MaHoSoYte && dt.NgayKeDon == dto.NgayKeDon)
                 .ToListAsync();
 
-            // So sánh danh sách chi tiết thuốc
             var existingDonThuoc = donThuocList.FirstOrDefault(dt =>
                 dt.TblDonThuocChiTiets.Count == dto.ChiTietThuocList.Count &&
                 dt.TblDonThuocChiTiets.All(ct =>
@@ -84,10 +82,12 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
                     dto.MaHoaDon = hoaDon.MaHoaDon;
             }
 
-            // Thêm đơn thuốc mới
-            return _donThuocMapping.MapEntityToDto(
-                await _donThuocRepository.CreateAsync(
-                    _donThuocMapping.MapDtoToEntity(dto)));
+            // Tạo entity nhưng không ánh xạ ChiTietThuocList
+            var donThuocEntity = _donThuocMapping.MapDtoToEntity(dto);
+            donThuocEntity.TblDonThuocChiTiets = null; // Ngăn lưu ChiTietThuocList
+
+            var createdDonThuoc = await _donThuocRepository.CreateAsync(donThuocEntity);
+            return _donThuocMapping.MapEntityToDto(createdDonThuoc);
         }
 
         public async Task DeleteAsync(int id)

@@ -3,6 +3,7 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
 {
@@ -21,26 +22,48 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services.DonThuocChiTiet
             _donThuocService = donThuocService;
         }
 
-        public async Task<DonThuocChiTietDTO> AddAsync(DonThuocChiTietDTO dto)
+        public async Task AddAsync(IEnumerable<DonThuocChiTietDTO> dtos)
         {
-            return _donThuocChiTietMapping.MapEntityToDto(
-                await _donThuocChiTietRepository.CreateAsync(
-                    _donThuocChiTietMapping.MapDtoToEntity(dto)));
-        }
-
-        public async Task AddAsync(IEnumerable<DonThuocChiTietDTO> dto)
-        {
-            foreach(var chiTiet in dto)
+            foreach (var chiTiet in dtos)
             {
-                var thuoc = await _thuocService.GetByIdAsync(chiTiet.MaThuoc);
-                await _donThuocService.GetByIdAsync(chiTiet.MaDonThuoc);
+                // Kiểm tra MaDonThuoc
+                var donThuoc = await _donThuocService.GetByIdAsync(chiTiet.MaDonThuoc);
+                if (donThuoc == null)
+                    throw new NotFoundException($"Đơn thuốc với ID [{chiTiet.MaDonThuoc}] không tồn tại.");
 
+                // Kiểm tra MaThuoc và lấy DonGia
+                var thuoc = await _thuocService.GetByIdAsync(chiTiet.MaThuoc);
+                if (thuoc == null)
+                    throw new NotFoundException($"Thuốc với ID [{chiTiet.MaThuoc}] không tồn tại.");
+
+                // Kiểm tra SoLuong
+                if (chiTiet.SoLuong <= 0)
+                    throw new ArgumentException("Số lượng thuốc phải lớn hơn 0.");
+
+                // Kiểm tra xem chi tiết đã tồn tại chưa
+                var existingChiTiet = await _donThuocChiTietRepository.GetQueryable()
+                    .FirstOrDefaultAsync(ct => ct.MaDonThuoc == chiTiet.MaDonThuoc &&
+                                              ct.MaThuoc == chiTiet.MaThuoc &&
+                                              ct.SoLuong == chiTiet.SoLuong &&
+                                              ct.CachDung == chiTiet.CachDung &&
+                                              ct.LieuLuong == chiTiet.LieuLuong &&
+                                              ct.TanSuat == chiTiet.TanSuat);
+
+                if (existingChiTiet != null)
+                    continue;
+
+                // Tính ThanhTien
                 chiTiet.ThanhTien = thuoc.DonGia * chiTiet.SoLuong;
 
                 await _donThuocChiTietRepository.CreateAsync(
                     _donThuocChiTietMapping.MapDtoToEntity(chiTiet)
                 );
             }
+        }
+
+        public Task<DonThuocChiTietDTO> AddAsync(DonThuocChiTietDTO dto)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task DeleteAsync(int id)

@@ -206,18 +206,19 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 if (maHoSoYTe == 0)
                     throw new NotFoundException($"Không tìm thấy hồ sơ y tế cho bệnh nhân với mã {lichHen.MaBenhNhan}.");
 
-                // Cập nhật tất cả đơn thuốc liên quan đến maHoSoYTe
+                // Cập nhật tất cả đơn thuốc liên quan đến maHoSoYTe (nếu có)
                 var donThuocs = await _donThuocRepository.GetQueryable()
                     .Where(dt => dt.MaHoSoYte == maHoSoYTe && dt.MaHoaDon == null) // Chỉ cập nhật các đơn thuốc chưa có maHoaDon
                     .ToListAsync();
 
-                if (!donThuocs.Any())
-                    throw new NotFoundException($"Không tìm thấy đơn thuốc nào cho hồ sơ y tế {maHoSoYTe} để cập nhật hóa đơn.");
-
-                foreach (var donThuoc in donThuocs)
+                // Nếu không có đơn thuốc nào cần cập nhật -> bỏ qua
+                if (donThuocs.Any())
                 {
-                    donThuoc.MaHoaDon = createdHoaDon.MaHoaDon;
-                    await _donThuocRepository.UpdateAsync(donThuoc);
+                    foreach (var donThuoc in donThuocs)
+                    {
+                        donThuoc.MaHoaDon = createdHoaDon.MaHoaDon;
+                        await _donThuocRepository.UpdateAsync(donThuoc);
+                    }
                 }
             }
 
@@ -228,20 +229,63 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         {
             throw new NotImplementedException();
         }
+
         private async Task<decimal> CalculateTongTien(int maLichHen)
         {
+            // Lấy thông tin lịch hẹn
             var lichHen = await GetByIdAsync(maLichHen);
+            if (lichHen == null)
+                throw new NotFoundException($"Không tìm thấy lịch hẹn với mã {maLichHen}.");
+
+            // Lấy chi phí dịch vụ y tế
             var dichVuYTe = await _dichVuYTeRepository.FindByIdAsync(lichHen.MaDichVuYTe ?? 0, "MaDichVuYte");
-            var donThuoc = await _donThuocRepository.GetQueryable()
-                .Include(dt => dt.TblDonThuocChiTiets)
-                .FirstOrDefaultAsync(dt => dt.MaHoaDon == maLichHen);
-
             decimal tongTien = dichVuYTe?.ChiPhi ?? 0;
-            if (donThuoc != null)
-                tongTien += donThuoc.TblDonThuocChiTiets.Sum(ct => ct.ThanhTien);
+            Console.WriteLine($"Chi phí dịch vụ y tế: {tongTien}");
 
+            // Lấy maHoSoYTe từ maBenhNhan của lịch hẹn
+            var maHoSoYTe = await _hoSoYTeRepository.GetQueryable()
+                .Where(hs => hs.MaBenhNhan == lichHen.MaBenhNhan)
+                .Select(hs => hs.MaHoSoYte)
+                .FirstOrDefaultAsync();
+
+            if (maHoSoYTe == 0)
+            {
+                Console.WriteLine($"Không tìm thấy maHoSoYTe cho bệnh nhân {lichHen.MaBenhNhan}.");
+                return tongTien;
+            }
+
+            // Lấy tất cả đơn thuốc liên quan đến maHoSoYTe và chưa có MaHoaDon
+            var donThuocs = await _donThuocRepository.GetQueryable()
+                .Include(dt => dt.TblDonThuocChiTiets)
+                .Where(dt => dt.MaHoSoYte == maHoSoYTe && dt.MaHoaDon == null)
+                .ToListAsync();
+
+            if (donThuocs.Any())
+            {
+                decimal tongTienDonThuoc = 0;
+                foreach (var donThuoc in donThuocs)
+                {
+                    if (donThuoc.TblDonThuocChiTiets != null && donThuoc.TblDonThuocChiTiets.Any())
+                    {
+                        decimal thanhTienDonThuoc = donThuoc.TblDonThuocChiTiets.Sum(ct => ct.ThanhTien);
+                        tongTienDonThuoc += thanhTienDonThuoc;
+                        Console.WriteLine($"Đơn thuốc {donThuoc.MaDonThuoc}: Thành tiền = {thanhTienDonThuoc}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Đơn thuốc {donThuoc.MaDonThuoc}: Không có chi tiết đơn thuốc.");
+                    }
+                }
+                tongTien += tongTienDonThuoc;
+                Console.WriteLine($"Tổng tiền đơn thuốc: {tongTienDonThuoc}");
+            }
+            else
+            {
+                Console.WriteLine($"Không tìm thấy đơn thuốc nào cho maHoSoYTe = {maHoSoYTe} với MaHoaDon = null.");
+            }
+
+            Console.WriteLine($"Tổng tiền cuối cùng: {tongTien}");
             return tongTien;
         }
-
     }
 }
