@@ -124,7 +124,7 @@ export class DangNhapComponent {
         this.router.navigateByUrl(returnUrl);
       } else {
         if (role !== 'BenhNhan') {
-          this.router.navigate(['/admin/dashboard']);
+          this.router.navigate(['/admin/bao-cao']);
         } else {
           this.router.navigate(['/dich-vu']);
         }

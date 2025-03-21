@@ -83,6 +83,7 @@ builder.Services.AddScoped<IVaiTroService, VaiTroService>();
 builder.Services.AddScoped<IPhongKhamService, PhongKhamService>();
 builder.Services.AddScoped<INhanVienService, NhanVienService>();
 builder.Services.AddScoped<IBenhNhanService, BenhNhanService>();
+builder.Services.AddScoped<IBaoCaoService, BaoCaoService>();
 
 // Đăng ký IPasswordHasher
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
