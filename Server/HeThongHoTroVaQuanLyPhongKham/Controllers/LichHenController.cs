@@ -22,7 +22,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "QuanLy,BacSi,YTa,LeTan,NhanVienHanhChinh")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(
             [FromQuery] int page = 1, [FromQuery] int pageSize = 10,
             [FromQuery] DateTime? ngayHen = null,

@@ -1,0 +1,140 @@
+<style>
+    .form-group { margin: 10px 0; }
+    button { margin: 0 10px; }
+    .table-striped th, .table-striped td { padding: 10px; text-align: left; }
+    .td-custom { display: flex; gap: 10px; }
+    h4.mt-4 { font-size: 1.25rem; color: #333; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+    .form-group, .form-container, .form-control {
+      background-color: #fff !important; 
+      color: black;
+    }
+    th {
+      text-align: center !important;
+    }
+  </style>
+  
+  <app-notification></app-notification>
+  
+  <h2 class="section--title mt-2">QUẢN LÝ HÓA ĐƠN</h2>
+  
+  <div class="recent--invoices">
+    <div class="row">
+              <!-- Bảng Hóa đơn chưa thanh toán -->
+      <div class="col-6">
+        <h4 class="mt-4">HÓA ĐƠN CHƯA THANH TOÁN</h4>
+        <div class="table table-striped">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã hóa đơn</th>
+                <th>Mã lịch hẹn</th>
+                <th>Tên bệnh nhân</th>
+                <th>Dịch vụ y tế</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let hoaDon of danhSachChuaThanhToan.slice(trangHienTaiChuaThanhToan * soLuongMoiTrangChuaThanhToan, (trangHienTaiChuaThanhToan + 1) * soLuongMoiTrangChuaThanhToan)">
+                <td>{{ hoaDon.maHoaDon }}</td>
+                <td>{{ hoaDon.maLichHen }}</td>
+                <td>{{ getTenBenhNhan(hoaDon.maLichHen) }}</td>
+                <td>{{ getTenDichVu(hoaDon.maLichHen) }}</td>
+                <td>{{ hoaDon.tongTien | currency:'VND':'symbol':'1.0-0' }}</td>
+                <td>
+                  <div class="select-container">
+                    <select [hasPermission]="'QuanLy,KeToan'" (change)="updateTrangThaiThanhToan(hoaDon, $event)">
+                      <option *ngFor="let trangThai of trangThaiThanhToanOptions" [value]="trangThai" [selected]="hoaDon.trangThaiThanhToan === trangThai">
+                        {{ trangThai }}
+                      </option>
+                    </select>
+                    <span class="lock-icon"></span>
+                  </div>
+                </td>
+                <td class="td-custom">
+                  <button [hasPermission]="'QuanLy,KeToan'" (click)="deleteHoaDon(hoaDon.maHoaDon)" class="btn btn-danger">
+                    <span class="lock-icon"></span>Xóa
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="danhSachChuaThanhToan.length === 0">
+                <td colspan="8" class="text-center">Không có hóa đơn nào chưa thanh toán.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-2" *ngIf="danhSachChuaThanhToan.length > 0">
+          <mat-paginator
+            #paginatorChuaThanhToan
+            [length]="soLuongChuaThanhToan"
+            [pageSize]="soLuongMoiTrangChuaThanhToan"
+            [pageSizeOptions]="[3, 6, 9]"
+            [pageIndex]="trangHienTaiChuaThanhToan"
+            (page)="xuLyThayDoiTrangChuaThanhToan($event)"
+            showFirstLastButtons>
+          </mat-paginator>
+        </div>
+      </div>
+
+      <!-- Bảng Hóa đơn đã thanh toán -->
+      <div class="col-6">
+        <h4 class="mt-4">HÓA ĐƠN ĐÃ THANH TOÁN</h4>
+        <div class="table table-striped">
+          <table>
+            <thead>
+              <tr>
+                <th>Mã hóa đơn</th>
+                <th>Mã lịch hẹn</th>
+                <th>Tên bệnh nhân</th>
+                <th>Dịch vụ y tế</th>
+                <th>Tổng tiền</th>
+                <th>Ngày thanh toán</th>
+                <th>Trạng thái</th>
+                <th>Hành động</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let hoaDon of danhSachDaThanhToan.slice(trangHienTaiDaThanhToan * soLuongMoiTrangDaThanhToan, (trangHienTaiDaThanhToan + 1) * soLuongMoiTrangDaThanhToan)">
+                <td>{{ hoaDon.maHoaDon }}</td>
+                <td>{{ hoaDon.maLichHen }}</td>
+                <td>{{ getTenBenhNhan(hoaDon.maLichHen) }}</td>
+                <td>{{ getTenDichVu(hoaDon.maLichHen) }}</td>
+                <td>{{ hoaDon.tongTien | currency:'VND':'symbol':'1.0-0' }}</td>
+                <td>{{ hoaDon.ngayThanhToan | date:'dd/MM/yyyy HH:mm' }}</td>
+                <td>
+                  <div class="select-container">
+                    <select [hasPermission]="'QuanLy,KeToan'" (change)="updateTrangThaiThanhToan(hoaDon, $event)">
+                      <option *ngFor="let trangThai of trangThaiThanhToanOptions" [value]="trangThai" [selected]="hoaDon.trangThaiThanhToan === trangThai">
+                        {{ trangThai }}
+                      </option>
+                    </select>
+                    <span class="lock-icon"></span>
+                  </div>
+                </td>
+                <td class="td-custom">
+                  <button [hasPermission]="'QuanLy,KeToan'" (click)="deleteHoaDon(hoaDon.maHoaDon)" class="btn btn-danger">
+                    <span class="lock-icon"></span>Xóa
+                  </button>
+                </td>
+              </tr>
+              <tr *ngIf="danhSachDaThanhToan.length === 0">
+                <td colspan="8" class="text-center">Không có hóa đơn nào đã thanh toán.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="mt-2" *ngIf="danhSachDaThanhToan.length > 0">
+          <mat-paginator
+            #paginatorDaThanhToan
+            [length]="soLuongDaThanhToan"
+            [pageSize]="soLuongMoiTrangDaThanhToan"
+            [pageSizeOptions]="[3, 6, 9]"
+            [pageIndex]="trangHienTaiDaThanhToan"
+            (page)="xuLyThayDoiTrangDaThanhToan($event)"
+            showFirstLastButtons>
+          </mat-paginator>
+        </div>
+      </div>
+    </div>
+  </div>

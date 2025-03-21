@@ -247,7 +247,7 @@ export class HoSoYTeComponent implements OnInit {
     const benhNhan = this.danhSachBenhNhan.find(bn => bn.maBenhNhan === maBenhNhan);
     return benhNhan && benhNhan.ten ? benhNhan.ten : 'Không xác định';
   }
-
+  
   taiDanhSachDonThuoc(maHoSoYTe: number): void {
     this.donThuocService.getByMaHoSoYTe(maHoSoYTe).subscribe({
       next: (res: ApiResponse<IDonThuoc[]>) => {
@@ -256,7 +256,14 @@ export class HoSoYTeComponent implements OnInit {
       error: (err: HttpErrorResponse) => this.xuLyLoi(err)
     });
   }
-  
+  getDonThuocInfo(maDonThuoc: number | null): string {
+    if (!maDonThuoc) return 'Không xác định';
+    const donThuoc = this.danhSachDonThuoc.find(dt => dt.maDonThuoc === maDonThuoc);
+    if (donThuoc) {
+      return `Đơn thuốc #${donThuoc.maDonThuoc} - Ngày kê: ${new Date(donThuoc.ngayKeDon).toLocaleString('vi-VN')}`;
+    }
+    return 'Không xác định';
+  }
   onPageChange(suKien: PageEvent): void {
     this.trangHienTai = suKien.pageIndex;
     this.soBanGhiMoiTrang = suKien.pageSize;
@@ -284,6 +291,9 @@ export class HoSoYTeComponent implements OnInit {
               );
             });
           }
+  
+          // Tải danh sách đơn thuốc
+          this.taiDanhSachDonThuoc(this.chiTietHoSo.maHoSoYTe);
   
           this.hienChiTiet = true;
           this.hienForm = false;
@@ -331,7 +341,7 @@ export class HoSoYTeComponent implements OnInit {
       phuongPhapDieuTri: formValue.phuongPhapDieuTri,
       lichSuBenh: formValue.lichSuBenh
     };
-    if (this.dangSuaTrieuChung) {
+    if (this.dangSua) {
       this.hoSoYTeService.updateMedicalRecord(maHoSoYTe, hoSo).subscribe({
         next: (response: ApiResponse<IHoSoYTe>) => {
           if (response.status) {
@@ -898,8 +908,7 @@ xoaDonThuoc(donThuoc: IDonThuoc): void {
     doc.text('Địa chỉ: 331/QL1A, Phường An Phú Đông, Quận 12, TP. HCM', pageWidth / 2, yPosition, { align: 'center' });
     yPosition += 5;
     doc.text('Điện thoại: (028) 1234 5678', pageWidth / 2, yPosition, { align: 'center' });
-  
-    yPosition += logoHeight + 2;
+    yPosition += 10;
     
     return { doc, pageWidth, margin, yPosition };
   }
@@ -1000,163 +1009,169 @@ xoaDonThuoc(donThuoc: IDonThuoc): void {
     doc.save(`DonThuoc_HoSo_${this.chiTietHoSo.maHoSoYTe}.pdf`);
 }
 
-  printMedicalRecordDetail(): void {
-    if (!this.chiTietHoSo) {
-      this.notificationService.showError('Không có hồ sơ y tế để in.');
-      return;
-    }
-
-    const { doc, pageWidth, margin, yPosition: initialY } = this.initializePDF('CHI TIẾT HỒ SƠ Y TẾ');
-    let yPosition = initialY;
-
-    // Thông tin cơ bản
-    doc.setFontSize(12);
-    doc.setFont('Roboto', 'normal');
-    doc.text(`Mã hồ sơ y tế: ${this.chiTietHoSo.maHoSoYTe}`, margin, yPosition);
-    yPosition += 6;
-    doc.text(`Bệnh nhân: ${this.getTenBenhNhan(this.chiTietHoSo.maBenhNhan)}`, margin, yPosition);
-    yPosition += 6;
-    doc.text(`Chuẩn đoán: ${this.chiTietHoSo.chuanDoan}`, margin, yPosition);
-    yPosition += 6;
-    doc.text(`Phương pháp điều trị: ${this.chiTietHoSo.phuongPhapDieuTri || 'Không có'}`, margin, yPosition);
-    yPosition += 6;
-    doc.text(`Lịch sử bệnh: ${this.chiTietHoSo.lichSuBenh || 'Không có'}`, margin, yPosition);
-    yPosition += 6;
-    yPosition = this.drawLine(doc, margin, yPosition, pageWidth);
-
-    // 1. Triệu chứng
-    doc.setFontSize(14);
-    doc.setFont('Roboto', 'bold');
-    doc.text('Triệu chứng', margin, yPosition);
-    yPosition += 8;
-    doc.setFont('Roboto', 'normal');
-    if (this.chiTietHoSo.trieuChung && this.chiTietHoSo.trieuChung.length > 0) {
-      autoTable(doc, {
-        startY: yPosition,
-        head: [['Tên triệu chứng', 'Mô tả', 'Thời gian xuất hiện']],
-        body: this.chiTietHoSo.trieuChung.map((tc) => [
-          tc.tenTrieuChung,
-          tc.moTa || 'Không có',
-          new Date(tc.thoiGianXuatHien).toLocaleString('vi-VN')
-        ]),
-        styles: { font: 'Roboto', fontSize: 10 },
-        headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
-        margin: { left: margin, right: margin },
-        columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 80 }, 2: { cellWidth: 50 } }
-      });
-      yPosition = (doc as any).lastAutoTable.finalY + 10;
-    } else {
-      doc.setFontSize(10);
-      doc.text('Không có triệu chứng.', margin, yPosition);
-      yPosition += 10;
-    }
-
-    // 2. Kết quả xét nghiệm
-    doc.setFontSize(14);
-    doc.setFont('Roboto', 'bold');
-    doc.text('Kết quả xét nghiệm', margin, yPosition);
-    yPosition += 8;
-    doc.setFont('Roboto', 'normal');
-    if (this.chiTietHoSo.ketQuaXetNghiem && this.chiTietHoSo.ketQuaXetNghiem.length > 0) {
-      autoTable(doc, {
-        startY: yPosition,
-        head: [['Tên xét nghiệm', 'Kết quả', 'Ngày xét nghiệm']],
-        body: this.chiTietHoSo.ketQuaXetNghiem.map((kq) => [
-          kq.tenXetNghiem,
-          kq.ketQua,
-          new Date(kq.ngayXetNghiem).toLocaleString('vi-VN')
-        ]),
-        styles: { font: 'Roboto', fontSize: 10 },
-        headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
-        margin: { left: margin, right: margin },
-        columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 80 }, 2: { cellWidth: 50 } }
-      });
-      yPosition = (doc as any).lastAutoTable.finalY + 10;
-    } else {
-      doc.setFontSize(10);
-      doc.text('Không có kết quả xét nghiệm.', margin, yPosition);
-      yPosition += 10;
-    }
-
-    // 3. Đơn thuốc
-    doc.setFontSize(14);
-    doc.setFont('Roboto', 'bold');
-    doc.text('Đơn thuốc', margin, yPosition);
-    yPosition += 8;
-    doc.setFont('Roboto', 'normal');
-    if (this.chiTietHoSo.donThuoc && this.chiTietHoSo.donThuoc.length > 0) {
-      this.chiTietHoSo.donThuoc.forEach((donThuoc) => {
-        doc.setFontSize(10);
-        doc.text(`Ngày kê đơn: ${new Date(donThuoc.ngayKeDon).toLocaleString('vi-VN')}`, margin, yPosition);
-        yPosition += 6;
-
-        autoTable(doc, {
-          startY: yPosition,
-          head: [['Tên thuốc', 'Số lượng', 'Cách dùng', 'Liều lượng', 'Tần suất', 'Thành tiền']],
-          body: donThuoc.chiTietThuocList.map((thuoc) => [
-            this.getTenThuoc(thuoc.maThuoc), // Sử dụng getTenThuoc thay vì hardcode
-            thuoc.soLuong.toString(),
-            thuoc.cachDung,
-            thuoc.lieuLuong,
-            thuoc.tanSuat,
-            thuoc.thanhTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
-          ]),
-          styles: { font: 'Roboto', fontSize: 10 },
-          headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
-          margin: { left: margin, right: margin },
-          columnStyles: {
-            0: { cellWidth: 50 },
-            1: { cellWidth: 20 },
-            2: { cellWidth: 30 },
-            3: { cellWidth: 30 },
-            4: { cellWidth: 30 },
-            5: { cellWidth: 30 }
-          }
-        });
-        yPosition = (doc as any).lastAutoTable.finalY + 10;
-      });
-    } else {
-      doc.setFontSize(10);
-      doc.text('Không có đơn thuốc.', margin, yPosition);
-      yPosition += 10;
-    }
-
-    // 4. Kết quả điều trị
-    doc.setFontSize(14);
-    doc.setFont('Roboto', 'bold');
-    doc.text('Kết quả điều trị', margin, yPosition);
-    yPosition += 8;
-    doc.setFont('Roboto', 'normal');
-    if (this.chiTietHoSo.ketQuaDieuTri && this.chiTietHoSo.ketQuaDieuTri.length > 0) {
-      autoTable(doc, {
-        startY: yPosition,
-        head: [['Hiệu quả', 'Tác dụng phụ', 'Ngày đánh giá']],
-        body: this.chiTietHoSo.ketQuaDieuTri.map((kq) => [
-          kq.hieuQua,
-          kq.tacDungPhu || 'Không có',
-          new Date(kq.ngayDanhGia).toLocaleString('vi-VN')
-        ]),
-        styles: { font: 'Roboto', fontSize: 10 },
-        headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
-        margin: { left: margin, right: margin },
-        columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 80 }, 2: { cellWidth: 50 } }
-      });
-      yPosition = (doc as any).lastAutoTable.finalY + 10;
-    } else {
-      doc.setFontSize(10);
-      doc.text('Không có kết quả điều trị.', margin, yPosition);
-      yPosition += 10;
-    }
-
-    // Ghi chú và chữ ký
-    doc.setFontSize(10);
-    doc.text('Ghi chú: Thông tin trên được trích từ hệ thống quản lý phòng khám.', margin, yPosition);
-    yPosition += 10;
-    doc.setFont('Roboto', 'bold');
-    doc.text('Bác sĩ phụ trách', pageWidth - margin - 30, yPosition);
-    doc.line(pageWidth - margin - 30, yPosition + 2, pageWidth - margin, yPosition + 2);
-    doc.setFont('Roboto', 'normal');
-
-    doc.save(`HoSoYTe_ChiTiet_${this.chiTietHoSo.maHoSoYTe}.pdf`);
+printMedicalRecordDetail(): void {
+  if (!this.chiTietHoSo) {
+    this.notificationService.showError('Không có hồ sơ y tế để in.');
+    return;
   }
+
+  const { doc, pageWidth, margin, yPosition: initialY } = this.initializePDF('CHI TIẾT HỒ SƠ Y TẾ');
+  let yPosition = initialY;
+
+  // Thông tin cơ bản
+  doc.setFontSize(12);
+  doc.setFont('Roboto', 'normal');
+  doc.text(`Mã hồ sơ y tế: ${this.chiTietHoSo.maHoSoYTe}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Bệnh nhân: ${this.getTenBenhNhan(this.chiTietHoSo.maBenhNhan)}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Chuẩn đoán: ${this.chiTietHoSo.chuanDoan}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Phương pháp điều trị: ${this.chiTietHoSo.phuongPhapDieuTri || 'Không có'}`, margin, yPosition);
+  yPosition += 6;
+  doc.text(`Lịch sử bệnh: ${this.chiTietHoSo.lichSuBenh || 'Không có'}`, margin, yPosition);
+  yPosition += 6;
+  yPosition = this.drawLine(doc, margin, yPosition, pageWidth);
+
+  // 1. Triệu chứng
+  doc.setFontSize(14);
+  doc.setFont('Roboto', 'bold');
+  doc.text('Triệu chứng', margin, yPosition);
+  yPosition += 8;
+  doc.setFont('Roboto', 'normal');
+  if (this.chiTietHoSo.trieuChung && this.chiTietHoSo.trieuChung.length > 0) {
+    autoTable(doc, {
+      startY: yPosition,
+      head: [['Tên triệu chứng', 'Mô tả', 'Thời gian xuất hiện']],
+      body: this.chiTietHoSo.trieuChung.map((tc) => [
+        tc.tenTrieuChung,
+        tc.moTa || 'Không có',
+        new Date(tc.thoiGianXuatHien).toLocaleString('vi-VN')
+      ]),
+      styles: { font: 'Roboto', fontSize: 10 },
+      headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
+      margin: { left: margin, right: margin },
+      columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 80 }, 2: { cellWidth: 50 } }
+    });
+    yPosition = (doc as any).lastAutoTable.finalY + 10;
+  } else {
+    doc.setFontSize(10);
+    doc.text('Không có triệu chứng.', margin, yPosition);
+    yPosition += 10;
+  }
+
+  // 2. Kết quả xét nghiệm
+  doc.setFontSize(14);
+  doc.setFont('Roboto', 'bold');
+  doc.text('Kết quả xét nghiệm', margin, yPosition);
+  yPosition += 8;
+  doc.setFont('Roboto', 'normal');
+  if (this.chiTietHoSo.ketQuaXetNghiem && this.chiTietHoSo.ketQuaXetNghiem.length > 0) {
+    autoTable(doc, {
+      startY: yPosition,
+      head: [['Tên xét nghiệm', 'Kết quả', 'Ngày xét nghiệm']],
+      body: this.chiTietHoSo.ketQuaXetNghiem.map((kq) => [
+        kq.tenXetNghiem,
+        kq.ketQua,
+        new Date(kq.ngayXetNghiem).toLocaleString('vi-VN')
+      ]),
+      styles: { font: 'Roboto', fontSize: 10 },
+      headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
+      margin: { left: margin, right: margin },
+      columnStyles: { 0: { cellWidth: 60 }, 1: { cellWidth: 80 }, 2: { cellWidth: 50 } }
+    });
+    yPosition = (doc as any).lastAutoTable.finalY + 10;
+  } else {
+    doc.setFontSize(10);
+    doc.text('Không có kết quả xét nghiệm.', margin, yPosition);
+    yPosition += 10;
+  }
+
+  // 3. Đơn thuốc
+  doc.setFontSize(14);
+  doc.setFont('Roboto', 'bold');
+  doc.text('Đơn thuốc', margin, yPosition);
+  yPosition += 8;
+  doc.setFont('Roboto', 'normal');
+  if (this.chiTietHoSo.donThuoc && this.chiTietHoSo.donThuoc.length > 0) {
+    this.chiTietHoSo.donThuoc.forEach((donThuoc) => {
+      doc.setFontSize(10);
+      doc.text(`Ngày kê đơn: ${new Date(donThuoc.ngayKeDon).toLocaleString('vi-VN')}`, margin, yPosition);
+      yPosition += 6;
+
+      autoTable(doc, {
+        startY: yPosition,
+        head: [['Tên thuốc', 'Số lượng', 'Cách dùng', 'Liều lượng', 'Tần suất', 'Thành tiền']],
+        body: donThuoc.chiTietThuocList.map((thuoc) => [
+          this.getTenThuoc(thuoc.maThuoc),
+          thuoc.soLuong.toString(),
+          thuoc.cachDung,
+          thuoc.lieuLuong,
+          thuoc.tanSuat,
+          thuoc.thanhTien.toLocaleString('vi-VN', { style: 'currency', currency: 'VND' })
+        ]),
+        styles: { font: 'Roboto', fontSize: 10 },
+        headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
+        margin: { left: margin, right: margin },
+        columnStyles: {
+          0: { cellWidth: 50 },
+          1: { cellWidth: 20 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 30 },
+          4: { cellWidth: 30 },
+          5: { cellWidth: 30 }
+        }
+      });
+      yPosition = (doc as any).lastAutoTable.finalY + 10;
+    });
+  } else {
+    doc.setFontSize(10);
+    doc.text('Không có đơn thuốc.', margin, yPosition);
+    yPosition += 10;
+  }
+
+  // 4. Kết quả điều trị
+  doc.setFontSize(14);
+  doc.setFont('Roboto', 'bold');
+  doc.text('Kết quả điều trị', margin, yPosition);
+  yPosition += 8;
+  doc.setFont('Roboto', 'normal');
+  if (this.chiTietHoSo.ketQuaDieuTri && this.chiTietHoSo.ketQuaDieuTri.length > 0) {
+    autoTable(doc, {
+      startY: yPosition,
+      head: [['Đơn thuốc', 'Hiệu quả', 'Tác dụng phụ', 'Ngày đánh giá']],
+      body: this.chiTietHoSo.ketQuaDieuTri.map((kq) => [
+        this.getDonThuocInfo(kq.maDonThuoc), // Thêm thông tin đơn thuốc
+        kq.hieuQua,
+        kq.tacDungPhu || 'Không có',
+        new Date(kq.ngayDanhGia).toLocaleString('vi-VN')
+      ]),
+      styles: { font: 'Roboto', fontSize: 10 },
+      headStyles: { fillColor: [0, 102, 204], textColor: [255, 255, 255] },
+      margin: { left: margin, right: margin },
+      columnStyles: {
+        0: { cellWidth: 60 }, // Đơn thuốc
+        1: { cellWidth: 40 }, // Hiệu quả
+        2: { cellWidth: 50 }, // Tác dụng phụ
+        3: { cellWidth: 40 }  // Ngày đánh giá
+      }
+    });
+    yPosition = (doc as any).lastAutoTable.finalY + 10;
+  } else {
+    doc.setFontSize(10);
+    doc.text('Không có kết quả điều trị.', margin, yPosition);
+    yPosition += 10;
+  }
+
+  // Ghi chú và chữ ký
+  doc.setFontSize(10);
+  doc.text('Ghi chú: Thông tin trên được trích từ hệ thống quản lý phòng khám.', margin, yPosition);
+  yPosition += 10;
+  doc.setFont('Roboto', 'bold');
+  doc.text('Bác sĩ phụ trách', pageWidth - margin - 30, yPosition);
+  doc.line(pageWidth - margin - 30, yPosition + 2, pageWidth - margin, yPosition + 2);
+  doc.setFont('Roboto', 'normal');
+
+  doc.save(`HoSoYTe_ChiTiet_${this.chiTietHoSo.maHoSoYTe}.pdf`);
+}
 }

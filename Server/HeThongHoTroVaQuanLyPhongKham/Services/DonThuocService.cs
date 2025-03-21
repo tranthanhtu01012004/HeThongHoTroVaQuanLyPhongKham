@@ -21,8 +21,11 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
         private readonly IKetQuaDieuTriService _ketQuaDieuTriService;
         private readonly IRepository<TblLichHen> _lichHenRepository;
         private readonly IRepository<TblHoaDon> _hoaDonRepository;
+        private readonly IMapper<HoaDonDTO, TblHoaDon> _hoaDonMapping;
+        private readonly IJwtService _jwtService;
+        private readonly IRepository<TblNhanVien> _nhanVienRepository;
 
-        public DonThuocService(IRepository<TblDonThuoc> donThuocRepository, IMapper<DonThuocDTO, TblDonThuoc> donThuocMapping, IRepository<TblHoSoYTe> hoSoYTeRepository, IThuocService thuocService, IKetQuaDieuTriService ketQuaDieuTriService, IRepository<TblLichHen> lichHenRepository, IRepository<TblHoaDon> hoaDonRepository)
+        public DonThuocService(IRepository<TblDonThuoc> donThuocRepository, IMapper<DonThuocDTO, TblDonThuoc> donThuocMapping, IRepository<TblHoSoYTe> hoSoYTeRepository, IThuocService thuocService, IKetQuaDieuTriService ketQuaDieuTriService, IRepository<TblLichHen> lichHenRepository, IRepository<TblHoaDon> hoaDonRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping, IJwtService jwtService, IRepository<TblNhanVien> nhanVienRepository)
         {
             _donThuocRepository = donThuocRepository;
             _donThuocMapping = donThuocMapping;
@@ -31,6 +34,9 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
             _ketQuaDieuTriService = ketQuaDieuTriService;
             _lichHenRepository = lichHenRepository;
             _hoaDonRepository = hoaDonRepository;
+            _hoaDonMapping = hoaDonMapping;
+            _jwtService = jwtService;
+            _nhanVienRepository = nhanVienRepository;
         }
 
         public async Task<DonThuocDTO> AddAsync(DonThuocDTO dto)
@@ -67,26 +73,51 @@ namespace HeThongHoTroVaQuanLydonThuoc.Services
             if (existingDonThuoc != null)
                 throw new InvalidOperationException("Đơn thuốc này đã tồn tại trong hệ thống.");
 
-            // Kiểm tra xem có lịch hẹn "Đã hoàn thành" nào liên quan đến maHoSoYTe không
+            // Kiểm tra lịch hẹn "Đã xác nhận" hoặc "Khám trực tiếp" liên quan đến MaBenhNhan
             var lichHen = await _lichHenRepository.GetQueryable()
-                .Where(lh => lh.MaBenhNhan == hoSoYTe.MaBenhNhan && lh.TrangThai == "Đã hoàn thành")
+                .Where(lh => lh.MaBenhNhan == hoSoYTe.MaBenhNhan &&
+                             (lh.TrangThai == "Đã xác nhận" || lh.TrangThai == "Khám trực tiếp"))
                 .OrderByDescending(lh => lh.NgayHen)
                 .FirstOrDefaultAsync();
 
-            if (lichHen != null)
+            if (lichHen == null)
             {
-                var hoaDon = await _hoaDonRepository.GetQueryable()
-                    .Where(hd => hd.MaLichHen == lichHen.MaLichHen)
+                // Trường hợp 1: Không có lịch hẹn (khám trực tiếp) -> Tạo một phiên khám mặc định
+                var maTaiKhoan = _jwtService.GetMaTaiKhoan();
+                if (maTaiKhoan is null)
+                    throw new UnauthorizedAccessException("Không thể xác định tài khoản từ JWT. Vui lòng đăng nhập lại.");
+
+                var nhanVien = await _nhanVienRepository.GetQueryable()
+                    .Where(nv => nv.MaTaiKhoan == maTaiKhoan)
                     .FirstOrDefaultAsync();
-                if (hoaDon != null)
-                    dto.MaHoaDon = hoaDon.MaHoaDon;
+                if (nhanVien is null)
+                    throw new NotFoundException($"Không tìm thấy nhân viên với MaTaiKhoan [{maTaiKhoan}].");
+
+                var lichHenMoi = new TblLichHen
+                {
+                    MaBenhNhan = hoSoYTe.MaBenhNhan,
+                    TrangThai = "Khám trực tiếp",
+                    NgayHen = DateTime.Now,
+                    MaDichVuYte = null,
+                    MaNhanVien = nhanVien.MaNhanVien
+                };
+                await _lichHenRepository.CreateAsync(lichHenMoi);
+            }
+
+            // Tính ThanhTien cho từng chi tiết thuốc
+            foreach (var chiTiet in dto.ChiTietThuocList)
+            {
+                var thuoc = await _thuocService.GetByIdAsync(chiTiet.MaThuoc);
+                chiTiet.ThanhTien = thuoc.DonGia * chiTiet.SoLuong;
             }
 
             // Tạo entity nhưng không ánh xạ ChiTietThuocList
             var donThuocEntity = _donThuocMapping.MapDtoToEntity(dto);
-            donThuocEntity.TblDonThuocChiTiets = null; // Ngăn lưu ChiTietThuocList
+            donThuocEntity.TblDonThuocChiTiets = null;
 
+            // Lưu đơn thuốc (không gán MaHoaDon)
             var createdDonThuoc = await _donThuocRepository.CreateAsync(donThuocEntity);
+
             return _donThuocMapping.MapEntityToDto(createdDonThuoc);
         }
 

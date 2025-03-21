@@ -345,86 +345,90 @@
       </div>
       </mat-tab>
 
-      <!-- Tab Kết quả điều trị -->
-      <mat-tab label="Kết quả điều trị">
-        <div class="title" [hasPermission]="'BacSi,TroLyBacSy'">
-          <button class="add" (click)="moFormThemKetQuaDieuTri()">
-            <span class="lock-icon"></span>
-            Thêm kết quả điều trị
-          </button>
+<!-- Tab Kết quả điều trị -->
+<mat-tab label="Kết quả điều trị">
+  <div class="title" [hasPermission]="'BacSi,TroLyBacSy'">
+    <button class="add" (click)="moFormThemKetQuaDieuTri()">
+      <span class="lock-icon"></span>
+      Thêm kết quả điều trị
+    </button>
+  </div>
+  <!-- Form thêm/sửa kết quả điều trị -->
+  <div *ngIf="hienFormKetQuaDieuTri">
+    <h3>{{ dangSuaKetQuaDieuTri ? 'Sửa Kết Quả Điều Trị' : 'Thêm Kết Quả Điều Trị' }}</h3>
+    <form [formGroup]="formKetQuaDieuTri" (ngSubmit)="luuKetQuaDieuTri()">
+      <div class="form-group">
+        <label for="maDonThuoc">Mã Đơn Thuốc</label>
+        <select formControlName="maDonThuoc" class="form-control" required>
+          <option value="" disabled>Chọn đơn thuốc</option>
+          <option *ngFor="let donThuoc of danhSachDonThuoc" [value]="donThuoc.maDonThuoc">
+            Đơn thuốc #{{ donThuoc.maDonThuoc }} - Ngày kê: {{ donThuoc.ngayKeDon | date:'dd/MM/yyyy HH:mm' }}
+          </option>
+        </select>
+        <div *ngIf="formKetQuaDieuTri.get('maDonThuoc')?.invalid && formKetQuaDieuTri.get('maDonThuoc')?.touched" class="text-danger">
+          Vui lòng chọn một đơn thuốc.
         </div>
-      <!-- Trong ho-so-y-te.component.html -->
-      <div *ngIf="hienFormKetQuaDieuTri">
-        <h3>{{ dangSuaKetQuaDieuTri ? 'Sửa Kết Quả Điều Trị' : 'Thêm Kết Quả Điều Trị' }}</h3>
-        <form [formGroup]="formKetQuaDieuTri" (ngSubmit)="luuKetQuaDieuTri()">
-          <div class="form-group">
-            <label for="maDonThuoc">Mã Đơn Thuốc</label>
-            <select formControlName="maDonThuoc" class="form-control" required>
-              <option value="" disabled>Chọn đơn thuốc</option>
-              <option *ngFor="let donThuoc of danhSachDonThuoc" [value]="donThuoc.maDonThuoc">
-                Đơn thuốc #{{ donThuoc.maDonThuoc }} - Ngày kê: {{ donThuoc.ngayKeDon | date:'dd/MM/yyyy HH:mm' }}
-              </option>
-            </select>
-            <div *ngIf="formKetQuaDieuTri.get('maDonThuoc')?.invalid && formKetQuaDieuTri.get('maDonThuoc')?.touched" class="text-danger">
-              Vui lòng chọn một đơn thuốc.
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="hieuQua">Hiệu Quả</label>
-            <input type="text" formControlName="hieuQua" class="form-control" required />
-            <div *ngIf="formKetQuaDieuTri.get('hieuQua')?.invalid && formKetQuaDieuTri.get('hieuQua')?.touched" class="text-danger">
-              Vui lòng nhập hiệu quả điều trị.
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label for="tacDungPhu">Tác Dụng Phụ</label>
-            <input type="text" formControlName="tacDungPhu" class="form-control" />
-          </div>
-
-          <div class="form-group">
-            <label for="ngayDanhGia">Ngày Đánh Giá</label>
-            <input type="datetime-local" formControlName="ngayDanhGia" class="form-control" required />
-            <div *ngIf="formKetQuaDieuTri.get('ngayDanhGia')?.invalid && formKetQuaDieuTri.get('ngayDanhGia')?.touched" class="text-danger">
-              Vui lòng chọn ngày đánh giá.
-            </div>
-          </div>
-
-          <button type="submit" class="btn btn-primary" [disabled]="formKetQuaDieuTri.invalid">Lưu</button>
-          <button type="button" class="btn btn-secondary" (click)="huyFormKetQuaDieuTri()">Hủy</button>
-        </form>
       </div>
-        <div class="table table-striped">
-          <table>
-            <thead>
-              <tr>
-                <th>Hiệu quả</th>
-                <th>Tác dụng phụ</th>
-                <th>Ngày đánh giá</th>
-                <th>Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr *ngFor="let ketQua of chiTietHoSo.ketQuaDieuTri">
-                <td>{{ ketQua.hieuQua }}</td>
-                <td>{{ ketQua.tacDungPhu || 'Không có' }}</td>
-                <td>{{ ketQua.ngayDanhGia | date:'dd-MM-yyyy HH:mm' }}</td>
-                <td class="td-custom">
-                  <button [hasPermission]="'BacSi,TroLyBacSy'" (click)="suaKetQuaDieuTri(ketQua)" class="btn btn-warning" style="margin-right: 10px;">
-                    <span class="lock-icon"></span>
-                    Sửa
-                  </button>
-                  <button [hasPermission]="'BacSi,TroLyBacSy'" (click)="xoaKetQuaDieuTri(ketQua)" class="btn btn-danger" style="margin-left: 10px;">
-                    <span class="lock-icon"></span>
-                    Xóa
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+
+      <div class="form-group">
+        <label for="hieuQua">Hiệu Quả</label>
+        <input type="text" formControlName="hieuQua" class="form-control" required />
+        <div *ngIf="formKetQuaDieuTri.get('hieuQua')?.invalid && formKetQuaDieuTri.get('hieuQua')?.touched" class="text-danger">
+          Vui lòng nhập hiệu quả điều trị.
         </div>
-      </mat-tab>
+      </div>
+
+      <div class="form-group">
+        <label for="tacDungPhu">Tác Dụng Phụ</label>
+        <input type="text" formControlName="tacDungPhu" class="form-control" />
+      </div>
+
+      <div class="form-group">
+        <label for="ngayDanhGia">Ngày Đánh Giá</label>
+        <input type="datetime-local" formControlName="ngayDanhGia" class="form-control" required />
+        <div *ngIf="formKetQuaDieuTri.get('ngayDanhGia')?.invalid && formKetQuaDieuTri.get('ngayDanhGia')?.touched" class="text-danger">
+          Vui lòng chọn ngày đánh giá.
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="formKetQuaDieuTri.invalid">Lưu</button>
+      <button type="button" class="btn btn-secondary" (click)="huyFormKetQuaDieuTri()">Hủy</button>
+    </form>
+  </div>
+
+  <!-- Bảng hiển thị kết quả điều trị -->
+  <div class="table table-striped">
+    <table>
+      <thead>
+        <tr>
+          <th>Đơn thuốc</th> <!-- Thêm cột Đơn thuốc -->
+          <th>Hiệu quả</th>
+          <th>Tác dụng phụ</th>
+          <th>Ngày đánh giá</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let ketQua of chiTietHoSo.ketQuaDieuTri">
+          <td>{{ getDonThuocInfo(ketQua.maDonThuoc) }}</td> <!-- Hiển thị thông tin đơn thuốc -->
+          <td>{{ ketQua.hieuQua }}</td>
+          <td>{{ ketQua.tacDungPhu || 'Không có' }}</td>
+          <td>{{ ketQua.ngayDanhGia | date:'dd-MM-yyyy HH:mm' }}</td>
+          <td class="td-custom">
+            <button [hasPermission]="'BacSi,TroLyBacSy'" (click)="suaKetQuaDieuTri(ketQua)" class="btn btn-warning" style="margin-right: 10px;">
+              <span class="lock-icon"></span>
+              Sửa
+            </button>
+            <button [hasPermission]="'BacSi,TroLyBacSy'" (click)="xoaKetQuaDieuTri(ketQua)" class="btn btn-danger" style="margin-left: 10px;">
+              <span class="lock-icon"></span>
+              Xóa
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</mat-tab>
     </mat-tab-group>
     <button class="btn btn-secondary" (click)="resetForm()">Quay lại</button>
   </div>

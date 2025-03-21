@@ -24,8 +24,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IRepository<TblDonThuoc> _donThuocRepository;
         private readonly IHoaDonService _hoaDonService;
         private readonly IRepository<TblHoSoYTe> _hoSoYTeRepository;
+        private readonly IMapper<HoaDonDTO, TblHoaDon> _hoaDonMapping;
 
-        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IRepository<TblDichVuYTe> dichVuYTeRepository, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService, IRepository<TblHoaDon> hoaDonRepository, IRepository<TblDonThuoc> donThuocRepository, IHoaDonService hoaDonService, IRepository<TblHoSoYTe> hoSoYTeRepository)
+        public LichHenService(IRepository<TblLichHen> lichHenRepository, IMapper<LichHenDTO, TblLichHen> lichHenMapping, IRepository<TblBenhNhan> benhNhanRepository, IService<NhanVienDTO> nhanVienService, IRepository<TblDichVuYTe> dichVuYTeRepository, IService<PhongKhamDTO> phongKhamService, IJwtService jwtService, IRepository<TblHoaDon> hoaDonRepository, IRepository<TblDonThuoc> donThuocRepository, IHoaDonService hoaDonService, IRepository<TblHoSoYTe> hoSoYTeRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping)
         {
             _lichHenRepository = lichHenRepository;
             _lichHenMapping = lichHenMapping;
@@ -38,6 +39,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             _donThuocRepository = donThuocRepository;
             _hoaDonService = hoaDonService;
             _hoSoYTeRepository = hoSoYTeRepository;
+            _hoaDonMapping = hoaDonMapping;
         }
 
         public Task<LichHenDTO> AddAsync(LichHenDTO dto)
@@ -185,17 +187,54 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
             var updatedLichHen = await _lichHenRepository.UpdateAsync(_lichHenMapping.MapDtoToEntity(lichHen));
 
-            // Tạo hóa đơn và cập nhật đơn thuốc khi lịch hẹn hoàn thành
+            // Tạo hoặc cập nhật hóa đơn khi lịch hẹn hoàn thành
             if (dto.TrangThai.Equals("Đã hoàn thành"))
             {
-                var hoaDonDto = new HoaDonDTO
+                // Kiểm tra xem đã có hóa đơn nào liên quan đến lịch hẹn chưa
+                var existingHoaDon = await _hoaDonRepository.GetQueryable()
+                    .Where(hd => hd.MaLichHen == dto.MaLichHen)
+                    .FirstOrDefaultAsync();
+
+                HoaDonDTO createdHoaDon;
+                if (existingHoaDon != null)
                 {
-                    MaLichHen = dto.MaLichHen,
-                    TongTien = await CalculateTongTien(dto.MaLichHen),
-                    TrangThaiThanhToan = "Chưa thanh toán",
-                    NgayThanhToan = null
-                };
-                var createdHoaDon = await _hoaDonService.AddAsync(hoaDonDto);
+                    // Có hóa đơn trước đó, kiểm tra trạng thái thanh toán
+                    if (existingHoaDon.TrangThaiThanhToan == "Đã thanh toán")
+                    {
+                        // Trường hợp 2 & 4: Hóa đơn đã thanh toán -> Tạo hóa đơn mới
+                        var hoaDonDto = new HoaDonDTO
+                        {
+                            MaHoaDon = 0,
+                            MaLichHen = dto.MaLichHen,
+                            TongTien = await CalculateTongTien(dto.MaLichHen),
+                            TrangThaiThanhToan = "Chưa thanh toán",
+                            NgayThanhToan = null
+                        };
+                        createdHoaDon = await _hoaDonService.AddAsync(hoaDonDto);
+                    }
+                    else
+                    {
+                        // Trường hợp 3: Hóa đơn chưa thanh toán -> Cộng dồn
+                        var hoaDonDtoToUpdate = _hoaDonMapping.MapEntityToDto(existingHoaDon);
+                        hoaDonDtoToUpdate.TongTien += await CalculateTongTien(dto.MaLichHen);
+                        var updatedHoaDon = _hoaDonMapping.MapDtoToEntity(hoaDonDtoToUpdate);
+                        await _hoaDonRepository.UpdateAsync(updatedHoaDon);
+                        createdHoaDon = hoaDonDtoToUpdate;
+                    }
+                }
+                else
+                {
+                    // Không có hóa đơn trước đó, tạo hóa đơn mới
+                    var hoaDonDto = new HoaDonDTO
+                    {
+                        MaHoaDon = 0,
+                        MaLichHen = dto.MaLichHen,
+                        TongTien = await CalculateTongTien(dto.MaLichHen),
+                        TrangThaiThanhToan = "Chưa thanh toán",
+                        NgayThanhToan = null
+                    };
+                    createdHoaDon = await _hoaDonService.AddAsync(hoaDonDto);
+                }
 
                 // Lấy maHoSoYTe từ maBenhNhan của lịch hẹn
                 var maHoSoYTe = await _hoSoYTeRepository.GetQueryable()
@@ -206,12 +245,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 if (maHoSoYTe == 0)
                     throw new NotFoundException($"Không tìm thấy hồ sơ y tế cho bệnh nhân với mã {lichHen.MaBenhNhan}.");
 
-                // Cập nhật tất cả đơn thuốc liên quan đến maHoSoYTe (nếu có)
+                // Cập nhật tất cả đơn thuốc liên quan đến maHoSoYTe
                 var donThuocs = await _donThuocRepository.GetQueryable()
-                    .Where(dt => dt.MaHoSoYte == maHoSoYTe && dt.MaHoaDon == null) // Chỉ cập nhật các đơn thuốc chưa có maHoaDon
+                    .Where(dt => dt.MaHoSoYte == maHoSoYTe)
                     .ToListAsync();
 
-                // Nếu không có đơn thuốc nào cần cập nhật -> bỏ qua
                 if (donThuocs.Any())
                 {
                     foreach (var donThuoc in donThuocs)
@@ -254,10 +292,10 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 return tongTien;
             }
 
-            // Lấy tất cả đơn thuốc liên quan đến maHoSoYTe và chưa có MaHoaDon
+            // Lấy tất cả đơn thuốc liên quan đến maHoSoYTe
             var donThuocs = await _donThuocRepository.GetQueryable()
                 .Include(dt => dt.TblDonThuocChiTiets)
-                .Where(dt => dt.MaHoSoYte == maHoSoYTe && dt.MaHoaDon == null)
+                .Where(dt => dt.MaHoSoYte == maHoSoYTe)
                 .ToListAsync();
 
             if (donThuocs.Any())
@@ -281,7 +319,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             }
             else
             {
-                Console.WriteLine($"Không tìm thấy đơn thuốc nào cho maHoSoYTe = {maHoSoYTe} với MaHoaDon = null.");
+                Console.WriteLine($"Không tìm thấy đơn thuốc nào cho maHoSoYTe = {maHoSoYTe}.");
             }
 
             Console.WriteLine($"Tổng tiền cuối cùng: {tongTien}");

@@ -7,7 +7,7 @@ public partial class TblHoaDon
 {
     public int MaHoaDon { get; set; }
 
-    public int MaLichHen { get; set; }
+    public int? MaLichHen { get; set; }
 
     public decimal TongTien { get; set; }
 
@@ -15,7 +15,7 @@ public partial class TblHoaDon
 
     public string TrangThaiThanhToan { get; set; } = null!;
 
-    public virtual TblLichHen MaLichHenNavigation { get; set; } = null!;
+    public virtual TblLichHen? MaLichHenNavigation { get; set; }
 
     public virtual ICollection<TblDonThuoc> TblDonThuocs { get; set; } = new List<TblDonThuoc>();
 }

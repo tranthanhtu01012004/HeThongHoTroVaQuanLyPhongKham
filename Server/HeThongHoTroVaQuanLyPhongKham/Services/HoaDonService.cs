@@ -5,6 +5,7 @@ using HeThongHoTroVaQuanLyPhongKham.Exceptions;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Models;
 using HeThongHoTroVaQuanLyPhongKham.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace HeThongHoTroVaQuanLyPhongKham.Services
 {
@@ -14,19 +15,26 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         private readonly IMapper<HoaDonDTO, TblHoaDon> _hoaDonMapping;
         //private readonly ILichHenService _lichHenService;
         private readonly IRepository<TblLichHen> _lichHenRepository;
+        private readonly IRepository<TblDonThuoc> _donThuocRepository;
 
-        public HoaDonService(IRepository<TblHoaDon> hoaDonRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping, IRepository<TblLichHen> lichHenRepository)
+        public HoaDonService(IRepository<TblHoaDon> hoaDonRepository, IMapper<HoaDonDTO, TblHoaDon> hoaDonMapping, IRepository<TblLichHen> lichHenRepository, IRepository<TblDonThuoc> donThuocRepository)
         {
             _hoaDonRepository = hoaDonRepository;
             _hoaDonMapping = hoaDonMapping;
             _lichHenRepository = lichHenRepository;
+            _donThuocRepository = donThuocRepository;
         }
 
         public async Task<HoaDonDTO> AddAsync(HoaDonDTO dto)
         {
-            var lichHen = await _lichHenRepository.FindByIdAsync(dto.MaLichHen, "MaLichHen");
-            if (lichHen is null)
-                throw new NotFoundException("Lịch hẹn không tồn tại");
+            if (dto.MaLichHen.HasValue)
+            {
+                var lichHen = await _lichHenRepository.FindByIdAsync(dto.MaLichHen.Value, "MaLichHen");
+                if (lichHen is null)
+                    throw new NotFoundException($"Lịch hẹn với ID [{dto.MaLichHen.Value}] không tồn tại.");
+            }
+
+            dto.MaHoaDon = 0;
 
             return _hoaDonMapping.MapEntityToDto(
                 await _hoaDonRepository.CreateAsync(
@@ -35,9 +43,21 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
 
         public async Task DeleteAsync(int id)
         {
-            await _hoaDonRepository.DeleteAsync(
-                _hoaDonMapping.MapDtoToEntity(
-                    await GetByIdAsync(id)));
+            var hoaDon = await _hoaDonRepository.FindByIdAsync(id, "MaHoaDon");
+            if (hoaDon == null)
+                throw new NotFoundException($"Hóa đơn với ID [{id}] không tồn tại.");
+
+            var donThuocs = await _donThuocRepository.GetQueryable()
+                .Where(dt => dt.MaHoaDon == id)
+                .ToListAsync();
+
+            foreach (var donThuoc in donThuocs)
+            {
+                donThuoc.MaHoaDon = null;
+                await _donThuocRepository.UpdateAsync(donThuoc);
+            }
+
+            await _hoaDonRepository.DeleteAsync(hoaDon);
         }
 
         public async Task<(IEnumerable<HoaDonDTO> Items, int TotalItems, int TotalPages)> GetAllAsync(int page, int pageSize)
@@ -46,7 +66,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             var totalPages = CalculateTotalPages(totalItems, pageSize);
             var pageSkip = CalculatePageSkip(page, pageSize);
 
-            var hoaDons = await _hoaDonRepository.FindAllAsync(page, pageSize, pageSkip, "MaDonThuoc");
+            var hoaDons = await _hoaDonRepository.FindAllAsync(page, pageSize, pageSkip, "MaHoaDon");
             var dtoList = hoaDons.Select(t => _hoaDonMapping.MapEntityToDto(t));
             return (dtoList, totalItems, totalPages);
         }
@@ -93,6 +113,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             
             if (dto.TrangThaiThanhToan is null)
                 throw new NotFoundException($"Hóa đơn với ID [{dto.MaHoaDon}] không có giá trị trạng thái thanh toán.");
+
+            if (hoaDon.TrangThaiThanhToan.Equals("Đã thanh toán"))
+                throw new UnauthorizedAccessException("Hóa đơn đã thanh toán, không thể thay đổi trạng thái.");
 
             hoaDon.TrangThaiThanhToan = dto.TrangThaiThanhToan;
 
