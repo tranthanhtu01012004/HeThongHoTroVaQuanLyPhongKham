@@ -179,7 +179,7 @@ GO
 -- Bảng HoaDon
 CREATE TABLE tbl_hoa_don (
     maHoaDon               INT             NOT NULL		IDENTITY(1,1),
-    maLichHen              INT             NOT NULL,
+    maLichHen              INT             NULL,
     tongTien               DECIMAL(15, 2)  NOT NULL,
     ngayThanhToan          DATETIME        NULL			DEFAULT GETDATE(),
     trangThaiThanhToan     NVARCHAR(50)    NOT NULL		DEFAULT N'Chưa thanh toán',
