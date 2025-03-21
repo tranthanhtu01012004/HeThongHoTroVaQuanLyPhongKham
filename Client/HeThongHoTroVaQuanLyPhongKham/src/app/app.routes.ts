@@ -16,6 +16,8 @@ import { QuanLyLichHenComponent } from './admins/components/quan-ly-lich-hen/qua
 import { ThuocComponent } from './admins/components/thuoc/thuoc.component';
 import { FilterAppointmentsComponent } from './admins/components/appointment-filter/appointment-filter.component';
 import { HoSoYTeComponent } from './admins/components/ho-so-y-te/ho-so-y-te.component';
+import { HoaDonComponent } from './admins/components/hoa-don/hoa-don.component';
+import { BaoCaoComponent } from './admins/components/bao-cao/bao-cao.component';
 
 export const routes: Routes = [
   { 
@@ -37,14 +39,15 @@ export const routes: Routes = [
     component: AdminLayoutComponent,
     canActivate: [adminAuthGuard],
     children: [
-      // { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      { path: 'bao-cao', component: BaoCaoComponent },
       { path: 'phong-kham', component: PhongKhamComponent },
       { path: 'dich-vu-y-te', component: DichVuYTeComponent },
       { path: 'nhan-vien', component: NhanVienComponent },
       { path: 'lich-hen', component: QuanLyLichHenComponent },
       { path: 'thuoc', component: ThuocComponent },
       { path: 'loc-lich-hen', component: FilterAppointmentsComponent },
-      { path: 'ho-so-y-te', component: HoSoYTeComponent }
+      { path: 'ho-so-y-te', component: HoSoYTeComponent },
+      { path: 'hoa-don', component: HoaDonComponent }
 
     ]
   }

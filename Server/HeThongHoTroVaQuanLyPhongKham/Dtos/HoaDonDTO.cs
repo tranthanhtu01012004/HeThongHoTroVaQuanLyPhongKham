@@ -6,9 +6,8 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
     {
         public int MaHoaDon { get; set; }
 
-        [Required(ErrorMessage = "Mã lịch hẹn là bắt buộc")]
         [Range(1, int.MaxValue, ErrorMessage = "Mã lịch hẹn phải là số dương")]
-        public int MaLichHen { get; set; }
+        public int? MaLichHen { get; set; }
 
         [Required(ErrorMessage = "Tổng tiền là bắt buộc")]
         [Range(0, 9999999999.99, ErrorMessage = "Tổng tiền phải từ 0 đến 9,999,999,999.99")]

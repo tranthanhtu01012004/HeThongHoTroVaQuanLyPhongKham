@@ -1,28 +1,114 @@
 .lock-icon {
-    display: none;
-    margin-right: 5px;
-  }
-  
-  .locked .lock-icon {
-    display: inline-block;
-  }
-  
-  .locked .lock-icon::before {
-    content: '\f023'; /* FontAwesome lock icon */
-    font-family: 'Font Awesome 6 Free';
-    font-weight: 900;
-    font-size: 20px;
-  }
-  
-  button[disabled], a.locked {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-  /* Style cho link bị vô hiệu hóa */
+  display: none;
+  margin-right: 5px;
+}
+
+.locked .lock-icon {
+  display: inline-block;
+}
+
+.locked .lock-icon::before {
+  content: '\f023'; /* FontAwesome lock icon */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 20px;
+}
+
+button[disabled], a.locked {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+/* Style cho link bị vô hiệu hóa */
+.disabled-link {
+opacity: 0.5; /* Làm mờ link */
+cursor: not-allowed; /* Hiển thị con trỏ không cho phép click */
+pointer-events: none; /* Ngăn hoàn toàn sự kiện click */
+}
+
+/* Đảm bảo lock icon hiển thị khi không có quyền */
+.permission-check .lock-icon {
+display: inline-block !important; /* Hiển thị icon khóa */
+}
+
+/* Đảm bảo sidebar cố định và có chiều cao tối đa */
+.sidebar {
+  padding-right: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  z-index: 1000;
+}
+ li {
+  padding-right: 10px;
+ }
+/* Phần danh sách các mục chính */
+.sidebar--items {
+  flex: 1; /* Chiếm toàn bộ không gian còn lại */
+  overflow-y: auto; /* Thêm thanh cuộn dọc */
+  padding: 20px 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* Tùy chỉnh thanh cuộn */
+.sidebar--items::-webkit-scrollbar {
+  width: 8px; /* Chiều rộng thanh cuộn */
+}
+
+.sidebar--items::-webkit-scrollbar-track {
+  background: #e9ecef; /* Màu nền của track */
+  border-radius: 4px;
+}
+
+.sidebar--items::-webkit-scrollbar-thumb {
+  background: #adb5bd; /* Màu của thumb */
+  border-radius: 4px;
+}
+
+.sidebar--items::-webkit-scrollbar-thumb:hover {
+  background: #6c757d; /* Màu khi hover */
+}
+
+/* Phần bottom-items (Logout) */
+.sidebar--bottom-items {
+  padding: 20px 0;
+  margin: 0;
+  list-style: none;
+  border-top: 1px solid #dee2e6; /* Đường viền phân cách */
+}
+
+/* Đảm bảo các mục trong sidebar không bị tràn */
+.sidebar--items li {
+  margin-bottom: 10px; /* Khoảng cách giữa các mục */
+}
+
+/* Style cho link bị vô hiệu hóa */
 .disabled-link {
   opacity: 0.5; /* Làm mờ link */
   cursor: not-allowed; /* Hiển thị con trỏ không cho phép click */
   pointer-events: none; /* Ngăn hoàn toàn sự kiện click */
+}
+
+/* Icon khóa */
+.lock-icon {
+  display: none;
+  margin-right: 5px;
+}
+
+.locked .lock-icon {
+  display: inline-block;
+}
+
+.locked .lock-icon::before {
+  content: '\f023'; /* FontAwesome lock icon */
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  font-size: 20px;
 }
 
 /* Đảm bảo lock icon hiển thị khi không có quyền */
@@ -34,4 +120,198 @@
 .sidebar--items li a:not(.disabled-link):hover {
   background-color: #f0f0f0;
   color: #007bff;
+}
+
+/* Mục cha */
+.sidebar--parent {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #000;
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  position: relative;
+  transition: transform 0.3s ease-in-out, background-color 0.3s;
+}
+
+.sidebar--parent:hover {
+  transform: scale(1.05);
+  background-color: #5073fb;
+  color: white;
+}
+
+.sidebar--parent .icon {
+  margin-right: 20px;
+  font-size: 1.3rem;
+}
+
+.child-count {
+  background-color: #007bff;
+  color: white;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  margin-left: 10px;
+}
+
+.sidebar--parent::after {
+  content: '\f078';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  right: 15px;
+  transition: transform 0.3s;
+}
+
+/* Khi mục cha được mở (checkbox checked) */
+.sidebar--toggle:checked + .sidebar--parent::after {
+  transform: rotate(180deg); /* Xoay mũi tên khi mở */
+}
+
+/* Khi sidebar thu gọn, ẩn số 2 và mũi tên */
+.sidebar.active .child-count,
+.sidebar.active .sidebar--parent::after {
+  display: none;
+}
+
+/* Danh sách con */
+.sidebar--submenu {
+  list-style: none;
+  padding-left: 30px;
+  margin: 0;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Khi mục cha được mở, hiển thị danh sách con */
+.sidebar--toggle:checked ~ .sidebar--submenu {
+  max-height: 200px; /* Chiều cao tối đa (đủ để chứa nội dung) */
+}
+
+/* Khi sidebar thu gọn, ẩn danh sách con */
+.sidebar.active .sidebar--submenu {
+  display: none;
+}
+
+/* Mỗi mục con */
+.sidebar--submenu li {
+  margin-bottom: 10px; /* Khoảng cách giữa các mục con, đồng nhất với các mục cha */
+}
+
+/* Liên kết trong mục con */
+.sidebar--submenu a {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #000;
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, background-color 0.3s;
+}
+
+/* Hiệu ứng hover cho mục con */
+.sidebar--submenu a:hover {
+  transform: scale(1.05);
+  background-color: #5073fb;
+  color: white;
+}
+
+/* Khi mục con được chọn */
+.sidebar--submenu a.active {
+  background-color: #5073fb;
+  color: white;
+}
+
+/* Đảm bảo lock-icon hiển thị đúng trong mục con nếu cần */
+.sidebar--submenu a .lock-icon {
+  margin-right: 5px;
+}
+
+/* Đảm bảo style cho mục cha và mục con khi có lock-icon */
+.sidebar--parent .lock-icon,
+.sidebar--submenu a .lock-icon {
+  display: none;
+}
+
+.sidebar--parent.locked .lock-icon,
+.sidebar--submenu a.locked .lock-icon {
+  display: inline-block;
+}
+
+/* Các mục không phải mục cha */
+.sidebar--items li a:not(.sidebar--parent):not(.no-hover) {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #000;
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, background-color 0.3s;
+}
+
+.sidebar--items li a:not(.sidebar--parent):not(.no-hover):hover {
+  transform: scale(1.05);
+  background-color: #5073fb;
+  color: white;
+}
+
+.sidebar--items li a:not(.sidebar--parent):not(.no-hover).active {
+  background-color: #5073fb;
+  color: white;
+}
+
+.sidebar--items li a:not(.sidebar--parent):not(.no-hover) .icon {
+  margin-right: 20px;
+  font-size: 1.3rem;
+}
+
+/* Mục "Bạn đang truy cập với vai trò" */
+.sidebar--item.cus {
+  font-size: 1rem;
+  color: #333;
+  padding: 10px 20px;
+  display: block;
+}
+
+/* Bottom items (Logout) */
+.sidebar--bottom-items li a {
+  display: flex;
+  align-items: center;
+  font-size: 1.1rem;
+  color: #000;
+  background-color: white;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease-in-out, background-color 0.3s;
+}
+
+.sidebar--bottom-items li a:hover {
+  transform: scale(1.05);
+  background-color: #dc3545; /* Màu đỏ cho Logout */
+  color: white;
+}
+
+.sidebar--bottom-items li a .icon {
+  margin-right: 20px;
+  font-size: 1.3rem;
+}
+
+/* Responsive: Ẩn sidebar trên màn hình nhỏ (nếu cần) */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 200px;
+  }
 }

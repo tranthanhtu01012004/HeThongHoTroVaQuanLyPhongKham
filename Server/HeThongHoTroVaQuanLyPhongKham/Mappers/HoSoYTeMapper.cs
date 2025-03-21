@@ -11,9 +11,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             {
                 MaHoSoYte = dto.MaHoSoYTe,
                 MaBenhNhan = dto.MaBenhNhan,
-                ChuanDoan = dto.ChuanDoan,
-                PhuongPhapDieuTri = dto.PhuongPhapDieuTri,
-                LichSuBenh = dto.LichSuBenh
+                ChuanDoan = dto.ChuanDoan ?? "chưa có",
+                PhuongPhapDieuTri = dto.PhuongPhapDieuTri ?? "chưa có",
+                LichSuBenh = dto.LichSuBenh ?? "không có"
             };
         }
 
@@ -21,9 +21,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
         {
             entity.MaHoSoYte = dto.MaHoSoYTe;
             entity.MaBenhNhan = dto.MaBenhNhan;
-            entity.ChuanDoan = dto.ChuanDoan;
-            entity.PhuongPhapDieuTri = dto.PhuongPhapDieuTri;
-            entity.LichSuBenh = dto.LichSuBenh;
+            entity.ChuanDoan = dto.ChuanDoan ?? "chưa có";
+            entity.PhuongPhapDieuTri = dto.PhuongPhapDieuTri ?? "chưa có";
+            entity.LichSuBenh = dto.LichSuBenh ?? "không có";
         }
 
         public HoSoYTeDTO MapEntityToDto(TblHoSoYTe entity)
@@ -32,9 +32,9 @@ namespace HeThongHoTroVaQuanLyPhongKham.Mappers
             {
                 MaHoSoYTe = entity.MaHoSoYte,
                 MaBenhNhan = entity.MaBenhNhan,
-                ChuanDoan = entity.ChuanDoan,
-                PhuongPhapDieuTri = entity.PhuongPhapDieuTri,
-                LichSuBenh = entity.LichSuBenh
+                ChuanDoan = entity.ChuanDoan ?? "chưa có",
+                PhuongPhapDieuTri = entity.PhuongPhapDieuTri ?? "chưa có",
+                LichSuBenh = entity.LichSuBenh ?? "không có"
             };
         }
     }

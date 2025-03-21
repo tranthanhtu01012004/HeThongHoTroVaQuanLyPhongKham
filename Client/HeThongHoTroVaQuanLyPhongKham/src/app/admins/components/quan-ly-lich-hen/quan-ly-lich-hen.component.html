@@ -52,266 +52,277 @@
       </div>
     </form>
   </div>
-  <!-- Bảng Chưa phân công (chỉ admin thấy) -->
-  <div [hasPermission]="'QuanLy'">
-    <h4 class="mt-4">LỊCH HẸN CHƯA PHÂN CÔNG</h4>
-    <div class="table table-striped">
-      <table>
-        <thead>
-          <tr>
-            <th>Tên bệnh nhân</th>
-            <th>Nhân viên</th>
-            <th>Dịch vụ y tế</th>
-            <th>Phòng khám</th>
-            <th>Ngày hẹn</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let lichHen of danhSachChuaPhanCong.slice(trangHienTaiChuaPhanCong * soLuongMoiTrangChuaPhanCong, (trangHienTaiChuaPhanCong + 1) * soLuongMoiTrangChuaPhanCong)">
-            <td>{{ getTenBenhNhan(lichHen.maBenhNhan) }}</td>
-            <td>{{ getTenNhanVien(lichHen.maNhanVien) }}</td>
-            <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
-            <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
-            <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td class="td-custom">
-              <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
-                <span class="lock-icon"></span>Sửa
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="danhSachChuaPhanCong.length === 0">
-            <td colspan="8" class="text-center">Không có lịch hẹn nào chưa phân công.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-2" *ngIf="danhSachChuaPhanCong.length > 0">
-      <mat-paginator
-        #paginatorChuaPhanCong
-        [length]="soLuongChuaPhanCong"
-        [pageSize]="soLuongMoiTrangChuaPhanCong"
-        [pageSizeOptions]="[3, 6, 9]"
-        [pageIndex]="trangHienTaiChuaPhanCong"
-        (page)="xuLyThayDoiTrangChuaPhanCong($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </div>
+<!-- Bảng Chưa phân công (chỉ admin thấy) -->
+<div [hasPermission]="'QuanLy'">
+  <h4 class="mt-4">LỊCH HẸN CHƯA PHÂN CÔNG</h4>
+  <div class="table table-striped">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã lịch hẹn</th> <!-- Thêm cột Mã lịch hẹn -->
+          <th>Tên bệnh nhân</th>
+          <th>Nhân viên</th>
+          <th>Dịch vụ y tế</th>
+          <th>Phòng khám</th>
+          <th>Ngày hẹn</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lichHen of danhSachChuaPhanCong.slice(trangHienTaiChuaPhanCong * soLuongMoiTrangChuaPhanCong, (trangHienTaiChuaPhanCong + 1) * soLuongMoiTrangChuaPhanCong)">
+          <td>{{ lichHen.maLichHen }}</td> <!-- Hiển thị mã lịch hẹn -->
+          <td>{{ getTenBenhNhan(lichHen.maBenhNhan) }}</td>
+          <td>{{ getTenNhanVien(lichHen.maNhanVien) }}</td>
+          <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
+          <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
+          <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td class="td-custom">
+            <button [hasPermission]="'QuanLy'" (click)="editLichHen(lichHen)" class="btn btn-warning">
+              <span class="lock-icon"></span>Sửa
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="danhSachChuaPhanCong.length === 0">
+          <td colspan="7" class="text-center">Không có lịch hẹn nào chưa phân công.</td> <!-- Cập nhật colspan -->
+        </tr>
+      </tbody>
+    </table>
   </div>
-<div class="row">
-  <!-- Bảng Chờ xác nhận -->
-  <div class="col-6">
-    <h4 class="mt-4">LỊCH HẸN CHỜ XÁC NHẬN</h4>
-    <div class="table table-striped">
-      <table>
-        <thead>
-          <tr>
-            <th>Tên bệnh nhân</th>
-            <th>Tên nhân viên</th>
-            <th>Dịch vụ y tế</th>
-            <th>Phòng khám</th>
-            <th>Ngày hẹn</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let lichHen of danhSachChoXacNhan.slice(trangHienTaiChoXacNhan * soLuongMoiTrangChoXacNhan, (trangHienTaiChoXacNhan + 1) * soLuongMoiTrangChoXacNhan)">
-            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
-            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
-            <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
-            <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
-            <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              <div class="select-container">
-                <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
-                  <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
-                    {{ trangThai }}
-                  </option>
-                </select>
-                <span class="lock-icon"></span>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="danhSachChoXacNhan.length === 0">
-            <td colspan="8" class="text-center">Không có lịch hẹn nào chờ xác nhận.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-2" *ngIf="danhSachChoXacNhan.length > 0">
-      <mat-paginator
-        #paginatorChoXacNhan
-        [length]="soLuongChoXacNhan"
-        [pageSize]="soLuongMoiTrangChoXacNhan"
-        [pageSizeOptions]="[3, 6, 9]"
-        [pageIndex]="trangHienTaiChoXacNhan"
-        (page)="xuLyThayDoiTrangChoXacNhan($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </div>
-  </div>
-
-  <!-- Bảng Đã xác nhận -->
-  <div class="col-6">
-    <h4 class="mt-4">LỊCH HẸN ĐÃ XÁC NHẬN</h4>
-    <div class="table table-striped">
-      <table>
-        <thead>
-          <tr>
-            <th>Tên bệnh nhân</th>
-            <th>Tên nhân viên</th>
-            <th>Dịch vụ y tế</th>
-            <th>Phòng khám</th>
-            <th>Ngày hẹn</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let lichHen of danhSachDaXacNhan.slice(trangHienTaiDaXacNhan * soLuongMoiTrangDaXacNhan, (trangHienTaiDaXacNhan + 1) * soLuongMoiTrangDaXacNhan)">
-            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
-            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
-            <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
-            <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
-            <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              <div class="select-container">
-                <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
-                  <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
-                    {{ trangThai }}
-                  </option>
-                </select>
-                <span class="lock-icon"></span>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="danhSachDaXacNhan.length === 0">
-            <td colspan="8" class="text-center">Không có lịch hẹn nào đã xác nhận.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-2" *ngIf="danhSachDaXacNhan.length > 0">
-      <mat-paginator
-        #paginatorDaXacNhan
-        [length]="soLuongDaXacNhan"
-        [pageSize]="soLuongMoiTrangDaXacNhan"
-        [pageSizeOptions]="[3, 6, 9]"
-        [pageIndex]="trangHienTaiDaXacNhan"
-        (page)="xuLyThayDoiTrangDaXacNhan($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </div>
+  <div class="mt-2" *ngIf="danhSachChuaPhanCong.length > 0">
+    <mat-paginator
+      #paginatorChuaPhanCong
+      [length]="soLuongChuaPhanCong"
+      [pageSize]="soLuongMoiTrangChuaPhanCong"
+      [pageSizeOptions]="[3, 6, 9]"
+      [pageIndex]="trangHienTaiChuaPhanCong"
+      (page)="xuLyThayDoiTrangChuaPhanCong($event)"
+      showFirstLastButtons>
+    </mat-paginator>
   </div>
 </div>
 <div class="row">
-  <!-- Bảng Đã hoàn thành -->
-  <div class="col-6">
-    <h4 class="mt-4">LỊCH HẸN ĐÃ HOÀN THÀNH</h4>
-    <div class="table table-striped">
-      <table>
-        <thead>
-          <tr>
-            <th>Tên bệnh nhân</th>
-            <th>Tên nhân viên</th>
-            <th>Dịch vụ y tế</th>
-            <th>Phòng khám</th>
-            <th>Ngày hẹn</th>
-            <th>Trạng thái</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let lichHen of danhSachDaHoanThanh.slice(trangHienTaiDaHoanThanh * soLuongMoiTrangDaHoanThanh, (trangHienTaiDaHoanThanh + 1) * soLuongMoiTrangDaHoanThanh)">
-            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
-            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
-            <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
-            <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
-            <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              <div class="select-container">
-                <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
-                  <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
-                    {{ trangThai }}
-                  </option>
-                </select>
-                <span class="lock-icon"></span>
-              </div>
-            </td>
-          </tr>
-          <tr *ngIf="danhSachDaHoanThanh.length === 0">
-            <td colspan="8" class="text-center">Không có lịch hẹn nào đã hoàn thành.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-2" *ngIf="danhSachDaHoanThanh.length > 0">
-      <mat-paginator
-        #paginatorDaHoanThanh
-        [length]="soLuongDaHoanThanh"
-        [pageSize]="soLuongMoiTrangDaHoanThanh"
-        [pageSizeOptions]="[3, 6, 9]"
-        [pageIndex]="trangHienTaiDaHoanThanh"
-        (page)="xuLyThayDoiTrangDaHoanThanh($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </div>
+<!-- Bảng Chờ xác nhận -->
+<div class="col-12">
+  <h4 class="mt-4">LỊCH HẸN CHỜ XÁC NHẬN</h4>
+  <div class="table table-striped">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã lịch hẹn</th> <!-- Thêm cột Mã lịch hẹn -->
+          <th>Tên bệnh nhân</th>
+          <th>Tên nhân viên</th>
+          <th>Dịch vụ y tế</th>
+          <th>Phòng khám</th>
+          <th>Ngày hẹn</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lichHen of danhSachChoXacNhan.slice(trangHienTaiChoXacNhan * soLuongMoiTrangChoXacNhan, (trangHienTaiChoXacNhan + 1) * soLuongMoiTrangChoXacNhan)">
+          <td>{{ lichHen.maLichHen }}</td> <!-- Hiển thị mã lịch hẹn -->
+          <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
+          <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
+          <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
+          <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
+          <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <div class="select-container">
+              <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
+                <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
+                  {{ trangThai }}
+                </option>
+              </select>
+              <span class="lock-icon"></span>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="danhSachChoXacNhan.length === 0">
+          <td colspan="7" class="text-center">Không có lịch hẹn nào chờ xác nhận.</td> <!-- Cập nhật colspan -->
+        </tr>
+      </tbody>
+    </table>
   </div>
+  <div class="mt-2" *ngIf="danhSachChoXacNhan.length > 0">
+    <mat-paginator
+      #paginatorChoXacNhan
+      [length]="soLuongChoXacNhan"
+      [pageSize]="soLuongMoiTrangChoXacNhan"
+      [pageSizeOptions]="[3, 6, 9]"
+      [pageIndex]="trangHienTaiChoXacNhan"
+      (page)="xuLyThayDoiTrangChoXacNhan($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
 
-  <!-- Bảng Đã hủy -->
-  <div class="col-6">
-    <h4 class="mt-4">LỊCH HẸN ĐÃ HỦY</h4>
-    <div class="table table-striped">
-      <table>
-        <thead>
-          <tr>
-            <th>Tên bệnh nhân</th>
-            <th>Tên nhân viên</th>
-            <th>Dịch vụ y tế</th>
-            <th>Phòng khám</th>
-            <th>Ngày hẹn</th>
-            <th>Trạng thái</th>
-            <th>Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let lichHen of danhSachDaHuy.slice(trangHienTaiDaHuy * soLuongMoiTrangDaHuy, (trangHienTaiDaHuy + 1) * soLuongMoiTrangDaHuy)">
-            <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
-            <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
-            <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
-            <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
-            <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
-            <td>
-              <div class="select-container">
-                <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
-                  <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
-                    {{ trangThai }}
-                  </option>
-                </select>
-                <span class="lock-icon"></span>
-              </div>
-            </td>
-            <td class="td-custom">
-              <button [hasPermission]="'QuanLy'" (click)="deleteLichHen(lichHen.maLichHen)" class="btn btn-danger">
-                <span class="lock-icon"></span>Xóa
-              </button>
-            </td>
-          </tr>
-          <tr *ngIf="danhSachDaHuy.length === 0">
-            <td colspan="8" class="text-center">Không có lịch hẹn nào đã hủy.</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="mt-2" *ngIf="danhSachDaHuy.length > 0">
-      <mat-paginator
-        #paginatorDaHuy
-        [length]="soLuongDaHuy"
-        [pageSize]="soLuongMoiTrangDaHuy"
-        [pageSizeOptions]="[3, 6, 9]"
-        [pageIndex]="trangHienTaiDaHuy"
-        (page)="xuLyThayDoiTrangDaHuy($event)"
-        showFirstLastButtons>
-      </mat-paginator>
-    </div>
+  <!-- Bảng Đã xác nhận -->
+<!-- Bảng Đã xác nhận -->
+<div class="col-12">
+  <h4 class="mt-4">LỊCH HẸN ĐÃ XÁC NHẬN</h4>
+  <div class="table table-striped">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã lịch hẹn</th> <!-- Thêm cột Mã lịch hẹn -->
+          <th>Tên bệnh nhân</th>
+          <th>Tên nhân viên</th>
+          <th>Dịch vụ y tế</th>
+          <th>Phòng khám</th>
+          <th>Ngày hẹn</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lichHen of danhSachDaXacNhan.slice(trangHienTaiDaXacNhan * soLuongMoiTrangDaXacNhan, (trangHienTaiDaXacNhan + 1) * soLuongMoiTrangDaXacNhan)">
+          <td>{{ lichHen.maLichHen }}</td> <!-- Hiển thị mã lịch hẹn -->
+          <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
+          <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
+          <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
+          <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
+          <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <div class="select-container">
+              <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
+                <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
+                  {{ trangThai }}
+                </option>
+              </select>
+              <span class="lock-icon"></span>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="danhSachDaXacNhan.length === 0">
+          <td colspan="7" class="text-center">Không có lịch hẹn nào đã xác nhận.</td> <!-- Cập nhật colspan -->
+        </tr>
+      </tbody>
+    </table>
   </div>
+  <div class="mt-2" *ngIf="danhSachDaXacNhan.length > 0">
+    <mat-paginator
+      #paginatorDaXacNhan
+      [length]="soLuongDaXacNhan"
+      [pageSize]="soLuongMoiTrangDaXacNhan"
+      [pageSizeOptions]="[3, 6, 9]"
+      [pageIndex]="trangHienTaiDaXacNhan"
+      (page)="xuLyThayDoiTrangDaXacNhan($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+</div>
+<div class="row">
+<!-- Bảng Đã hoàn thành -->
+<div class="col-12">
+  <h4 class="mt-4">LỊCH HẸN ĐÃ HOÀN THÀNH</h4>
+  <div class="table table-striped">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã lịch hẹn</th> <!-- Thêm cột Mã lịch hẹn -->
+          <th>Tên bệnh nhân</th>
+          <th>Tên nhân viên</th>
+          <th>Dịch vụ y tế</th>
+          <th>Phòng khám</th>
+          <th>Ngày hẹn</th>
+          <th>Trạng thái</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lichHen of danhSachDaHoanThanh.slice(trangHienTaiDaHoanThanh * soLuongMoiTrangDaHoanThanh, (trangHienTaiDaHoanThanh + 1) * soLuongMoiTrangDaHoanThanh)">
+          <td>{{ lichHen.maLichHen }}</td> <!-- Hiển thị mã lịch hẹn -->
+          <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
+          <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
+          <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
+          <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
+          <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <div class="select-container">
+              <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
+                <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
+                  {{ trangThai }}
+                </option>
+              </select>
+              <span class="lock-icon"></span>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="danhSachDaHoanThanh.length === 0">
+          <td colspan="7" class="text-center">Không có lịch hẹn nào đã hoàn thành.</td> <!-- Cập nhật colspan -->
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-2" *ngIf="danhSachDaHoanThanh.length > 0">
+    <mat-paginator
+      #paginatorDaHoanThanh
+      [length]="soLuongDaHoanThanh"
+      [pageSize]="soLuongMoiTrangDaHoanThanh"
+      [pageSizeOptions]="[3, 6, 9]"
+      [pageIndex]="trangHienTaiDaHoanThanh"
+      (page)="xuLyThayDoiTrangDaHoanThanh($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
+
+<!-- Bảng Đã hủy -->
+<div class="col-12">
+  <h4 class="mt-4">LỊCH HẸN ĐÃ HỦY</h4>
+  <div class="table table-striped">
+    <table>
+      <thead>
+        <tr>
+          <th>Mã lịch hẹn</th> <!-- Thêm cột Mã lịch hẹn -->
+          <th>Tên bệnh nhân</th>
+          <th>Tên nhân viên</th>
+          <th>Dịch vụ y tế</th>
+          <th>Phòng khám</th>
+          <th>Ngày hẹn</th>
+          <th>Trạng thái</th>
+          <th>Hành động</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let lichHen of danhSachDaHuy.slice(trangHienTaiDaHuy * soLuongMoiTrangDaHuy, (trangHienTaiDaHuy + 1) * soLuongMoiTrangDaHuy)">
+          <td>{{ lichHen.maLichHen }}</td> <!-- Hiển thị mã lịch hẹn -->
+          <td>{{ getTenBenhNhan(lichHen.maBenhNhan)}}</td>
+          <td>{{ getTenNhanVien(lichHen.maNhanVien) || 'Chưa gán' }}</td>
+          <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
+          <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
+          <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>
+            <div class="select-container">
+              <select [hasPermission]="'BacSi'" (change)="updateTrangThai(lichHen, $event)">
+                <option *ngFor="let trangThai of trangThaiOptions" [value]="trangThai" [selected]="lichHen.trangThai === trangThai">
+                  {{ trangThai }}
+                </option>
+              </select>
+              <span class="lock-icon"></span>
+            </div>
+          </td>
+          <td class="td-custom">
+            <button [hasPermission]="'QuanLy'" (click)="deleteLichHen(lichHen.maLichHen)" class="btn btn-danger">
+              <span class="lock-icon"></span>Xóa
+            </button>
+          </td>
+        </tr>
+        <tr *ngIf="danhSachDaHuy.length === 0">
+          <td colspan="8" class="text-center">Không có lịch hẹn nào đã hủy.</td> <!-- Cập nhật colspan -->
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="mt-2" *ngIf="danhSachDaHuy.length > 0">
+    <mat-paginator
+      #paginatorDaHuy
+      [length]="soLuongDaHuy"
+      [pageSize]="soLuongMoiTrangDaHuy"
+      [pageSizeOptions]="[3, 6, 9]"
+      [pageIndex]="trangHienTaiDaHuy"
+      (page)="xuLyThayDoiTrangDaHuy($event)"
+      showFirstLastButtons>
+    </mat-paginator>
+  </div>
+</div>
 </div>
 </div>
