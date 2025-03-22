@@ -102,6 +102,20 @@
     <button class="btn btn-outline-primary mt-3 me-2" (click)="printMedicalRecordDetail()">
       <i class="fa-solid fa-file-pdf"></i> In chi tiết hồ sơ y tế
     </button>
+    <button class="btn btn-outline-success mt-3 me-2" (click)="goiYChanDoan()" [disabled]="!isPredictionButtonEnabled()" title="Dự đoán chẩn đoán dựa trên triệu chứng">
+      <i class="fa-solid fa-stethoscope"></i> Gợi ý chẩn đoán
+    </button>
+  
+    <!-- Hiển thị kết quả dự đoán -->
+    <div *ngIf="predictionResult" class="prediction-result mt-3 p-3 border rounded bg-light">
+      <h4>Gợi ý chẩn đoán từ AI</h4>
+      <p><strong>Chẩn đoán:</strong> {{ predictionResult.diagnosis }}</p>
+      <p><strong>Phương pháp điều trị:</strong> {{ predictionResult.treatment }}</p>
+      <div class="action-buttons">
+        <button class="btn btn-success me-2" (click)="dongYCapNhat()">Đồng ý</button>
+        <button class="btn btn-danger" (click)="huyCapNhat()">Hủy</button>
+      </div>
+    </div>
     <h3>Hồ sơ y tế #{{ chiTietHoSo.maHoSoYTe }} - {{ chiTietHoSo.chuanDoan }}</h3>
     <p class="text-danger">Bệnh nhân: {{ getTenBenhNhan(chiTietHoSo.maBenhNhan) }}</p>
 
