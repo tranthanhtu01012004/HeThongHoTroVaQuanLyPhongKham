@@ -17,15 +17,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         public async Task<PredictionResponseDto> Predict(PredictionRequestDto request)
         {
             if (request == null || request.Symptoms == null || !request.Symptoms.Any())
-            {
                 throw new ArgumentException("Danh sách triệu chứng không được để trống.");
-            }
 
             var client = _httpClientFactory.CreateClient();
 
             try
             {
-                // Sửa dữ liệu thành {"symptoms": [...]}
+                // Chuẩn bị dữ liệu gửi tới Flask
                 var requestData = new { symptoms = request.Symptoms };
                 var jsonRequest = JsonSerializer.Serialize(requestData);
                 var content = new StringContent(jsonRequest, Encoding.UTF8, "application/json");
@@ -33,8 +31,13 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
                 var response = await client.PostAsync(FlaskApiUrl, content);
                 response.EnsureSuccessStatusCode();
 
+                // Đọc và deserialize phản hồi từ Flask
                 var jsonResponse = await response.Content.ReadAsStringAsync();
-                var prediction = JsonSerializer.Deserialize<PredictionResponseDto>(jsonResponse);
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true // Bỏ qua phân biệt hoa thường
+                };
+                var prediction = JsonSerializer.Deserialize<PredictionResponseDto>(jsonResponse, options);
 
                 if (prediction == null)
                 {

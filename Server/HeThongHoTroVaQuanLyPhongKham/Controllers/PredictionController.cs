@@ -27,7 +27,7 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             {
                 var prediction = await _mlService.Predict(request);
                 return Ok(ApiResponse<PredictionResponseDto>.Success(
-                    prediction, "Dự đoán chẩn đoán và phương pháp điều trị thành công."));
+                    prediction, "Dự đoán chẩn đoán, phương pháp điều trị và thuốc thành công."));
             }
             catch (ArgumentException ex)
             {

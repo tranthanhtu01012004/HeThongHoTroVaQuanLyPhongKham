@@ -66,38 +66,108 @@ disease_symptoms_map = {
     "Đột quỵ": ["Đau đầu", "Chóng mặt", "Yếu một bên cơ thể", "Khó nói"]
 }
 
+treatment_medicine_map = {
+    "Uống kháng sinh và giảm đau": [
+        {"name": "Amoxicillin", "dose": "500mg", "frequency": "3 lần/ngày", "instruction": "Uống sau ăn"},
+        {"name": "Paracetamol", "dose": "500mg", "frequency": "4-6 giờ/lần khi đau", "instruction": "Uống khi cần"}
+    ],
+    "Đeo kính điều chỉnh": [],
+    "Uống thuốc hạ áp, theo dõi": [
+        {"name": "Amlodipine", "dose": "5mg", "frequency": "1 lần/ngày", "instruction": "Uống tối"}
+    ],
+    "Truyền dịch, nghỉ ngơi": [
+        {"name": "Natri Clorid", "dose": "500ml", "frequency": "1 lần/ngày", "instruction": "Truyền tĩnh mạch"}
+    ],
+    "Bổ sung sắt, vitamin": [
+        {"name": "Ferrous Sulfate", "dose": "100mg", "frequency": "1 lần/ngày", "instruction": "Uống sau ăn"},
+        {"name": "Vitamin B12", "dose": "1000mcg", "frequency": "1 lần/ngày", "instruction": "Uống sáng"}
+    ],
+    "Thuốc giảm axit, kiêng đồ chua": [
+        {"name": "Omeprazole", "dose": "20mg", "frequency": "2 lần/ngày", "instruction": "Uống trước ăn"}
+    ],
+    "Bó bột, nghỉ ngơi": [],
+    "Bôi kem chống viêm": [
+        {"name": "Hydrocortisone", "dose": "1%", "frequency": "2 lần/ngày", "instruction": "Bôi ngoài da"}
+    ],
+    "Kháng sinh, theo dõi chức năng thận": [
+        {"name": "Ciprofloxacin", "dose": "500mg", "frequency": "2 lần/ngày", "instruction": "Uống sau ăn"}
+    ],
+    "Nghỉ ngơi, hạ sốt": [
+        {"name": "Paracetamol", "dose": "500mg", "frequency": "4-6 giờ/lần khi sốt", "instruction": "Uống khi cần"}
+    ],
+    "Rửa xoang, kháng sinh": [
+        {"name": "Natri Clorid", "dose": "0.9%", "frequency": "2 lần/ngày", "instruction": "Rửa xoang"},
+        {"name": "Amoxicillin", "dose": "500mg", "frequency": "3 lần/ngày", "instruction": "Uống sau ăn"}
+    ],
+    "Vật lý trị liệu, giảm đau": [
+        {"name": "Ibuprofen", "dose": "200mg", "frequency": "3 lần/ngày", "instruction": "Uống khi đau"}
+    ],
+    "Thuốc hạ đường huyết, chế độ ăn": [
+        {"name": "Metformin", "dose": "500mg", "frequency": "2 lần/ngày", "instruction": "Uống sau ăn"}
+    ],
+    "Bôi kem dưỡng ẩm, tránh kích ứng": [
+        {"name": "Cetaphil", "dose": "Lượng vừa đủ", "frequency": "2 lần/ngày", "instruction": "Bôi ngoài da"}
+    ],
+    "Thuốc hỗ trợ tim mạch, nghỉ ngơi": [
+        {"name": "Furosemide", "dose": "40mg", "frequency": "1 lần/ngày", "instruction": "Uống sáng"}
+    ],
+    "Kháng sinh, nghỉ ngơi, hỗ trợ hô hấp": [
+        {"name": "Azithromycin", "dose": "500mg", "frequency": "1 lần/ngày", "instruction": "Uống trước ăn"}
+    ],
+    "Uống nhiều nước, thuốc giảm đau, tán sỏi": [
+        {"name": "Spasmolyt", "dose": "10mg", "frequency": "2 lần/ngày", "instruction": "Uống khi đau"}
+    ],
+    "Thuốc kháng virus, theo dõi chức năng gan": [
+        {"name": "Tenofovir", "dose": "300mg", "frequency": "1 lần/ngày", "instruction": "Uống tối"}
+    ],
+    "Thuốc giảm đau, tránh ánh sáng mạnh": [
+        {"name": "Sumatriptan", "dose": "50mg", "frequency": "1 lần khi đau", "instruction": "Uống khi cần"}
+    ],
+    "Thuốc chống viêm, vật lý trị liệu": [
+        {"name": "Diclofenac", "dose": "50mg", "frequency": "2 lần/ngày", "instruction": "Uống sau ăn"}
+    ],
+    "Thuốc giãn phế quản, tránh tác nhân kích ứng": [
+        {"name": "Salbutamol", "dose": "2mg", "frequency": "3 lần/ngày", "instruction": "Uống khi cần"}
+    ],
+    "Thuốc ức chế bơm proton, kiêng đồ cay": [
+        {"name": "Pantoprazole", "dose": "40mg", "frequency": "1 lần/ngày", "instruction": "Uống trước ăn"}
+    ],
+    "Kháng sinh, uống nhiều nước": [
+        {"name": "Ciprofloxacin", "dose": "500mg", "frequency": "2 lần/ngày", "instruction": "Uống sau ăn"}
+    ],
+    "Phẫu thuật cắt ruột thừa, kháng sinh": [
+        {"name": "Ceftriaxone", "dose": "1g", "frequency": "1 lần/ngày", "instruction": "Tiêm tĩnh mạch"}
+    ],
+    "Thuốc tiêu sợi huyết, phục hồi chức năng": [
+        {"name": "Alteplase", "dose": "0.9mg/kg", "frequency": "1 lần", "instruction": "Tiêm tĩnh mạch"}
+    ]
+}
+
+
+# Tạo danh sách tất cả các thuốc duy nhất
+all_medicines = sorted(set(med["name"] for treatment in treatment_medicine_map.values() for med in treatment))
+
 # Tạo dữ liệu giả lập
 np.random.seed(42)
-num_records = 5000  # Số lượng bản ghi giả lập
+num_records = 5000
 data = []
-
-# Tạo danh sách triệu chứng làm cột
 symptom_cols = sorted(symptoms)
 
 for i in range(num_records):
-    # Thông tin cơ bản
     ma_ho_so_y_te = i + 1
-
-    # Chọn ngẫu nhiên một bệnh và phương pháp điều trị tương ứng
     idx = np.random.randint(0, len(diseases))
     chuan_doan = diseases[idx]
     phuong_phap_dieu_tri = treatments[idx]
 
-    # Lấy danh sách triệu chứng liên quan đến bệnh
+    # Lấy triệu chứng (chỉ chọn 1-3 triệu chứng để tăng tính đa dạng)
     related_symptoms = disease_symptoms_map[chuan_doan]
-    # Chỉ giữ lại 80% triệu chứng đặc trưng (mô phỏng trường hợp bệnh nhân không có đầy đủ triệu chứng)
-    related_symptoms = [s for s in related_symptoms if np.random.random() < 0.8]
-    # Thêm 0-2 triệu chứng ngẫu nhiên khác để tăng tính đa dạng
-    additional_symptoms = np.random.choice(
-        [s for s in symptoms if s not in related_symptoms],
-        np.random.randint(0, 3),
-        replace=False
-    )
-    # Thêm triệu chứng không liên quan với xác suất 20%
-    if np.random.random() < 0.2:
+    num_symptoms = np.random.randint(1, min(4, len(related_symptoms) + 1))  # Chọn ngẫu nhiên 1-3 triệu chứng
+    selected_symptoms = np.random.choice(related_symptoms, num_symptoms, replace=False).tolist()
+
+    # Thêm triệu chứng không liên quan (ít hơn)
+    if np.random.random() < 0.1:  # Giảm xác suất xuống 10%
         unrelated_symptom = np.random.choice([s for s in symptoms if s not in related_symptoms], 1)[0]
-        additional_symptoms = list(additional_symptoms) + [unrelated_symptom]
-    selected_symptoms = list(related_symptoms) + list(additional_symptoms)
+        selected_symptoms.append(unrelated_symptom)
 
     # Tạo bản ghi
     record = {
@@ -105,13 +175,12 @@ for i in range(num_records):
         "Chẩn đoán": chuan_doan,
         "Phương pháp điều trị": phuong_phap_dieu_tri,
     }
-
-    # Thêm các cột triệu chứng
     for symptom in symptom_cols:
         record[f"Triệu chứng_{symptom}"] = 1 if symptom in selected_symptoms else 0
-
+    for medicine in all_medicines:
+        record[f"Thuốc_{medicine}"] = 1 if medicine in [m["name"] for m in treatment_medicine_map[phuong_phap_dieu_tri]] else 0
     data.append(record)
-
+    
 # Tạo DataFrame
 df = pd.DataFrame(data)
 
@@ -122,9 +191,11 @@ encoded_cols = pd.DataFrame({
 })
 df = pd.concat([df, encoded_cols], axis=1)
 
-# Tối ưu bộ nhớ bằng cách chuyển đổi kiểu dữ liệu
+# Tối ưu bộ nhớ
 for symptom in symptom_cols:
     df[f"Triệu chứng_{symptom}"] = df[f"Triệu chứng_{symptom}"].astype("int8")
+for medicine in all_medicines:
+    df[f"Thuốc_{medicine}"] = df[f"Thuốc_{medicine}"].astype("int8")
 
 # Lưu ánh xạ
 diagnosis_map = dict(enumerate(df["Chẩn đoán"].astype("category").cat.categories))
@@ -134,8 +205,9 @@ with open("../models/diagnosis_map_vn.pkl", "wb") as f:
     pickle.dump(diagnosis_map, f)
 with open("../models/treatment_map_vn.pkl", "wb") as f:
     pickle.dump(treatment_map, f)
+with open("../models/medicine_map.pkl", "wb") as f:
+    pickle.dump(treatment_medicine_map, f)  # Lưu ánh xạ thuốc để dùng sau
 
 # Lưu dataset
 df.to_csv("../data/medical_data_from_sql.csv", index=False, encoding="utf-8-sig")
-
 print("Đã tạo dataset thành công và lưu tại ../data/medical_data_from_sql.csv")

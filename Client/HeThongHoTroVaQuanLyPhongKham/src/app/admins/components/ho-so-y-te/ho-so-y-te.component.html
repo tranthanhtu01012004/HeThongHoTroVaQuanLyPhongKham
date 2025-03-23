@@ -111,6 +111,30 @@
       <h4>Gợi ý chẩn đoán từ AI</h4>
       <p><strong>Chẩn đoán:</strong> {{ predictionResult.diagnosis }}</p>
       <p><strong>Phương pháp điều trị:</strong> {{ predictionResult.treatment }}</p>
+      <div *ngIf="predictionResult.medicines && predictionResult.medicines.length > 0">
+        <p><strong>Thuốc gợi ý:</strong></p>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Tên thuốc</th>
+              <th>Liều lượng</th>
+              <th>Tần suất</th>
+              <th>Hướng dẫn</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let med of predictionResult.medicines">
+              <td>{{ med.name }}</td>
+              <td>{{ med.dose }}</td>
+              <td>{{ med.frequency }}</td>
+              <td>{{ med.instruction }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="predictionResult.warning" class="alert alert-warning">
+        {{ predictionResult.warning }}
+      </div>
       <div class="action-buttons">
         <button class="btn btn-success me-2" (click)="dongYCapNhat()">Đồng ý</button>
         <button class="btn btn-danger" (click)="huyCapNhat()">Hủy</button>
