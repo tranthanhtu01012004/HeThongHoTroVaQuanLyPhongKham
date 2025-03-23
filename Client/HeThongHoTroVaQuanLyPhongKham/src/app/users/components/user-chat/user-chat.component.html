@@ -1,0 +1,24 @@
+<div class="chat-wrapper">
+    <div class="sidebar">
+      <h3>Hỗ trợ trực tuyến</h3>
+      <p>Bạn đang chat với nhân viên hỗ trợ</p>
+    </div>
+    <div class="chat-main">
+      <div class="chat-header">
+        <h4>Chat với nhân viên</h4>
+        <div class="notification" *ngIf="notification">{{ notification }}</div>
+      </div>
+      <div class="chat-body" #chatBody>
+        <div *ngFor="let msg of messages" [ngClass]="{'message-right': msg.senderId === maTaiKhoan, 'message-left': msg.senderId !== maTaiKhoan}">
+          <div class="message-content">
+            <strong>{{ msg.senderName }}</strong> <span>({{ msg.timestamp | date:'short' }})</span>
+            <p>{{ msg.message }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="chat-footer">
+        <textarea [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Nhập tin nhắn..."></textarea>
+        <button (click)="sendMessage()">Gửi</button>
+      </div>
+    </div>
+</div>

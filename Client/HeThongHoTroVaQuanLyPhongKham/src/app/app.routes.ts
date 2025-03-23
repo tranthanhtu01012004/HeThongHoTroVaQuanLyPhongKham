@@ -18,6 +18,8 @@ import { FilterAppointmentsComponent } from './admins/components/appointment-fil
 import { HoSoYTeComponent } from './admins/components/ho-so-y-te/ho-so-y-te.component';
 import { HoaDonComponent } from './admins/components/hoa-don/hoa-don.component';
 import { BaoCaoComponent } from './admins/components/bao-cao/bao-cao.component';
+import { UserChatComponent } from './users/components/user-chat/user-chat.component';
+import { AdminChatComponent } from './admins/components/admin-chat/admin-chat.component';
 
 export const routes: Routes = [
   { 
@@ -29,7 +31,8 @@ export const routes: Routes = [
       { path: 'dich-vu', component: DichVuComponent },
       { path: 'lich-hen', component: LichHenComponent, canActivate: [authGuard] },
       { path: 'dang-nhap', component: DangNhapComponent },
-      { path: 'unauthorized', component: UnauthorizedComponent }
+      { path: 'unauthorized', component: UnauthorizedComponent },
+      { path: 'chat', component: UserChatComponent, canActivate: [authGuard] }
     ]
   },
 
@@ -47,7 +50,8 @@ export const routes: Routes = [
       { path: 'thuoc', component: ThuocComponent },
       { path: 'loc-lich-hen', component: FilterAppointmentsComponent },
       { path: 'ho-so-y-te', component: HoSoYTeComponent },
-      { path: 'hoa-don', component: HoaDonComponent }
+      { path: 'hoa-don', component: HoaDonComponent },
+      { path: 'chat', component: AdminChatComponent }
 
     ]
   }

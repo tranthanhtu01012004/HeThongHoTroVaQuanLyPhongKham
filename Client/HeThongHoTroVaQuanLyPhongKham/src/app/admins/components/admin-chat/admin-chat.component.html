@@ -1,0 +1,42 @@
+<div class="chat-wrapper">
+    <div class="sidebar">
+      <h3>Danh sách bệnh nhân</h3>
+      <ul>
+        <li *ngFor="let patient of chatPatientList" 
+            (click)="selectPatient(patient.maTaiKhoan)" 
+            [class.selected]="patient.maTaiKhoan === selectedPatientId"
+            [class.active]="isPatientActive(patient.maTaiKhoan)">
+          {{ patient.ten || 'Chưa có tên' }} (Mã: {{ patient.maTaiKhoan || 'Chưa có mã' }}) 
+          <span *ngIf="isPatientActive(patient.maTaiKhoan)" class="status">Đang chat</span>
+          <span *ngIf="!isPatientActive(patient.maTaiKhoan) && patient.maTaiKhoan !== undefined" class="status offline">Không hoạt động</span>
+        </li>
+      </ul>
+    </div>
+    <div class="chat-main" *ngIf="selectedPatientId !== null; else noChat">
+      <div class="chat-header">
+        <h4>Chat với {{ selectedPatientName }}</h4>
+      </div>
+      <div class="chat-body" #chatBody>
+        <div *ngFor="let msg of messages" [ngClass]="{'message-right': msg.senderId === maNhanVien, 'message-left': msg.senderId !== maNhanVien}">
+          <div class="message-content">
+            <strong>{{ msg.senderName }}</strong> <span>({{ msg.timestamp | date:'short' }})</span>
+            <p>{{ msg.message }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="chat-footer">
+        <textarea [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Nhập tin nhắn..."></textarea>
+        <button (click)="sendMessage()">Gửi</button>
+      </div>
+    </div>
+    <ng-template #noChat>
+      <div class="chat-main">
+        <div class="chat-header">
+          <h4>Chưa chọn cuộc chat</h4>
+        </div>
+        <div class="chat-body">
+          <p>Vui lòng chọn một bệnh nhân để bắt đầu chat.</p>
+        </div>
+      </div>
+    </ng-template>
+</div>

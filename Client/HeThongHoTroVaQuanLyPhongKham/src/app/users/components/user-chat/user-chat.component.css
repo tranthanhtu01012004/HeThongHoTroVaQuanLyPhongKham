@@ -1,0 +1,31 @@
+.chat-body {
+  max-height: 400px; /* Điều chỉnh chiều cao tối đa */
+  overflow-y: auto; /* Cho phép cuộn dọc */
+  display: flex;
+  flex-direction: column; /* Sắp xếp tin nhắn theo cột */
+}
+
+/* Đảm bảo tin nhắn mới nhất ở dưới cùng */
+.chat-body {
+  justify-content: flex-end; /* Đẩy nội dung xuống dưới */
+}
+
+/* Style cho tin nhắn */
+.message-right {
+  text-align: right;
+  margin-left: auto;
+  max-width: 70%;
+}
+
+.message-left {
+  text-align: left;
+  margin-right: auto;
+  max-width: 70%;
+}
+
+.message-content {
+  margin: 5px 0;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: #f1f1f1;
+}
