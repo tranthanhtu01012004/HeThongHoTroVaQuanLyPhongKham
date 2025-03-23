@@ -9,5 +9,11 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
 
         [JsonPropertyName("treatment")]
         public string Treatment { get; set; }
+
+        [JsonPropertyName("medicines")]
+        public List<MedicineDto> Medicines { get; set; }
+
+        [JsonPropertyName("warning")]
+        public string Warning { get; set; }
     }
 }

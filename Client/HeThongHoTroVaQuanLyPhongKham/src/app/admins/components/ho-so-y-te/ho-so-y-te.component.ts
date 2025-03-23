@@ -314,61 +314,62 @@ export class HoSoYTeComponent implements OnInit {
     });
   }
 
-  goiYChanDoan(): void {
-    if (!this.chiTietHoSo || !this.chiTietHoSo.trieuChung || this.chiTietHoSo.trieuChung.length === 0) {
-      this.notificationService.showError('Không có triệu chứng để dự đoán.');
-      return;
-    }
-
-    const symptoms = this.chiTietHoSo.trieuChung.map(tc => tc.tenTrieuChung);
-
-    this.mlService.predictDiagnosis(symptoms).subscribe({
-      next: (response: ApiResponse<IPrediction>) => {
-        if (response.status && response.data) {
-          this.predictionResult = response.data;
-          this.notificationService.showSuccess('Đã nhận được gợi ý chẩn đoán. Vui lòng xác nhận hoặc hủy.');
-        } else {
-          this.notificationService.showError(response.message || 'Không nhận được kết quả dự đoán từ API.');
-        }
-      },
-      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
-    });
+goiYChanDoan(): void {
+  if (!this.chiTietHoSo || !this.chiTietHoSo.trieuChung || this.chiTietHoSo.trieuChung.length === 0) {
+    this.notificationService.showError('Không có triệu chứng để dự đoán.');
+    return;
   }
 
-  dongYCapNhat(): void {
-    if (!this.predictionResult || !this.chiTietHoSo) {
-      this.notificationService.showError('Không có kết quả dự đoán để cập nhật.');
-      return;
-    }
+  const symptoms = this.chiTietHoSo.trieuChung.map(tc => tc.tenTrieuChung);
 
-    const { diagnosis, treatment } = this.predictionResult;
+  this.mlService.predictDiagnosis(symptoms).subscribe({
+    next: (response: ApiResponse<IPrediction>) => {
+      if (response.status && response.data) {
+        this.predictionResult = response.data;
+        // Warning sẽ hiển thị trực tiếp trong HTML nếu có
+        this.notificationService.showSuccess('Đã nhận được gợi ý chẩn đoán và đơn thuốc. Vui lòng xác nhận hoặc hủy.');
+      } else {
+        this.notificationService.showError(response.message || 'Không nhận được kết quả dự đoán từ API.');
+      }
+    },
+    error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+  });
+}
 
-    // Cập nhật chiTietHoSo
-    this.chiTietHoSo.chuanDoan = diagnosis;
-    this.chiTietHoSo.phuongPhapDieuTri = treatment;
-
-    // Cập nhật hồ sơ y tế qua API
-    const updatedHoSo: IHoSoYTe = {
-      maHoSoYTe: this.chiTietHoSo.maHoSoYTe,
-      maBenhNhan: this.chiTietHoSo.maBenhNhan,
-      chuanDoan: diagnosis,
-      phuongPhapDieuTri: treatment,
-      lichSuBenh: this.chiTietHoSo.lichSuBenh
-    };
-
-    this.hoSoYTeService.updateMedicalRecord(this.chiTietHoSo.maHoSoYTe, updatedHoSo).subscribe({
-      next: (updateResponse: ApiResponse<IHoSoYTe>) => {
-        if (updateResponse.status) {
-          this.notificationService.showSuccess('Gợi ý chẩn đoán và phương pháp điều trị đã được cập nhật thành công!');
-          this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
-          this.predictionResult = null;
-        } else {
-          this.notificationService.showError(updateResponse.message || 'Cập nhật thất bại.');
-        }
-      },
-      error: (err: HttpErrorResponse) => this.xuLyLoi(err)
-    });
+dongYCapNhat(): void {
+  if (!this.predictionResult || !this.chiTietHoSo) {
+    this.notificationService.showError('Không có kết quả dự đoán để cập nhật.');
+    return;
   }
+
+  const { diagnosis, treatment } = this.predictionResult;
+
+  // Cập nhật chiTietHoSo
+  this.chiTietHoSo.chuanDoan = diagnosis;
+  this.chiTietHoSo.phuongPhapDieuTri = treatment;
+
+  // Cập nhật hồ sơ y tế qua API
+  const updatedHoSo: IHoSoYTe = {
+    maHoSoYTe: this.chiTietHoSo.maHoSoYTe,
+    maBenhNhan: this.chiTietHoSo.maBenhNhan,
+    chuanDoan: diagnosis,
+    phuongPhapDieuTri: treatment,
+    lichSuBenh: this.chiTietHoSo.lichSuBenh
+  };
+
+  this.hoSoYTeService.updateMedicalRecord(this.chiTietHoSo.maHoSoYTe, updatedHoSo).subscribe({
+    next: (updateResponse: ApiResponse<IHoSoYTe>) => {
+      if (updateResponse.status) {
+        this.notificationService.showSuccess('Gợi ý chẩn đoán và phương pháp điều trị đã được cập nhật thành công!');
+        this.xemChiTietHoSo(this.chiTietHoSo!.maHoSoYTe);
+        this.predictionResult = null;
+      } else {
+        this.notificationService.showError(updateResponse.message || 'Cập nhật thất bại.');
+      }
+    },
+    error: (err: HttpErrorResponse) => this.xuLyLoi(err)
+  });
+}
 
   huyCapNhat(): void {
     this.predictionResult = null;
