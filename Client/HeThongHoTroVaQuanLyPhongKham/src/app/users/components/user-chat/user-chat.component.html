@@ -5,7 +5,7 @@
     </div>
     <div class="chat-main">
       <div class="chat-header">
-        <h4>Chat với nhân viên</h4>
+        <h4 class="text-center text-white">Chat với nhân viên</h4>
         <div class="notification" *ngIf="notification">{{ notification }}</div>
       </div>
       <div class="chat-body" #chatBody>
@@ -17,7 +17,7 @@
         </div>
       </div>
       <div class="chat-footer">
-        <textarea [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Nhập tin nhắn..."></textarea>
+        <textarea [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Nhập tin nhắn..." spellcheck="false"></textarea>
         <button (click)="sendMessage()">Gửi</button>
       </div>
     </div>

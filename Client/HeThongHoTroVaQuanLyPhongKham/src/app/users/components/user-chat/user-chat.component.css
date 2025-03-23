@@ -1,31 +1,229 @@
+/* Tổng thể chat wrapper */
+.chat-wrapper {
+  display: flex;
+  height: 80vh; /* Chiều cao tối đa 80% viewport */
+  max-width: 1200px; /* Giới hạn chiều rộng tối đa */
+  margin: 20px auto; /* Căn giữa */
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng nhẹ */
+  overflow: hidden; /* Ẩn phần thừa */
+  background-color: #f9f9f9; /* Màu nền nhẹ */
+}
+
+/* Sidebar */
+.sidebar {
+  width: 250px; /* Chiều rộng sidebar */
+  background-color: #2c3e50; /* Màu nền tối */
+  color: #ecf0f1; /* Màu chữ sáng */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar h3 {
+  font-size: 1.5rem;
+  margin-bottom: 10px;
+  color: #1abc9c; /* Màu tiêu đề nổi bật */
+}
+
+.sidebar p {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Chat main */
+.chat-main {
+  flex: 1; /* Chiếm toàn bộ không gian còn lại */
+  display: flex;
+  flex-direction: column;
+  background-color: #ffffff; /* Màu nền trắng */
+}
+
+/* Chat header */
+.chat-header {
+  padding: 15px 20px;
+  background-color: #3498db; /* Màu nền header */
+  color: #ffffff; /* Màu chữ trắng */
+  border-bottom: 1px solid #2980b9; /* Đường viền dưới */
+}
+
+.chat-header h4 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.chat-header .notification {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  background-color: #e74c3c; /* Màu nền thông báo */
+  padding: 5px 10px;
+  border-radius: 5px;
+  display: inline-block;
+}
+
+/* Chat body */
 .chat-body {
-  max-height: 400px; /* Điều chỉnh chiều cao tối đa */
+  padding: 20px !important;
+  flex: 1; /* Chiếm toàn bộ không gian còn lại */
   overflow-y: auto; /* Cho phép cuộn dọc */
   display: flex;
   flex-direction: column; /* Sắp xếp tin nhắn theo cột */
+  justify-content: flex-end; /* Đẩy tin nhắn xuống dưới */
+  background-color: #ecf0f1; /* Màu nền nhẹ */
+  min-height: 0; /* Đảm bảo flex không bị lỗi trên một số trình duyệt */
 }
 
-/* Đảm bảo tin nhắn mới nhất ở dưới cùng */
-.chat-body {
-  justify-content: flex-end; /* Đẩy nội dung xuống dưới */
+/* Tin nhắn */
+.message-right,
+.message-left {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px;
 }
 
-/* Style cho tin nhắn */
+/* Loại bỏ margin-bottom cho tin nhắn cuối cùng */
+.message-right:last-child,
+.message-left:last-child {
+  margin-bottom: 0; /* Loại bỏ khoảng cách dưới của tin nhắn cuối */
+}
+
 .message-right {
-  text-align: right;
-  margin-left: auto;
-  max-width: 70%;
+  align-items: flex-end; /* Căn phải */
+  margin-right: 0; /* Đảm bảo không có margin bên phải */
 }
 
 .message-left {
-  text-align: left;
-  margin-right: auto;
-  max-width: 70%;
+  align-items: flex-start; /* Căn trái */
 }
 
+/* Tinh chỉnh nội dung tin nhắn */
 .message-content {
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 10px;
-  background-color: #f1f1f1;
+  max-width: 70%; /* Giới hạn chiều rộng tối đa của tin nhắn */
+  padding: 10px 15px;
+  border-radius: 15px;
+  background-color: #ffffff; /* Màu nền tin nhắn mặc định */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng nhẹ */
+  position: relative;
+  word-wrap: break-word; /* Đảm bảo xuống dòng nếu nội dung dài */
+  overflow-wrap: break-word; /* Hỗ trợ trên các trình duyệt mới */
+}
+
+/* Đảm bảo tin nhắn bên phải sát khung */
+.message-right .message-content {
+  background-color: #3498db; /* Màu nền tin nhắn của người gửi (bệnh nhân) */
+  color: #ffffff; /* Màu chữ trắng */
+  margin-right: 0; /* Loại bỏ khoảng cách bên phải */
+}
+
+.message-left .message-content {
+  background-color: #ffffff; /* Màu nền tin nhắn của người nhận (nhân viên) */
+  color: #2c3e50; /* Màu chữ tối */
+}
+
+.message-content strong {
+  font-size: 0.9rem;
+  display: block;
+}
+
+.message-content span {
+  font-size: 0.8rem;
+  opacity: 0.7;
+  margin-left: 5px;
+}
+
+.message-content p {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.4; /* Khoảng cách dòng */
+  word-wrap: break-word; /* Đảm bảo xuống dòng nếu nội dung dài */
+  overflow-wrap: break-word; /* Hỗ trợ trên các trình duyệt mới */
+  white-space: normal; /* Cho phép xuống dòng tự nhiên */
+}
+
+/* Chat footer */
+.chat-footer {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px; /* Giảm padding để tiết kiệm không gian */
+  background-color: #f9f9f9; /* Màu nền footer */
+  border-top: 1px solid #ddd; /* Đường viền trên */
+}
+
+.chat-footer textarea {
+  flex: 1; /* Chiếm toàn bộ không gian còn lại */
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  resize: none; /* Không cho phép thay đổi kích thước */
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+  height: 40px; /* Chiều cao cố định */
+  line-height: 20px; /* Căn chỉnh dòng */
+  overflow-y: hidden; /* Ẩn thanh cuộn dọc */
+}
+
+/* Loại bỏ mũi tên lên/xuống trên các trình duyệt */
+.chat-footer textarea::-webkit-scrollbar {
+  display: none; /* Ẩn thanh cuộn trên Chrome, Safari */
+}
+
+.chat-footer textarea {
+  -ms-overflow-style: none; /* Ẩn thanh cuộn trên IE, Edge */
+  scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+}
+
+.chat-footer textarea:focus {
+  border-color: #3498db; /* Màu viền khi focus */
+}
+
+.chat-footer button {
+  margin-left: 10px;
+  padding: 10px 20px;
+  background-color: #3498db; /* Màu nền nút */
+  color: #ffffff; /* Màu chữ trắng */
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.chat-footer button:hover {
+  background-color: #2980b9; /* Màu nền khi hover */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-wrapper {
+    flex-direction: column;
+    height: auto;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .chat-body {
+    max-height: 300px; /* Giảm chiều cao trên mobile */
+    padding: 15px 0 0 15px; /* Điều chỉnh padding trên mobile */
+  }
+
+  .chat-footer {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .chat-footer textarea {
+    width: 100%;
+    height: 50px;
+  }
+
+  .chat-footer button {
+    width: 100%;
+    margin-left: 0;
+  }
 }

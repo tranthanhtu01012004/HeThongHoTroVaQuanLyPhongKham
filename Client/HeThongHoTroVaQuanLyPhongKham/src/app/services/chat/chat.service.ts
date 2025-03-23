@@ -20,11 +20,13 @@ export class ChatService {
   private notificationSubject = new BehaviorSubject<string>('');
   private activePatientsSubject = new BehaviorSubject<number[]>([]);
   private chatPatientsSubject = new BehaviorSubject<number[]>([]);
+  private connectionStateSubject = new BehaviorSubject<boolean>(false); // Theo dõi trạng thái kết nối
 
   public messages$ = this.messagesSubject.asObservable();
   public notification$ = this.notificationSubject.asObservable();
   public activePatients$ = this.activePatientsSubject.asObservable();
   public chatPatients$ = this.chatPatientsSubject.asObservable();
+  public connectionState$ = this.connectionStateSubject.asObservable(); // Observable để theo dõi trạng thái kết nối
 
   constructor(private authService: AuthService) {
     this.hubConnection = new signalR.HubConnectionBuilder()
@@ -47,22 +49,23 @@ export class ChatService {
     try {
       await this.hubConnection.start();
       console.log('Connected to SignalR');
+      this.connectionStateSubject.next(true); // Cập nhật trạng thái kết nối
 
       this.hubConnection.on('ReceiveMessage', (message: ChatMessage) => {
-        console.log('Received message:', message); // Debug
+        console.log('Received message:', message);
         const currentMessages = this.messagesSubject.value;
-        this.messagesSubject.next([...currentMessages, message]); // Thêm tin nhắn vào cuối mảng
+        this.messagesSubject.next([...currentMessages, message]);
         this.updateChatPatients(message.senderId);
       });
 
       this.hubConnection.on('StaffJoined', (notification: string) => {
-        console.log('Staff joined:', notification); // Debug
+        console.log('Staff joined:', notification);
         this.notificationSubject.next(notification);
       });
 
       this.hubConnection.on('LoadChatHistory', (messages: ChatMessage[]) => {
-        console.log('Loaded chat history:', messages); // Debug
-        this.messagesSubject.next(messages); // Không đảo ngược mảng
+        console.log('Loaded chat history:', messages);
+        this.messagesSubject.next(messages);
         const chatPatientIds = [...new Set(messages.map(msg => msg.senderId))];
         this.updateChatPatients(chatPatientIds);
       });
@@ -76,10 +79,11 @@ export class ChatService {
       });
 
       this.hubConnection.on('Error', (error: string) => {
-        console.error('SignalR Error:', error); // Debug
+        console.error('SignalR Error:', error);
       });
     } catch (err) {
       console.error('Error connecting to SignalR:', err);
+      this.connectionStateSubject.next(false);
       setTimeout(() => this.startConnection(), 5000);
     }
   }
@@ -98,18 +102,36 @@ export class ChatService {
 
   public async stopConnection() {
     await this.hubConnection.stop();
+    this.connectionStateSubject.next(false);
     console.log('Disconnected from SignalR');
   }
 
-  public sendMessageToStaff(maBenhNhan: number, message: string) {
-    this.hubConnection.invoke('SendMessageToStaff', maBenhNhan, message);
+  private async ensureConnection(): Promise<void> {
+    if (this.hubConnection.state !== signalR.HubConnectionState.Connected) {
+      console.log('Connection not ready, waiting...');
+      await new Promise<void>((resolve) => {
+        const subscription = this.connectionState$.subscribe((isConnected) => {
+          if (isConnected) {
+            subscription.unsubscribe();
+            resolve();
+          }
+        });
+      });
+    }
   }
 
-  public joinChat(maNhanVien: number, maBenhNhan: number) {
-    this.hubConnection.invoke('JoinChat', maNhanVien, maBenhNhan);
+  public async sendMessageToStaff(maBenhNhan: number, message: string) {
+    await this.ensureConnection();
+    await this.hubConnection.invoke('SendMessageToStaff', maBenhNhan, message);
   }
 
-  public sendMessageToPatient(maNhanVien: number, maBenhNhan: number, message: string) {
-    this.hubConnection.invoke('SendMessageToPatient', maNhanVien, maBenhNhan, message);
+  public async joinChat(maNhanVien: number, maBenhNhan: number) {
+    await this.ensureConnection();
+    await this.hubConnection.invoke('JoinChat', maNhanVien, maBenhNhan);
+  }
+
+  public async sendMessageToPatient(maNhanVien: number, maBenhNhan: number, message: string) {
+    await this.ensureConnection();
+    await this.hubConnection.invoke('SendMessageToPatient', maNhanVien, maBenhNhan, message);
   }
 }

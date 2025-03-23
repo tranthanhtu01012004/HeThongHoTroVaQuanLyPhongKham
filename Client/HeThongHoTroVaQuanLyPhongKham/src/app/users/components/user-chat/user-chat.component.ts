@@ -22,7 +22,7 @@ import { CommonModule } from '@angular/common';
   encapsulation: ViewEncapsulation.None
 })
 export class UserChatComponent implements OnInit, OnDestroy, AfterViewChecked {
-  @ViewChild('chatBody') chatBody!: ElementRef; // Tham chiếu đến phần tử chat-body
+  @ViewChild('chatBody') chatBody!: ElementRef;
 
   messages: ChatMessage[] = [];
   notification: string = '';
@@ -31,7 +31,7 @@ export class UserChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   constructor(private chatService: ChatService, private authService: AuthService) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     if (!this.authService.isAuthenticated()) {
       console.error('User not authenticated');
       return;
@@ -43,7 +43,16 @@ export class UserChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       return;
     }
 
-    this.chatService.joinChat(0, this.maTaiKhoan);
+    // Chờ kết nối SignalR hoàn tất trước khi gọi joinChat
+    await new Promise<void>((resolve) => {
+      this.chatService.connectionState$.subscribe((isConnected) => {
+        if (isConnected) {
+          resolve();
+        }
+      });
+    });
+
+    await this.chatService.joinChat(0, this.maTaiKhoan);
 
     this.chatService.messages$.subscribe(messages => {
       console.log('Messages updated:', messages);
@@ -57,12 +66,12 @@ export class UserChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   ngAfterViewChecked() {
-    this.scrollToBottom(); // Cuộn xuống dưới sau mỗi lần cập nhật giao diện
+    this.scrollToBottom();
   }
 
-  sendMessage() {
+  async sendMessage() {
     if (this.newMessage.trim() && this.maTaiKhoan) {
-      this.chatService.sendMessageToStaff(this.maTaiKhoan, this.newMessage);
+      await this.chatService.sendMessageToStaff(this.maTaiKhoan, this.newMessage);
       this.newMessage = '';
     }
   }

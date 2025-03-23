@@ -7,11 +7,12 @@ import { ApiResponse } from '../../../commons/ApiResponse';
 import { HttpErrorResponse } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { NotificationComponent } from '../../../users/components/notification/notification.component';
 
 @Component({
   selector: 'app-admin-chat',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NotificationComponent],
   templateUrl: './admin-chat.component.html',
   styleUrls: [
     './admin-chat.component.css',
