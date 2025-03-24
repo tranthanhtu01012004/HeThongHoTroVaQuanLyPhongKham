@@ -62,6 +62,24 @@ namespace HeThongHoTroVaQuanLyPhongKham.Controllers
             }
         }
 
+        [HttpGet("patient/{id:int}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetLichHenByMaBenhNhan(int id)
+        {
+            try
+            {
+                return Ok(ApiResponse<LichHenDTO>.Success(await _lichHenService.GetByMaBenhNhan(id), $"Đã lấy danh sách lịch hẹn với mã bệnh nhân [{id}]."));
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(ApiResponse<LichHenDTO>.Fail(ex.Message));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ApiResponse<LichHenDTO>.Fail(ex.Message));
+            }
+        }
+
         [HttpPatch("{id:int}/status")]
         [Authorize(Roles = "BacSi")]
         public async Task<IActionResult> UpdateTrangThai([FromRoute] int id, [FromBody] LichHenUpdateDTO dto)

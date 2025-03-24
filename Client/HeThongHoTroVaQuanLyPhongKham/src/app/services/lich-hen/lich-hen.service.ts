@@ -41,6 +41,10 @@ export class LichHenService extends BaseApiService {
     return this.http.get<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/${id}`);
   }
 
+  getLichHenByMaBenhNhan(maBenhNhan: number): Observable<ApiResponse<ILichHen>> {
+    return this.http.get<ApiResponse<ILichHen>>(`${this.apiBaseUrl}${this.endpoint}/patient/${maBenhNhan}`);
+  }
+
   getLichHenByMaHoSoYTe(id: number): Observable<ApiResponse<any[]>> {
     return this.http.get<ApiResponse<any[]>>(`${this.apiBaseUrl}${this.endpoint}/${id}/lich-hen`);
   }

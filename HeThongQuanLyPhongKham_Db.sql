@@ -341,8 +341,8 @@ GO
 
 -- Chèn dữ liệu vào tbl_tai_khoan
 INSERT INTO tbl_tai_khoan (maVaiTro, tenDangNhap, matKhau) VALUES
-    (1, 'admin', '$2a$11$tefBETGZk1g2HGBIKWtMOu6gnsC9Pk/1BkakgDKBjavu4iXxjPMgK'),	-- QuanLy -- pass: admin001
-    (2, 'bsnguyen', '$2a$11$3AiR4BJPF.oYRN6kcYHBxeQnrpOdk6iyhYgVLf89PWIWjnUcv0Xwq'),	-- BacSi -- pass: bsnguyen001
+    (1, 'admin', '$2a$11$tefBETGZk1g2HGBIKWtMOu6gnsC9Pk/1BkakgDKBjavu4iXxjPMgK'),	-- QuanLy -- pass: admin1111
+    (2, 'bsnguyen', '$2a$11$3AiR4BJPF.oYRN6kcYHBxeQnrpOdk6iyhYgVLf89PWIWjnUcv0Xwq'),	-- BacSi -- pass: bsnguyen1111
     (2, 'bsmatdo', 'eye2023'),                -- BacSi
     (2, 'bstimngo', 'heart123'),              -- BacSi
     (2, 'bsnhivu', 'kid2023'),                -- BacSi

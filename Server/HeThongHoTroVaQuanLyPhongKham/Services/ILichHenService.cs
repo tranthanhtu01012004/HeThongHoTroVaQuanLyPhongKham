@@ -14,5 +14,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
         Task<LichHenDTO> UpdateTrangThaiAsync(LichHenUpdateDTO dto);
         Task<LichHenDTO> AddForPatientAsync(LichHenCreateDTO dto);
         Task<LichHenDTO> UpdateAsync(LichHenForUpdateDTO dto);
+        Task<LichHenDTO> GetByMaBenhNhan(int maBenhNhan);
     }
 }
