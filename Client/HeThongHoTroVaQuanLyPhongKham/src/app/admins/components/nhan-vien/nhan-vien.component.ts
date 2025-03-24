@@ -196,23 +196,25 @@ export class NhanVienComponent {
   }
 
   luuThongTinNhanVien() {
-    const giaTriForm = this.formThongTinNhanVien.value;
+    const formValue = this.formThongTinNhanVien.value;
   
-    if (this.cheDoChinhSuaNhanVien && this.nhanVienDangChon?.maNhanVien) {
-      // Khi chỉnh sửa: Không gửi tenDangNhap và matKhau
-      const nhanVien: INhanVien = {
-        maNhanVien: this.nhanVienDangChon.maNhanVien, // Đảm bảo maNhanVien luôn có giá trị
-        ten: giaTriForm.ten,
-        soDienThoai: giaTriForm.soDienThoai,
-        caLamViec: giaTriForm.caLamViec || undefined,
-        chuyenMon: giaTriForm.chuyenMon,
-        tenDangNhap: this.nhanVienDangChon.tenDangNhap,
-        matKhau: this.nhanVienDangChon.matKhau,
-        maVaiTro: Number(giaTriForm.maVaiTro),
-        maTaiKhoan: this.nhanVienDangChon.maTaiKhoan || 0
-      };
+    const maNhanVien = this.formThongTinNhanVien.get('maNhanVien')?.value || 0;
   
-      this.nhanVienService.updateService(this.nhanVienDangChon.maNhanVien, nhanVien).subscribe({
+    const nhanVien: INhanVien = {
+      maNhanVien: maNhanVien,
+      ten: formValue.ten,
+      soDienThoai: formValue.soDienThoai,
+      caLamViec: formValue.caLamViec || undefined,
+      chuyenMon: formValue.chuyenMon,
+      tenDangNhap: formValue.tenDangNhap || '',
+      matKhau: formValue.matKhau || null,
+      maVaiTro: Number(formValue.maVaiTro) || 0,
+      maTaiKhoan: 0
+    };
+  
+    if (this.cheDoChinhSuaNhanVien) {
+      // Chế độ chỉnh sửa
+      this.nhanVienService.updateService(maNhanVien, nhanVien).subscribe({
         next: (response: ApiResponse<INhanVien>) => {
           if (response.status) {
             this.thongBaoService.showSuccess('Cập nhật nhân viên thành công!');
@@ -225,19 +227,7 @@ export class NhanVienComponent {
         error: (err: HttpErrorResponse) => this.xuLyLoi(err)
       });
     } else {
-      // Khi thêm mới: Gửi đầy đủ các trường
-      const nhanVien: INhanVien = {
-        maNhanVien: 0,
-        ten: giaTriForm.ten,
-        soDienThoai: giaTriForm.soDienThoai,
-        caLamViec: giaTriForm.caLamViec || undefined,
-        chuyenMon: giaTriForm.chuyenMon,
-        tenDangNhap: giaTriForm.tenDangNhap,
-        matKhau: giaTriForm.matKhau || null,
-        maVaiTro: Number(giaTriForm.maVaiTro),
-        maTaiKhoan: 0
-      };
-  
+      // Chế độ thêm mới
       this.nhanVienService.createService(nhanVien).subscribe({
         next: (response: ApiResponse<INhanVien>) => {
           if (response.status) {

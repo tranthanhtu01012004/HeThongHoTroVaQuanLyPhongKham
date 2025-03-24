@@ -1,0 +1,71 @@
+<div class="chat-wrapper">
+  <h2 class="section--title mt-2">QUẢN LÝ CHAT VỚI BỆNH NHÂN</h2>
+  <app-notification></app-notification>
+  <div class="recent--patients">
+    <!-- Sidebar danh sách bệnh nhân -->
+    <h3>Danh sách chat</h3>
+    <div class="table table-striped" style="width: 80%;">
+      <table>
+        <thead>
+          <tr>
+            <th>Mã tài khoản</th>
+            <th>Tên bệnh nhân</th>
+            <th>Trạng thái</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let patient of chatPatientList" 
+              (click)="selectPatient(patient.maTaiKhoan)"
+              [class.selected]="patient.maTaiKhoan === selectedPatientId">
+            <td>{{ patient.maTaiKhoan || 'Chưa có mã' }}</td>
+            <td>{{ patient.ten || 'Chưa có tên' }}</td>
+            <td>
+              <span *ngIf="isPatientActive(patient.maTaiKhoan)" class="status">Đang chat</span>
+              <span *ngIf="!isPatientActive(patient.maTaiKhoan) && patient.maTaiKhoan !== undefined" class="status offline">Không hoạt động</span>
+            </td>
+            <td class="td-custom">
+              <button class="btn btn-warning" (click)="selectPatient(patient.maTaiKhoan)">
+                <span class="lock-icon"></span>
+                Chat
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Phần hiển thị chat -->
+    <div *ngIf="selectedPatientId !== null; else noChat" class="form-container" style="width: 80%;">
+      <div>
+        <h3>Chat với khách hàng</h3>
+      </div>
+      <div class="chat-body" #chatBody>
+        <div *ngFor="let msg of messages" [ngClass]="{'message-right': msg.senderId === maNhanVien, 'message-left': msg.senderId !== maNhanVien}">
+          <div class="message-content">
+            <strong>{{ msg.senderName }}</strong> <span>({{ msg.timestamp | date:'short' }})</span>
+            <p>{{ msg.message }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <textarea [(ngModel)]="newMessage" (keyup.enter)="sendMessage()" placeholder="Nhập tin nhắn..." class="form-control"></textarea>
+      </div>
+      <div class="form-group">
+        <button (click)="sendMessage()" class="btn btn-success">Gửi</button>
+      </div>
+    </div>
+
+    <!-- Template khi chưa chọn chat -->
+    <ng-template #noChat>
+      <div class="form-container" style="width: 80%;">
+        <div>
+          <h3>Chưa chọn cuộc chat</h3>
+        </div>
+        <div class="chat-body">
+          <p>Vui lòng chọn một bệnh nhân để bắt đầu chat.</p>
+        </div>
+      </div>
+    </ng-template>
+  </div>
+</div>

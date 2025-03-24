@@ -1,0 +1,192 @@
+/* Tinh chỉnh phần chat-body */
+.chat-body {
+  max-height: 400px; /* Giới hạn chiều cao để cuộn */
+  overflow-y: auto; /* Cuộn dọc */
+  padding: 20px;
+  background-color: #f9f9f9; /* Nền nhạt để tạo độ tương phản */
+  border-radius: 8px; /* Bo góc */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end; /* Tin nhắn mới nhất ở dưới cùng */
+  border: 1px solid #e0e0e0; /* Viền nhẹ */
+  scroll-behavior: smooth; /* Cuộn mượt mà */
+  scrollbar-width: thin; /* Thanh cuộn mỏng (Firefox) */
+  scrollbar-color: #5073fb #e0e0e0; /* Màu thanh cuộn (Firefox) */
+  min-height: 0; /* Đảm bảo flex không bị lỗi trên một số trình duyệt */
+}
+
+/* Tùy chỉnh thanh cuộn cho Webkit (Chrome, Safari) */
+.chat-body::-webkit-scrollbar {
+  width: 8px; /* Chiều rộng thanh cuộn */
+}
+
+.chat-body::-webkit-scrollbar-track {
+  background: #e0e0e0; /* Màu nền của thanh cuộn */
+  border-radius: 8px;
+}
+
+.chat-body::-webkit-scrollbar-thumb {
+  background: #5073fb; /* Màu của thanh cuộn */
+  border-radius: 8px;
+}
+
+.chat-body::-webkit-scrollbar-thumb:hover {
+  background: #405dc9; /* Màu khi hover */
+}
+
+/* Tin nhắn */
+.message-right,
+.message-left {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 15px; /* Khoảng cách giữa các tin nhắn */
+}
+
+/* Loại bỏ margin-bottom cho tin nhắn cuối cùng */
+.message-right:last-child,
+.message-left:last-child {
+  margin-bottom: 0; /* Loại bỏ khoảng cách dưới của tin nhắn cuối */
+}
+
+.message-right {
+  align-items: flex-end; /* Căn phải */
+  margin-right: 0; /* Đảm bảo không có margin bên phải */
+}
+
+.message-left {
+  align-items: flex-start; /* Căn trái */
+}
+
+/* Tinh chỉnh nội dung tin nhắn */
+.message-content {
+  position: relative;
+  word-wrap: break-word; /* Đảm bảo xuống dòng nếu nội dung dài */
+  overflow-wrap: break-word; /* Hỗ trợ trên các trình duyệt mới */
+  border-radius: 15px;
+  background-color: #ffffff; /* Màu nền tin nhắn mặc định */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Hiệu ứng bóng nhẹ */
+  padding: 10px 15px;
+}
+
+/* Tinh chỉnh tên người gửi và thời gian */
+.message-content strong {
+  font-size: 14px;
+  color: #333; /* Màu chữ đậm */
+  display: block;
+}
+
+.message-content span {
+  font-size: 12px;
+  color: #6c757d; /* Màu thời gian nhạt */
+  margin-left: 5px;
+}
+
+/* Tinh chỉnh nội dung tin nhắn */
+.message-content p {
+  margin: 0;
+  padding: 10px 15px;
+  border-radius: 15px; /* Bo góc tin nhắn */
+  font-size: 14px;
+  line-height: 1.4; /* Khoảng cách dòng */
+  background-color: #ffffff; /* Màu nền tin nhắn mặc định */
+  color: #2c3e50; /* Màu chữ tối */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* Đổ bóng nhẹ */
+  transition: background-color 0.3s; /* Hiệu ứng chuyển màu */
+  word-wrap: break-word; /* Đảm bảo xuống dòng nếu nội dung dài */
+  overflow-wrap: break-word; /* Hỗ trợ trên các trình duyệt mới */
+  white-space: normal; /* Cho phép xuống dòng tự nhiên */
+}
+
+/* Tin nhắn bên trái (bệnh nhân) */
+.message-left .message-content p {
+  background-color: #e9ecef; /* Nền xám nhạt */
+  color: #333; /* Màu chữ */
+}
+
+/* Tin nhắn bên phải (nhân viên) */
+.message-right .message-content p {
+  background-color: #5073fb; /* Nền xanh dương */
+  color: #fff; /* Màu chữ trắng */
+}
+
+/* Hiệu ứng hover cho tin nhắn */
+.message-content p:hover {
+  opacity: 0.9; /* Hơi mờ khi hover */
+}
+
+/* Đảm bảo khoảng cách giữa các tin nhắn */
+.message-content + .message-content {
+  margin-top: 10px;
+}
+
+/* Các phần khác */
+h3 {
+  width: 80%;
+}
+
+.recent--patients {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Form group */
+.form-group {
+  margin-top: 10px;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  resize: none; /* Không cho phép thay đổi kích thước */
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+  height: 40px; /* Chiều cao cố định */
+  line-height: 20px; /* Căn chỉnh dòng */
+  overflow-y: hidden; /* Ẩn thanh cuộn dọc */
+}
+
+/* Loại bỏ mũi tên lên/xuống trên các trình duyệt */
+.form-group textarea::-webkit-scrollbar {
+  display: none; /* Ẩn thanh cuộn trên Chrome, Safari */
+}
+
+.form-group textarea {
+  -ms-overflow-style: none; /* Ẩn thanh cuộn trên IE, Edge */
+  scrollbar-width: none; /* Ẩn thanh cuộn trên Firefox */
+}
+
+.form-group textarea:focus {
+  border-color: #5073fb; /* Màu viền khi focus */
+}
+
+.form-group button {
+  padding: 10px 20px;
+  background-color: #5073fb; /* Màu nền nút */
+  color: #ffffff; /* Màu chữ trắng */
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.3s ease;
+}
+
+.form-group button:hover {
+  background-color: #405dc9; /* Màu nền khi hover */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .chat-body {
+    max-height: 300px; /* Giảm chiều cao trên mobile */
+    padding: 15px 0 0 15px; /* Điều chỉnh padding trên mobile */
+  }
+
+  .form-group textarea {
+    height: 50px;
+  }
+}

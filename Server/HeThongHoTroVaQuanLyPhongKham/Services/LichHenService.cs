@@ -325,5 +325,12 @@ namespace HeThongHoTroVaQuanLyPhongKham.Services
             Console.WriteLine($"Tổng tiền cuối cùng: {tongTien}");
             return tongTien;
         }
+
+        public async Task<LichHenDTO> GetByMaBenhNhan(int maBenhNhan)
+        {
+            return _lichHenMapping.MapEntityToDto( 
+                await _lichHenRepository.GetQueryable()
+                .FirstOrDefaultAsync(lh => lh.MaBenhNhan == maBenhNhan));
+        }
     }
 }

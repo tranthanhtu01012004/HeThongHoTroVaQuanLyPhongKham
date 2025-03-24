@@ -3,6 +3,7 @@ using HeThongHoTroVaQuanLydonThuoc.Services;
 using HeThongHoTroVaQuanLyPhongKham.Data;
 using HeThongHoTroVaQuanLyPhongKham.Dtos;
 using HeThongHoTroVaQuanLyPhongKham.Dtos.HeThongHoTroVaQuanLyPhongKham.DTOs;
+using HeThongHoTroVaQuanLyPhongKham.Hubs;
 using HeThongHoTroVaQuanLyPhongKham.Mappers;
 using HeThongHoTroVaQuanLyPhongKham.Middlewares;
 using HeThongHoTroVaQuanLyPhongKham.Models;
@@ -17,6 +18,9 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// SignalR
+builder.Services.AddSignalR();
+
 // Connection
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DbConnection"))
@@ -29,6 +33,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Http client
 builder.Services.AddHttpClient();
 
 // Dependency Injection
@@ -85,6 +90,7 @@ builder.Services.AddScoped<IPhongKhamService, PhongKhamService>();
 builder.Services.AddScoped<INhanVienService, NhanVienService>();
 builder.Services.AddScoped<IBenhNhanService, BenhNhanService>();
 builder.Services.AddScoped<IBaoCaoService, BaoCaoService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IMLService, MLService>();
 
 // Đăng ký IPasswordHasher
@@ -92,13 +98,15 @@ builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 
 // Cấu hình CORS
 // Tai lieu tham khao: https://learn.microsoft.com/en-us/aspnet/core/security/cors?view=aspnetcore-9.0
+// Cấu hình CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", builder =>
+    options.AddPolicy("AllowSpecificOrigins", builder =>
     {
-        builder.AllowAnyOrigin()
+        builder.WithOrigins("http://localhost:4200")
                .AllowAnyMethod()
-               .AllowAnyHeader();
+               .AllowAnyHeader()
+               .AllowCredentials(); // Hỗ trợ credentials (SignalR + JWT)
     });
 });
 
@@ -118,8 +126,22 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(builder.Configuration["Jwt:SecretKey"]))
         };
-    }
-);
+
+        // Cấu hình SignalR để lấy token từ query string
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                var accessToken = context.Request.Query["access_token"];
+                var path = context.HttpContext.Request.Path;
+                if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chatHub"))
+                {
+                    context.Token = accessToken;
+                }
+                return Task.CompletedTask;
+            }
+        };
+    });
 
 var app = builder.Build();
 
@@ -130,10 +152,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 // Enable CORS
-app.UseCors("AllowAll");
+app.UseCors("AllowSpecificOrigins");
 
 app.UseAuthentication(); // Xác thực JWT 
 
@@ -144,5 +166,5 @@ app.UseMiddleware<AuthorizationMiddleware>(); // Kiểm tra quyền tùy chỉnh
 app.UseAuthorization(); // Áp dụng policy của ASP.NET Core
 
 app.MapControllers();
-
+app.MapHub<ChatHub>("/chatHub");
 app.Run();

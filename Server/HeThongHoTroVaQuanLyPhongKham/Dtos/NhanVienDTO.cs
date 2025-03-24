@@ -6,7 +6,6 @@ namespace HeThongHoTroVaQuanLyPhongKham.Dtos
     {
         public int MaNhanVien { get; set; }
 
-        [Range(1, int.MaxValue, ErrorMessage = "Mã tài khoản phải là số dương nếu có")]
         public int? MaTaiKhoan { get; set; }
 
         [Required(ErrorMessage = "Tên nhân viên là bắt buộc")]

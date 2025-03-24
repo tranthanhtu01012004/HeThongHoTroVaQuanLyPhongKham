@@ -143,7 +143,7 @@ export class HoSoYTeComponent implements OnInit {
     });
 
     this.formKetQuaXetNghiem = this.fb.group({
-      maKetQuaXetNghiem: [0],
+      maKetQua: [0],
       maHoSoYTe: [0],
       tenXetNghiem: ['', Validators.required],
       ketQua: ['', Validators.required],
@@ -569,7 +569,7 @@ dongYCapNhat(): void {
     this.dangSuaKetQuaXetNghiem = true;
     this.ketQuaXetNghiemDangChon = ketQua;
     this.formKetQuaXetNghiem.patchValue({
-      maKetQuaXetNghiem: ketQua.maKetQua,
+      maKetQua: ketQua.maKetQua || 0,
       maHoSoYTe: this.chiTietHoSo?.maHoSoYTe,
       tenXetNghiem: ketQua.tenXetNghiem,
       ketQua: ketQua.ketQua,
@@ -584,9 +584,17 @@ dongYCapNhat(): void {
       return;
     }
 
-    const ketQua: IKetQuaXetNghiem = this.formKetQuaXetNghiem.value;
-    if (this.dangSuaKetQuaXetNghiem && this.ketQuaXetNghiemDangChon?.maKetQua) { 
-      this.ketQuaXetNghiemService.updateService(this.ketQuaXetNghiemDangChon.maKetQua, ketQua).subscribe({
+  const formValue = this.formKetQuaXetNghiem.value;
+  const maKetQua = this.formKetQuaXetNghiem.get('maKetQua')?.value || 0;
+  const ketQua: IKetQuaXetNghiem = {
+    maKetQua: maKetQua,
+    maHoSoYTe: formValue.maHoSoYTe,
+    tenXetNghiem: formValue.tenXetNghiem,
+    ketQua: formValue.ketQua,
+    ngayXetNghiem: formValue.ngayXetNghiem
+  };
+    if (this.dangSuaKetQuaXetNghiem) { 
+      this.ketQuaXetNghiemService.updateService(ketQua.maKetQua, ketQua).subscribe({
         next: (response: ApiResponse<IKetQuaXetNghiem>) => {
           if (response.status) {
             this.notificationService.showSuccess('Cập nhật kết quả xét nghiệm thành công!');
