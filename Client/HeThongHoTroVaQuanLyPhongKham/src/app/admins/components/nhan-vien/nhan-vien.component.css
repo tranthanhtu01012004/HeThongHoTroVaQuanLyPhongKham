@@ -1,0 +1,71 @@
+.lock-icon {
+    display: none;
+    margin-right: 5px;
+  }
+  
+  .locked .lock-icon {
+    display: inline-block;
+  }
+  
+  .locked .lock-icon::before {
+    content: '\f023'; /* FontAwesome lock icon */
+    font-family: 'Font Awesome 6 Free';
+    font-weight: 900;
+    font-size: 20px;
+  }
+  
+  button[disabled], a.locked {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+ /* Tùy chỉnh select */
+.form-control {
+  width: 100%;
+  padding: 10px 15px;
+  font-size: 16px;
+  font-family: 'Arial', sans-serif;
+  border: 1px solid #dcdcdc;
+  border-radius: 5px;
+  background-color: #ffffff;
+  color: #5073fb; /* Màu chữ chính được áp dụng trực tiếp */
+  appearance: none; /* Tắt giao diện mặc định */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  position: relative;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  /* Thêm mũi tên tùy chỉnh */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23333' width='18px' height='18px'%3E%3Cpath d='M7 10l5 5 5-5z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 12px;
+}
+
+/* Hiệu ứng khi hover hoặc focus */
+.form-control:hover,
+.form-control:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  outline: none;
+}
+
+/* Tùy chỉnh option */
+.form-control option {
+  padding: 10px;
+  background-color: #ffffff;
+  color: #333;
+}
+
+/* Đảm bảo span bên trong option được hiển thị đúng */
+.form-control option span {
+  display: inline-block;
+  color: red; /* Màu đỏ cho tên vai trò, áp dụng trực tiếp */
+}
+
+/* Khi option được chọn */
+.form-control option:checked {
+  background-color: #f0f0f0;
+  font-weight: 500;
+}

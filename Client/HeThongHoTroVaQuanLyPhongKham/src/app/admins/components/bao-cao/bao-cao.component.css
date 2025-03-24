@@ -1,0 +1,11 @@
+mat-card {
+    margin: 20px;
+    padding: 20px;
+    text-align: center;
+  }
+  
+  ngx-charts-bar-vertical, ngx-charts-pie-chart {
+    display: block;
+    margin: auto;
+  }
+  

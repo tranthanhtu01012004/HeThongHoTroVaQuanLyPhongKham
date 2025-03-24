@@ -1,0 +1,99 @@
+<div class="sidebar">
+  <ul class="sidebar--items">
+    <li>
+      <a class="no-hover">
+        <span class="sidebar--item cus">
+          Bạn đang truy cập với vai trò: <span style="color: red;">{{ role }}</span>
+        </span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/admin/bao-cao" routerLinkActive="active">
+        <span class="icon icon-1"><i class="ri-layout-grid-line"></i></span>
+        <span class="sidebar--item">Báo cáo/ Thống kê</span>
+      </a>
+    </li>
+    <li>
+      <a routerLink="/admin/dich-vu-y-te" routerLinkActive="active">
+        <span class="icon icon-3"><i class="fa-solid fa-notes-medical"></i></span>
+        <span class="sidebar--item" style="white-space: nowrap;">Dịch vụ y tế</span>
+      </a>
+    </li>
+    <li class="permission-check">
+      <a [routerLink]="hasPermission('QuanLy') ? '/admin/phong-kham' : null" 
+         routerLinkActive="active" 
+         [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
+        <span class="icon icon-2"><i class="fa-solid fa-house-chimney-medical"></i></span>
+        <span class="sidebar--item"><span class="lock-icon"></span>Phòng khám</span>
+      </a>
+    </li>
+    <li class="permission-check">
+      <a [routerLink]="hasPermission('QuanLy') ? '/admin/nhan-vien' : null" 
+         routerLinkActive="active" 
+         [ngClass]="{'disabled-link': !hasPermission('QuanLy')}">
+        <span class="icon icon-2"><i class="fa-solid fa-users"></i></span>
+        <span class="sidebar--item"><span class="lock-icon"></span>Nhân viên</span>
+      </a>
+    </li>
+    <li class="sidebar--item-wrapper">
+      <input type="checkbox" id="lich-hen-toggle" class="sidebar--toggle" hidden/>
+    
+      <label for="lich-hen-toggle" class="sidebar--parent">
+        <span class="icon icon-3"><i class="fa-solid fa-calendar-check"></i></span>
+        <span class="sidebar--item" style="white-space: nowrap;">Quản lý lịch hẹn</span>
+      </label>
+    
+      <ul class="sidebar--submenu" *ngIf="hasPermission(['QuanLy', 'BacSi', 'YTa', 'LeTan', 'NhanVienHanhChinh'])">
+        <li style="margin-top: 10px;">
+          <a [routerLink]="['/admin/lich-hen']"
+             [ngClass]="{'disabled-link': !hasPermission(['QuanLy', 'BacSi', 'YTa', 'LeTan', 'NhanVienHanhChinh'])}"
+             routerLinkActive="active">
+             <span class="icon icon-2"><i class="fa-solid fa-list"></i></span>
+            <span class="sidebar--item" style="white-space: nowrap;">Danh sách lịch</span>
+          </a>
+        </li>
+    
+        <li>
+          <a [routerLink]="['/admin/loc-lich-hen']"
+             [ngClass]="{'disabled-link': !hasPermission(['QuanLy', 'BacSi', 'YTa', 'LeTan', 'NhanVienHanhChinh'])}"
+             routerLinkActive="active">
+             <span class="icon icon-2"><i class="fa-solid fa-filter"></i></span>
+            <span class="sidebar--item" style="white-space: nowrap;">Lọc lịch hẹn</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+    <li style="margin-top: 10px;">
+      <a [routerLink]="hasPermission(['QuanLy', 'BacSi', 'DuocSi']) ? '/admin/thuoc' : null"
+        [ngClass]="{'disabled-link': !hasPermission(['QuanLy', 'BacSi', 'DuocSi'])}"
+        routerLinkActive="active">
+        <span class="icon icon-3"><i class="fa-solid fa-capsules"></i></span>
+        <span class="sidebar--item" style="white-space: nowrap;">Quản lý thuốc</span>
+      </a>
+    </li>
+    <li>
+      <a [routerLink]="hasPermission(['QuanLy','BacSi','YTa','TroLyBacSy','NhanVienHanhChinh','KyThuatVienXetNghiem']) ? '/admin/ho-so-y-te' : null"
+        [ngClass]="{'disabled-link': !hasPermission(['QuanLy','BacSi','YTa','TroLyBacSy','NhanVienHanhChinh','KyThuatVienXetNghiem'])}"
+        routerLinkActive="active">
+        <span class="icon icon-3"><i class="fa-solid fa-book-medical"></i></span>
+        <span class="sidebar--item" style="white-space: nowrap;">Hồ sơ y tế</span>
+      </a>
+    </li>
+    <li>
+      <a [routerLink]="hasPermission(['QuanLy','KeToan','NhanVienHanhChinh']) ? '/admin/hoa-don' : null"
+        [ngClass]="{'disabled-link': !hasPermission(['QuanLy','KeToan','NhanVienHanhChinh'])}"
+        routerLinkActive="active">
+        <span class="icon icon-3"><i class="fa-solid fa-book-medical"></i></span>
+        <span class="sidebar--item" style="white-space: nowrap;">Quản lý hóa đơn</span>
+      </a>
+    </li>
+  </ul>
+  <ul class="sidebar--bottom-items">
+    <li>
+      <a href="#" (click)="logout()">
+        <span class="icon icon-8"><i class="ri-logout-box-r-line"></i></span>
+        <span class="sidebar--item">Logout</span>
+      </a>
+    </li>
+  </ul>
+</div>

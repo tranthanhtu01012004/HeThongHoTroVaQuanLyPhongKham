@@ -1,0 +1,91 @@
+<style>
+    .filter-form {
+        display: flex;
+        flex-direction: column;
+        width: 30%;
+    }
+    .cus {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-wrap: nowrap;
+        flex-direction: column;
+    }
+</style>
+<div class="filter-appointments">
+    <h2 class="text-center">LỌC LỊCH HẸN</h2>
+    <div class="cus">
+        <form [formGroup]="filterForm" (ngSubmit)="applyFilter()" class="filter-form">
+        <mat-form-field appearance="fill">
+            <mat-label>Ngày hẹn</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="ngayHen">
+            <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+    
+        <mat-form-field appearance="fill">
+            <mat-label>Tên nhân viên</mat-label>
+            <mat-select formControlName="maNhanVien">
+            <mat-option value="">Tất cả</mat-option>
+            <mat-option *ngFor="let nv of danhSachNhanVien" [value]="nv.maNhanVien">
+                {{ nv.ten }}
+            </mat-option>
+            </mat-select>
+        </mat-form-field>
+    
+        <mat-form-field appearance="fill">
+            <mat-label>Phòng khám</mat-label>
+            <mat-select formControlName="maPhong">
+            <mat-option value="">Tất cả</mat-option>
+            <mat-option *ngFor="let pk of danhSachPhongKham" [value]="pk.maPhongKham">
+                {{ pk.loai }}
+            </mat-option>
+            </mat-select>
+        </mat-form-field>
+    
+        <button mat-raised-button color="primary" type="submit" class="mb-3">Lọc</button>
+        <button mat-raised-button type="button" (click)="resetFilter()" class="mb-5">Xóa lọc</button>
+        </form>
+    </div>
+    <div class="results" *ngIf="!isLoading">
+      <h3>Kết quả lọc</h3>
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Mã lịch hẹn</th>
+            <th>Tên bệnh nhân</th>
+            <th>Tên nhân viên</th>
+            <th>Dịch vụ y tế</th>
+            <th>Phòng khám</th>
+            <th>Ngày hẹn</th>
+            <th>Trạng thái</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lichHen of danhSachLichHen">
+            <td>{{ lichHen.maLichHen }}</td>
+            <td>{{ getTenBenhNhan(lichHen.maBenhNhan) }}</td>
+            <td>{{ getTenNhanVien(lichHen.maNhanVien) }}</td>
+            <td>{{ getTenDichVu(lichHen.maDichVuYTe) }}</td>
+            <td>{{ getTenPhongKham(lichHen.maPhongKham) }}</td>
+            <td>{{ lichHen.ngayHen | date: 'dd/MM/yyyy HH:mm' }}</td>
+            <td>{{ lichHen.trangThai }}</td>
+          </tr>
+          <tr *ngIf="danhSachLichHen.length === 0">
+            <td colspan="7" class="no-data">Không có lịch hẹn nào phù hợp.</td>
+          </tr>
+        </tbody>
+      </table>
+  
+      <mat-paginator
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageSizeOptions]="[5, 10, 20]"
+        [pageIndex]="currentPage - 1"
+        (page)="handlePageChange($event)"
+        showFirstLastButtons>
+      </mat-paginator>
+    </div>
+  
+    <div *ngIf="isLoading" class="loading">Đang tải dữ liệu...</div>
+  </div>

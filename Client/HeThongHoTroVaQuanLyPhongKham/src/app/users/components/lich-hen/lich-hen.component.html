@@ -1,0 +1,76 @@
+<style>
+  label {
+    color: black;
+  }
+
+  .form-group1 { 
+    margin: 15px 0; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: row;
+  }
+
+  .form-group {
+    margin: 15px 0;
+  }
+
+  button { margin: 5px; }
+
+  .form-container2 {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: nowrap;
+    flex-direction: column;
+    margin-top: 50px;
+  }
+
+  .form-container {
+    width: 25%;
+    background-color: #88ccd5;
+    padding: 50px;
+    border-radius: 20px;
+  }
+</style>
+
+<app-notification></app-notification>
+<div class="form-container2">
+  <div class="form-container">
+    <h2 class="text-center text-danger">Đặt Lịch Hẹn</h2>
+    <form [formGroup]="lichHenForm" (ngSubmit)="datLichHen()">
+      <div class="form-group" *ngIf="isTenNull">
+        <label>Họ và tên</label>
+        <input 
+          type="text" 
+          formControlName="Ten" 
+          class="form-control" 
+          placeholder="Nhập tên của bạn" 
+        />
+      </div>
+
+      <div class="form-group">
+        <label>Dịch vụ y tế</label>
+        <select formControlName="MaDichVuYTe" class="form-control">
+          <option value="">Chọn dịch vụ</option>
+          <option *ngFor="let dv of danhSachDichVu" [value]="dv.maDichVuYTe">{{ dv.ten }}</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Ngày hẹn</label>
+        <input 
+          type="datetime-local" 
+          formControlName="NgayHen" 
+          class="form-control" 
+          [min]="minDateTime" 
+          [max]="maxDateTime"
+        />
+      </div>
+      <div class="form-group1">
+        <button type="submit" class="btn btn-success" [disabled]="lichHenForm.invalid">Đặt lịch</button>
+        <button type="button" class="btn btn-secondary" (click)="lichHenForm.reset()">Hủy</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,13 @@
+<div *ngIf="notificationService.showNotification" class="notification fade" [ngClass]="{
+  'show': notificationService.showNotification,
+  'alert-success': notificationService.messageType === 'success',
+  'alert-danger': notificationService.messageType === 'error',
+  'alert-info': notificationService.messageType === 'info'
+}">
+  <div *ngFor="let message of notificationService.messages" class="notification-message">
+    {{ message }}
+  </div>
+  <button (click)="notificationService.closeNotification()" class="btn-close-sm">
+    <span class="bi bi-x"></span>
+  </button>
+</div>
