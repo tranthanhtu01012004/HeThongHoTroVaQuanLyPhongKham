@@ -1,1 +1,1 @@
-"# HeThongHoTroVaQuanLyPhongKham" 
+"“Hệ thống Quản lý Phòng khám Thông minh” gồm website quản lý (Angular 18 + ASP.NET Core .NET 8 + SQL Server) hỗ trợ quản lý bệnh nhân, bác sĩ, lịch hẹn, hồ sơ y tế và thanh toán, Tích hợp AI Random Forest cho phân tích dữ liệu, SignalR cho chat thời gian thực, RabbitMQ cho xử lý bất đồng bộ, Phát triển thêm ứng dụng desktop C# (ADO.NET) để quản lý bán hàng, kho thuốc và hóa đơn với giao diện tối ưu." 
